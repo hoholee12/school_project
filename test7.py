@@ -1,16 +1,21 @@
 # this is my homework:D
 from tweepy import *
 from urllib.request import *
-from time import *
 
 #private stuff -leave this part out when editing!!
+consumer_key="TlcvCB9srGSXjR7mWUAMdYFRm"
+consumer_secret="ecWtLw6Gf4vNDCpp3nxAgWCVyFtl5Q573sWXzNkLVY0QSb4G91"
+access_token="456669442—TV6T3YZC1Cu824HR6CHlgk0xH2jrDba72FFOOytD"
+access_token_secret="VhhagTRrh5HV9TKJZv8oajBn35usL3v95sy3hFsQDHqb7"
 
 #tweepy stuff
 auth=OAuthHandler(consumer_key,consumer_secret)
-auth.secure=True
 auth.set_access_token(access_token,access_token_secret)
-api=API(auth)
+api=API(auth_handler=auth,api_root='/1.1',secure=True)
 #print(api.me().name)
+
+api.update_status(status='hello')
+exit()
 
 #old one modified
 def prices():
