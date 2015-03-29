@@ -1,6 +1,7 @@
 # this is my homework:D
 from tweepy import *
 from urllib.request import *
+from time import *
 
 #private stuff -leave this part out when editing!!
 consumer_key="TlcvCB9srGSXjR7mWUAMdYFRm"
