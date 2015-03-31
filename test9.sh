@@ -490,7 +490,7 @@ while true; do
 	y_axis=$((random%20))
 	random=$(print_RANDOM_BYTE)
 	color=$((random%7+31))
-	echo -e "\033[2J\033[${y_axis};${x_axis}H\033[${color}m${hello}\033[0m"
+	echo -e -n "\033[2J\033[${y_axis};${x_axis}H\033[${color}m${hello}\033[0m"
 	sleep $speed
 done
 
