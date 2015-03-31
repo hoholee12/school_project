@@ -340,6 +340,7 @@ cmd8=pgrep
 cmd9=ps
 cmd10=cp
 cmd11=cut
+cmd12=tput
 cmd= # It notifies the generator how many cmds are available for check. Leave it as blank.
 
 silent_mode= # enabling this will hide errors.
@@ -485,9 +486,9 @@ if [[ ! "$hello" ]]; then
 fi
 while true; do
 	random=$(print_RANDOM_BYTE)
-	x_axis=$((random%80))
+	x_axis=$((random%$(tput cols)))
 	random=$(print_RANDOM_BYTE)
-	y_axis=$((random%25))
+	y_axis=$((random%$(tput lines)))
 	random=$(print_RANDOM_BYTE)
 	color=$((random%7+31))
 	echo -e -n "\033[2J\033[${y_axis};${x_axis}H\033[${color}m${hello}\033[0m"
