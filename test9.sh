@@ -13,7 +13,7 @@ install=0
 # launch debug_shell() at start.
 debug=0
 # Bourne-again Shell only.
-bash_only=0
+bash_only=1
 until [[ "$1" != --debug ]] && [[ "$1" != --verbose ]] && [[ "$1" != --supass ]] && [[ "$1" != --bbpass ]] && [[ "$1" != --urand ]] && [[ "$1" != --invrand ]] && [[ "$1" != --renice ]] && [[ "$1" != --install ]]; do
 	if [[ "$1" == --debug ]]; then
 		if [[ "$install" == 1 ]]; then
@@ -304,7 +304,7 @@ error(){
 	if [[ "$(echo $message | grep \")" ]]; then
 		echo -n $message | sed 's/".*//'
 		errmsg=$(echo $message | cut -d'"' -f2)
-		echo -e "\033[31m\"$errmsg\""
+		echo -e "\e[1;31m\"$errmsg\""
 	else
 		echo $message
 	fi
@@ -326,6 +326,7 @@ error(){
 if [[ "$bash_only" == 1 ]]; then
 	if [[ ! "$BASH" ]]; then
 		error Please re-run this program with BASH. \"error code 1\"
+		exit 1
 	fi
 fi
 # test9.sh
