@@ -12,6 +12,8 @@ invert_rand=1
 install=0
 # launch debug_shell() at start.
 debug=0
+# Bourne-again Shell only.
+bash_only=0
 until [[ "$1" != --debug ]] && [[ "$1" != --verbose ]] && [[ "$1" != --supass ]] && [[ "$1" != --bbpass ]] && [[ "$1" != --urand ]] && [[ "$1" != --invrand ]] && [[ "$1" != --renice ]] && [[ "$1" != --install ]]; do
 	if [[ "$1" == --debug ]]; then
 		if [[ "$install" == 1 ]]; then
@@ -299,7 +301,13 @@ long_line(){
 }
 error(){
 	message=$@
-	echo $message
+	if [[ "$(echo $message | grep \")" ]]; then
+		echo -n $message | sed 's/".*//'
+		errmsg=$(echo $message | cut -d'"' -f2)
+		echo -e "\033[31m\"$errmsg\""
+	else
+		echo $message
+	fi
 	CUSTOM_DIR=$(echo $CUSTOM_DIR | sed 's/\/$//')
 	cd /
 	for i in $(echo $CUSTOM_DIR | sed 's/\//\n/g'); do
@@ -315,6 +323,11 @@ error(){
 		date '+date: %m/%d/%y%ttime: %H:%M:%S ->'"$message"'' >> $DIR_NAME/$NO_EXTENSION.log
 	fi
 }
+if [[ "$bash_only" == 1 ]]; then
+	if [[ ! "$BASH" ]]; then
+		error Please re-run this program with BASH. \"error code 1\"
+	fi
+fi
 # test9.sh
 #
 # Copyright (C) 2013-2015  hoholee12@naver.com
