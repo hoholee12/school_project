@@ -304,7 +304,7 @@ error(){
 	if [[ "$(echo $message | grep \")" ]]; then
 		echo -n $message | sed 's/".*//'
 		errmsg=$(echo $message | cut -d'"' -f2)
-		echo -e "\e[1;31m\"$errmsg\""
+		echo -e "\e[1;31m\"$errmsg\"\e[0m"
 	else
 		echo $message
 	fi
