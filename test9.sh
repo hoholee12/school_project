@@ -325,7 +325,7 @@ error(){
 }
 if [[ "$bash_only" == 1 ]]; then
 	if [[ ! "$BASH" ]]; then
-		error Please re-run this program with BASH. \"error code 1\"
+		error Please re-run this program with BASH. \"error code 1\" #to pass the double-quote character to the error function, you must use the inverted-slash character.
 		exit 1
 	fi
 fi
@@ -475,13 +475,12 @@ bb_apg_2(){
 		done
 	fi 2>/dev/null
 	if [[ "$fail" == 1 ]]; then #the fail manager!
-		echo -e "process terminated. \e[1;31m\"error code 1\"\e[0m"
 		if [[ "$used_fopt" == 1 ]]; then
-			unset used_fopt #in such cases.
-			exit 1
-		else
+			unset used_fopt
 			return 1
 		fi
+		echo -e "process terminated. \e[1;31m\"error code 1\"\e[0m"
+		return 1
 	fi
 }
 
@@ -528,6 +527,10 @@ Roll_Down(){
 Roll_Down
 
 bb_apg_2 -f tput
+if [[ "$?" == 1 ]]; then
+	error sorry your device dont work with this. \"error code 1\"
+	exit 1
+fi
 trap "echo -e \"\033[2JI LOVE YOU\"; exit" 2
 
 speed=$1
