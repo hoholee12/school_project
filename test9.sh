@@ -488,6 +488,10 @@ bb_apg_2(){
 su_check= # root availability
 as_root(){
 	bb_apg_2 -f id tr grep sed
+	if [[ "$?" == 1 ]]; then
+		error critical command missing. run with --supass for bypassing root check. \"error code 2\"
+		exit 2
+	fi
 	su_check=0
 	if [[ "$(id | tr '(' ' ' | tr ' ' '\n' | grep uid | sed 's/uid=//g')" != 0 ]]; then
 		su_check=1
