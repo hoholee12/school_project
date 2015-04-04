@@ -354,7 +354,6 @@ cmd8=pgrep
 cmd9=ps
 cmd10=cp
 cmd11=cut
-cmd12=tput
 cmd= # It notifies the generator how many cmds are available for check. Leave it as blank.
 
 silent_mode= # enabling this will hide errors.
@@ -364,6 +363,7 @@ bb_check= # BB availability.
 bb_apg_2(){
 	if [[ "$1" == -f ]]; then
 		shift
+		used_fopt=1
 		silent_mode=1
 		if [[ "$cmd" ]]; then
 			if [[ "$cmd" -lt 0 ]]; then
@@ -476,7 +476,12 @@ bb_apg_2(){
 	fi 2>/dev/null
 	if [[ "$fail" == 1 ]]; then #the fail manager!
 		echo -e "process terminated. \e[1;31m\"error code 1\"\e[0m"
-		return 1
+		if [[ "$used_fopt" == 1 ]]; then
+			unset used_fopt #in such cases.
+			exit 1
+		else
+			return 1
+		fi
 	fi
 }
 
@@ -522,6 +527,7 @@ Roll_Down(){
 }
 Roll_Down
 
+bb_apg_2 -f tput
 trap "echo -e \"\033[2JI LOVE YOU\"; exit" 2
 
 speed=$1
