@@ -83,6 +83,8 @@ try:
 					exit()
 except IndexError:
 	help()
+except KeyboardInterrupt:
+	exit()
 except FileNotFoundError:
 	print("there is no such thing as '",argv[1],"'")
 	exit(1)
