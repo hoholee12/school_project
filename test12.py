@@ -1,7 +1,7 @@
 #encryptor/decryptor program by hoholee12@naver.com
 #1337 biches.
 #i do know there are lots of vulnerabilities with this method. this is just for fun.
-from sys import argv
+from sys import *
 def encrypt(f):
 	with open(f,'r') as result:
 		arr=[]
