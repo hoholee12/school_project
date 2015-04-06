@@ -539,7 +539,7 @@ Roll_Down(){
 }
 Roll_Down
 
-bb_apg_2 -f tput
+bb_apg_2 -f stty
 if [[ "$?" == 1 ]]; then
 	error sorry your device dont work with this. \"error code 1\"
 	exit 1
@@ -556,9 +556,9 @@ if [[ ! "$hello" ]]; then
 fi
 while true; do
 	random=$(print_RANDOM_BYTE)
-	x_axis=$((random%$(tput cols)))
+	x_axis=$((random%$(stty size | awk '{print $2}' 2>/dev/null)))
 	random=$(print_RANDOM_BYTE)
-	y_axis=$((random%$(tput lines)))
+	y_axis=$((random%$(stty size | awk '{print $1}' 2>/dev/null)))
 	random=$(print_RANDOM_BYTE)
 	color=$((random%7+31))
 	echo -e -n "\033[2J\033[${y_axis};${x_axis}H\033[${color}m${hello}\033[0m"
