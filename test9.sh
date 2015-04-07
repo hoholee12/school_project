@@ -554,9 +554,10 @@ fi
 if [[ ! "$hello" ]]; then
 	hello="Hello, World!"
 fi
+count=$(echo $hello | wc -c)
 while true; do
 	random=$(print_RANDOM_BYTE)
-	x_axis=$((random%$(stty size | awk '{print $2}' 2>/dev/null)))
+	x_axis=$((random%$(($(stty size | awk '{print $2}' 2>/dev/null)-count))))
 	random=$(print_RANDOM_BYTE)
 	y_axis=$((random%$(stty size | awk '{print $1}' 2>/dev/null)))
 	random=$(print_RANDOM_BYTE)
