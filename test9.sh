@@ -544,7 +544,13 @@ if [[ "$?" == 1 ]]; then
 	error sorry your device dont work with this. \"error code 1\"
 	exit 1
 fi
-trap "echo -e \"\033[2JI LOVE YOU\"; exit" 2
+trap "echo -e \"\e[2JI LOVE YOU\"; exit" 2
+
+if [[ "$1" == '--ghost' ]]; then
+	shift
+	ghost=1; echo ghosting effect is ON!
+	sleep 1
+fi
 
 speed=$1
 hello=$2
@@ -555,15 +561,29 @@ if [[ ! "$hello" ]]; then
 	hello="Hello, World!"
 fi
 count=$(echo $hello | wc -c)
-while true; do
-	random=$(print_RANDOM_BYTE)
-	x_axis=$((random%$(($(stty size | awk '{print $2}' 2>/dev/null)-count))))
-	random=$(print_RANDOM_BYTE)
-	y_axis=$((random%$(stty size | awk '{print $1}' 2>/dev/null)))
-	random=$(print_RANDOM_BYTE)
-	color=$((random%7+31))
-	echo -e -n "\033[2J\033[${y_axis};${x_axis}H\033[${color}m${hello}\033[0m"
-	sleep $speed
-done
+if [[ "$ghost" == 1 ]]; then
+	echo -e "\e[2J"
+	while true; do
+		random=$(print_RANDOM_BYTE)
+		x_axis=$((random%$(($(stty size | awk '{print $2}' 2>/dev/null)-count))))
+		random=$(print_RANDOM_BYTE)
+		y_axis=$((random%$(stty size | awk '{print $1}' 2>/dev/null)))
+		random=$(print_RANDOM_BYTE)
+		color=$((random%7+31))
+		echo -e -n "\e[${y_axis};${x_axis}H\e[${color}m${hello}\e[0m"
+		sleep $speed
+	done
+else
+	while true; do
+		random=$(print_RANDOM_BYTE)
+		x_axis=$((random%$(($(stty size | awk '{print $2}' 2>/dev/null)-count))))
+		random=$(print_RANDOM_BYTE)
+		y_axis=$((random%$(stty size | awk '{print $1}' 2>/dev/null)))
+		random=$(print_RANDOM_BYTE)
+		color=$((random%7+31))
+		echo -e -n "\e[2J\e[${y_axis};${x_axis}H\e[${color}m${hello}\e[0m"
+		sleep $speed
+	done
+fi
 
 exit 0 #EOF
