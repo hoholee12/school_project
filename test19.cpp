@@ -3,7 +3,7 @@ using namespace std;
 
 class myintstack{
 private:
-	int *p=new int[10];
+	int p[10];
 	int tos; //top index of stack
 public:
 	myintstack(){for(int i=0;i<10;i++){
