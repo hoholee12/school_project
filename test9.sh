@@ -596,7 +596,7 @@ if [[ ! "$hello" ]]; then
 fi
 count=$(echo $hello | wc -c)
 if [[ "$ghost" == 1 ]]; then
-	echo -e "\e[2J"
+	#echo -e "\e[2J"
 	while true; do
 		random=$(print_RANDOM_BYTE)
 		x_axis=$((random%$(($(stty size | awk '{print $2}' 2>/dev/null)-count))))
