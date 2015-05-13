@@ -19,17 +19,12 @@ int main(int argc, char* argv[]){
 		array[i]=rand()%size;
 	}
 	
-	/*a very generic algorithm*/
-	bool click=false;
-	while(1){
-		for(int i=1;i<size;i++){
-			if(array[i-1]>array[i]){
-				swap(array[i-1],array[i]);
-				click=true;
-			}
+	/*advanced algorithm*/
+	//approx. 150ms faster than test20.cpp with 10000 random numbers.
+	for(int i=0;i<size;i++){
+		for(int j=i+1;j<size;j++){
+			if(array[i]>array[j])swap(array[i],array[j]);
 		}
-		if(click==false)break;
-		click=false;
 	}
 	//print
 	for(int i=0;i<size;i++){
