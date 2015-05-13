@@ -1,6 +1,7 @@
 #include<iostream>
 #include<cstdlib>
 #include<ctime>
+#include<vector>
 using namespace std;
 
 void swap(int &a,int &b){
@@ -14,7 +15,7 @@ int main(int argc, char* argv[]){
 	else option=0;
 	srand((unsigned)time(0));
 	const int size=option;
-	int array[size];
+	int *array=new int[size];
 	for(int i=0;i<size;i++){
 		array[i]=rand()%size;
 	}
@@ -35,5 +36,6 @@ int main(int argc, char* argv[]){
 	for(int i=0;i<size;i++){
 		cout<<array[i]<<' ';
 	}
+	delete [] array;
 	return 0;
 }
