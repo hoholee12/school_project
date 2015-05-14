@@ -2,10 +2,12 @@
 #include<cstdlib>
 #include<ctime>
 #include<vector>
+
 #ifdef _WIN32
 #include<conio.h>
 #else
 #include<ncurses.h>
+#include<unistd.h>
 #endif
 using namespace std;
 
@@ -31,7 +33,7 @@ int main(int argc, char** argv){
 	for(int i=0;i<size;i++){
 		for(int j=i+1;j<size;j++){
 			count++;
-			if(count%(rand()%1000+1)==0){//improve performance. +1 to avoid dividing by zero.
+			if(count%(rand()%(size*(size/10))+1)==0){//improve performance. +1 to avoid dividing by zero.
 				cout<<"\rcounting: "<<count<<" cycles";
 				cout.flush();}
 			if(array[i]>array[j])swap(array[i],array[j]);
