@@ -41,6 +41,10 @@ int main(int argc, char** argv){
 	cout.flush();
 	char input;
 	cout<<endl<<"count finished. view generated?(y/n)";
+#ifndef _WIN32
+	cin.clear();
+	cin.ignore(32767,'\n');
+#endif
 	input=getch();
 	if(input=='y'){
 		//print
