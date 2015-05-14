@@ -2,6 +2,11 @@
 #include<cstdlib>
 #include<ctime>
 #include<vector>
+#ifdef _WIN32
+#include<conio.h>
+#else
+#include<ncurses.h>
+#endif
 using namespace std;
 
 void swap(int &a,int &b){
@@ -9,9 +14,9 @@ void swap(int &a,int &b){
 	a=b;b=temp;
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char** argv){
 	static int option;
-	if(argv[1])option=atol(argv[1]);
+	if(argv[1])option=atoi(argv[1]);
 	else option=0;
 	srand((unsigned)time(0));
 	const int size=option;
@@ -22,8 +27,13 @@ int main(int argc, char* argv[]){
 	
 	/*a very generic algorithm*/
 	bool click=false;
+	int count=0;
 	while(1){
 		for(int i=1;i<size;i++){
+			count++;
+			if(count%(rand()%1000+1)==0){//improve performance. +1 to avoid dividing by zero.
+				cout<<"\rcounting: "<<count<<" cycles";
+				cout.flush();}
 			if(array[i-1]>array[i]){
 				swap(array[i-1],array[i]);
 				click=true;
@@ -32,10 +42,17 @@ int main(int argc, char* argv[]){
 		if(click==false)break;
 		click=false;
 	}
-	//print
-	for(int i=0;i<size;i++){
-		cout<<array[i]<<' ';
-	}
+	cout<<"\rcounting: "<<count<<" cycles";
+	cout.flush();
+	char input;
+	cout<<endl<<"count finished. view generated?(y/n)";
+	cin>>input;
+	if(input=='y'){
+		//print
+		for(int i=0;i<size;i++){
+			cout<<array[i]<<'\t';
+		}
+	}else cout<<endl<<"aborted.";
 	delete [] array;
 	return 0;
 }
