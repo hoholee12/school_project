@@ -29,7 +29,7 @@ int main(int argc, char** argv){
 	
 	/*a very generic algorithm*/
 	bool click=false;
-	int count=0;
+	long long count=0;
 	while(1){
 		for(int i=1;i<size;i++){
 			count++;

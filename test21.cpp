@@ -29,7 +29,7 @@ int main(int argc, char** argv){
 	
 	/*advanced algorithm*/
 	//approx. 1.5 times faster, almost half less cycle count.
-	int count=0;
+	long long count=0;
 	for(int i=0;i<size;i++){
 		for(int j=i+1;j<size;j++){
 			count++;
