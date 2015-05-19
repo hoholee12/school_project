@@ -21,14 +21,14 @@ public:
 			stuff[i]=s1[i];
 		}
 		for(int i=0; i<size;i++){
-			for(int j=0; j<size;i++){
+			for(int j=0; j<size;j++){
 				if(stuff[i]==s2[j]){
-					stuff[i]=NULL; //null
+					stuff[i]=0; //null
 				}
 			}
 		}
 		for(int i=0; i<size;i++){
-			if(stuff[i])retSize++;
+			if(stuff[i]!=0)retSize++;
 		}
 		return stuff;
 	}
@@ -47,11 +47,14 @@ int main(){
 		cout<<stuff[i]<<' ';
 	}
 	delete [] stuff;
-	cout<<"x[]-y[]";
-	int retSize=0;
-	int *stuff2=ArrayUtility2::remove(x,y,5,retSize);
-	cout<<retSize<<"chars"<<endl;
-	
-	delete [] stuff2;
+	cout<<endl<<"x[]-y[]";
+	static int retSize=0;
+	stuff=ArrayUtility2::remove(x,y,5,retSize);
+	cout<<" "<<retSize<<"chars"<<endl;
+	for(int i=0; i<retSize;i++){
+		cout<<stuff[i]<<' ';
+	}
+	cout<<endl;
+	delete [] stuff;
 	return 0;
 }
