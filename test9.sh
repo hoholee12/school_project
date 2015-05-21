@@ -113,8 +113,17 @@ debug_shell(){
 	fi
 	while eval read i; do
 		case $i in
-			randtest)
-				while true; do echo -n $(print_RANDOM_BYTE); done
+			randtest | test9) #test9 version.
+				trap "echo -e \"\e[2JI LOVE YOU\"; exit" 2
+				while true; do
+					random=$(print_RANDOM_BYTE)
+					x_axis=$((random%$(($(stty size | awk '{print $2}' 2>/dev/null)-1))))
+					random=$(print_RANDOM_BYTE)
+					y_axis=$((random%$(stty size | awk '{print $1}' 2>/dev/null)))
+					random=$(print_RANDOM_BYTE)
+					color=$((random%7+31))
+					echo -e -n "\e[${y_axis};${x_axis}H\e[${color}m0\e[0m"
+				done
 			;;
 			help)
 				echo -e "this debug shell is \e[1;31mONLY\e[0m used for testing conditions inside this program!
