@@ -1,7 +1,11 @@
 from colorama import * #tty stuff dont work on windows.
 from time import sleep
 from random import randint
+<<<<<<< HEAD
 from sys import argv #get arguments from prompt
+=======
+from sys import * #get arguments from prompt #i also need sys.exit() for covering py2exe errors!
+>>>>>>> 1aef66888dda5180bb8321ea4da7b4fbdcd1d014
 init() #initialize colorama - be sure to ask professor to install one before running this!
 color=31 #color code ranges from 31 to 37
 while 1: #loop forever

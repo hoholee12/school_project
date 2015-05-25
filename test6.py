@@ -6,7 +6,7 @@ def clear():
 
 def position(x,y):
 	print('\033['+str(y)+';'+str(x)+'H', end='')
-	
+
 def posname(x,y,name):
 	print('\033['+str(y)+';'+str(x)+'H'+str(name))
 
