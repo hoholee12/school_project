@@ -27,9 +27,22 @@ public:
 				break;
 			}
 			cout<<this->stuff[i]<<' ';
-			this->stuff[i]=0;
+			this->stuff[i]=0; //NULL
 		}
 		cout<<endl;
+	}
+	void pop(int &stuff){
+		if(!this->stuff[0]){
+			cout<<"empty."<<endl;
+		}else{
+		for(int i=0; i<INT_MAX;i++){
+			if(!this->stuff[i]){
+				stuff=this->stuff[i-1];
+				this->stuff[i-1]=0; //NULL
+				break;
+			}
+		}
+		}
 	}
 	statistics operator>>(int &avg){
 		avg=0;int j=0;
@@ -46,7 +59,7 @@ public:
 
 int main(){
 	statistics stat;
-	//stat.push(1);
+	
 	if(!stat) cout<<"no data"<<endl;
 
 	int x[5];
@@ -55,9 +68,13 @@ int main(){
 	for(int i=0;i<5;i++){ cin>>x[i];stat<<x[i];}
 	stat<<100<<200;
 	//~stat;
+	int hi;
+	stat.pop(hi);
+	cout<<hi<<'!'<<endl;
+	~stat;
 	
 	if(!stat) cout<<"no data"<<endl;
-	
+	stat<<100<<200<<100;
 	int avg;
 	stat>>avg;
 	cout<<"average = "<<avg<<endl;
