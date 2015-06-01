@@ -2,16 +2,16 @@
 #include<climits>
 using namespace std;
 
-class statistics{
+class stack{
 private:
 	int *stuff;
 public:
-	statistics(){stuff=new int [INT_MAX];}
+	stack(){stuff=new int [INT_MAX];}
 	bool operator!(){ //check if empty
 		if(!stuff[0]) return true;
 		else return false;
 	}
-	statistics operator<<(int stuff){ //push
+	stack operator<<(int stuff){ //push
 		for(int i=0; i<INT_MAX;i++){
 			if(!this->stuff[i]){
 				this->stuff[i]=stuff;
@@ -21,7 +21,7 @@ public:
 		}
 		return *this;
 	}
-	void operator~(){ //pop
+	void operator~(){ //pop all
 		for(int i=0; i<INT_MAX;i++){
 			if(!this->stuff[i]){
 				break;
@@ -31,7 +31,7 @@ public:
 		}
 		cout<<endl;
 	}
-	void pop(int &stuff){
+	stack operator>>(int &stuff){ //pop
 		if(!this->stuff[0]){
 			cout<<"empty."<<endl;
 		}else{
@@ -43,8 +43,9 @@ public:
 			}
 		}
 		}
+		return *this;
 	}
-	statistics operator>>(int &avg){
+	/*stack operator>>(int &avg){
 		avg=0;int j=0;
 		for(int &i=j; i<INT_MAX;i++){
 			if(!stuff[i]){
@@ -54,30 +55,19 @@ public:
 		}
 		avg/=j;
 		return *this;
-	}
+	}*/
 };
 
 int main(){
-	statistics stat;
-	
-	if(!stat) cout<<"no data"<<endl;
-
-	int x[5];
-	cout<<"enter five integers";
-	
-	for(int i=0;i<5;i++){ cin>>x[i];stat<<x[i];}
-	stat<<100<<200;
-	//~stat;
-	int hi;
-	stat.pop(hi);
-	cout<<hi<<'!'<<endl;
-	~stat;
-	
-	if(!stat) cout<<"no data"<<endl;
-	stat<<100<<200<<100;
-	int avg;
-	stat>>avg;
-	cout<<"average = "<<avg<<endl;
+	stack slack;
+	slack<<3<<5<<10;
+	while(1){
+		if(!slack) break;
+		int x;
+		slack>>x;
+		cout<<x<<' ';
+	}
+	cout<<endl;
 	
 	return 0;
 }
