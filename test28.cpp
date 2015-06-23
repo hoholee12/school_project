@@ -22,7 +22,7 @@ namespace gradespace{
 	
 	};
 }
-
+namespace stuff{
 using namespace gradespace::grade_wrapper;
 int printgrade(grade *test){
 	switch(*test /*just 'test' is an address to *test.*/){
@@ -49,14 +49,15 @@ int printgrade(grade *test){
 			return(1);
 	}
 	return(0);
-}
+}}
 
 int main(int argc, char **argv){
 	{using gradespace::hello;
 	hello hi;
 	//exit(0);
 	sleep(1);}
-	
+	using namespace gradespace::grade_wrapper;
+	using stuff::printgrade;
 	if(!argv[1]) argv[1]=static_cast<char *>("1337");
 	grade test=static_cast<grade>(atoi(argv[1]));
 	int result=printgrade(&test);
