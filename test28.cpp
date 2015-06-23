@@ -1,18 +1,21 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-//namespace gradespace{
-	enum grade{
-		a,
-		b,
-		c,
-		d,
-		e,
-		f
-	};
-//}
+namespace gradespace{
+	namespace grade_wrapper{
+		enum grade{
+			a,
+			b,
+			c,
+			d,
+			e,
+			f
+		};
+	}
+	
+}
 
-//using gradespace::grade;
+using namespace gradespace::grade_wrapper;
 int printgrade(grade *test){
 	switch(*test /*just 'test' is an address to *test.*/){
 		case a:
