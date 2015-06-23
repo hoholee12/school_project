@@ -1,5 +1,9 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<unistd.h> //sleep
+
+/*class does not need a wrapper
+while enum does...*/
 
 namespace gradespace{
 	namespace grade_wrapper{
@@ -12,7 +16,11 @@ namespace gradespace{
 			f
 		};
 	}
+	class hello{
+	public:
+		hello(){printf("hello!\n");}
 	
+	};
 }
 
 using namespace gradespace::grade_wrapper;
@@ -44,6 +52,11 @@ int printgrade(grade *test){
 }
 
 int main(int argc, char **argv){
+	{using gradespace::hello;
+	hello hi;
+	//exit(0);
+	sleep(1);}
+	
 	if(!argv[1]) argv[1]=static_cast<char *>("1337");
 	grade test=static_cast<grade>(atoi(argv[1]));
 	int result=printgrade(&test);
