@@ -26,9 +26,10 @@ int main(int argc, char **argv, char **envp){
 	signal(SIGTSTP, handler); //^Z pause a process
 	signal(SIGQUIT, handler); //^\ mercilessly kill
 	signal(SIGTERM, handler); // terminate
+	signal(SIGUSR1, handler); // custom
 	while((ch=getchar())){
 		if((ch>='A')&&(ch<='Z')) ::num1++;
-		else if((ch>='a')&&(ch<='z')) ::nums++;
+		else if((ch>='a')&&(ch<='z')){ ::nums++;raise(SIGUSR1);}
 	}
 	return 0;
 }
