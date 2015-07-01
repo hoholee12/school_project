@@ -22,8 +22,10 @@ void handler(int){
 static const int zero=0;
 int main(int argc, char **argv, char **envp){
 	int ch;
-	signal(SIGINT, handler); //^C keyboard interrupt
-	signal(SIGTSTP, handler); //^Z tty stop
+	signal(SIGINT, handler); //^C politely ask
+	signal(SIGTSTP, handler); //^Z pause a process
+	signal(SIGQUIT, handler); //^\ mercilessly kill
+	signal(SIGTERM, handler); // terminate
 	while((ch=getchar())){
 		if((ch>='A')&&(ch<='Z')) ::num1++;
 		else if((ch>='a')&&(ch<='z')) ::nums++;
