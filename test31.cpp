@@ -20,6 +20,10 @@ int main(){
 		char c;
 		c=getchar();
 		putchar(c);
+	}{
+		char c[100]; //there are some functions that will not work if the string format is uninitialized.
+		scanf("%s", c/* or &c[0] */);
+		printf("%s\n", c);
 	}
 	return 0;
 }
