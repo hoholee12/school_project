@@ -14,7 +14,8 @@
 
 int main(){
 	int i=3;
-	int *x=fibonacci(i);
+	using array::fibonacci;
+	int *x=fibonacci(i); //or array::fibonacci(i); if not using 'using'.
 	
 	for(int n=0; n<i;n++){
 		printf("%d ", x[n]);
