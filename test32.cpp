@@ -15,7 +15,6 @@
 int main(){
 	//unless malloc or new, everything else is on stack.
 	//by that standard, everything here is on stack.
-	string_tools asdf;
 	char a[]="fuck off"; //spawn an array		//right operand is basically a static char arr[9]="fuck off"; pre-defined even before this. also, its NOT constant.
 	//a[4]=''; empty character constant is not allowed!!
 	a[6]='a';
@@ -26,8 +25,7 @@ int main(){
 	//the above code is basically the same as the under code.
 	char *ptf="motherfucker"; //truncated
 	//printf("%d\n", a);
-	asdf.append(ptf, "SEIG HEIL HITLER ‎REICHSFüHRER-SS");
+	append(ptf, "SEIG HEIL HITLER ‎REICHSFüHRER-SS", 4);
 	printf("%s %s\n", ptr, ptf); //printf's %s needs an ADDRESS of the first character of an array.
-	
 	return 0;
 }
