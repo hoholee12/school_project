@@ -2,7 +2,6 @@
 #include<cstdio>
 #include<signal.h>
 #include<cstring>
-#include<climits>
 #include"tools.h"
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -27,7 +26,7 @@ int main(){
 	//the above code is basically the same as the under code.
 	char *ptf="motherfucker"; //truncated
 	//printf("%d\n", a);
-	asdf.append(ptf, 5, "SEIG HEIL HITLER ‎REICHSFüHRER-SS");
+	asdf.append(ptf, "SEIG HEIL HITLER ‎REICHSFüHRER-SS");
 	printf("%s %s\n", ptr, ptf); //printf's %s needs an ADDRESS of the first character of an array.
 	
 	return 0;
