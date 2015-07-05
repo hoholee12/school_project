@@ -2,10 +2,12 @@
 #include<cstdio>
 #include<signal.h>
 #include<cstring>
+#include<climits>
 #include"tools.h"
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wformat="
 //common ascii stuff
 //0~9 => 48~57
 //a~z => 97~122
@@ -14,7 +16,7 @@
 int main(){
 	//unless malloc or new, everything else is on stack.
 	//by that standard, everything here is on stack.
-
+	string_tools asdf;
 	char a[]="fuck off"; //spawn an array		//right operand is basically a static char arr[9]="fuck off"; pre-defined even before this. also, its NOT constant.
 	//a[4]=''; empty character constant is not allowed!!
 	a[6]='a';
@@ -24,7 +26,8 @@ int main(){
 	ptr[5]='d';
 	//the above code is basically the same as the under code.
 	char *ptf="motherfucker"; //truncated
-	
+	//printf("%d\n", a);
+	asdf.append(ptf, 5, "SEIG HEIL HITLER ‎REICHSFüHRER-SS");
 	printf("%s %s\n", ptr, ptf); //printf's %s needs an ADDRESS of the first character of an array.
 	
 	return 0;
