@@ -1,18 +1,10 @@
 #include<cstdlib>
 #include<cstdio>
-#include<signal.h>
 #include<cstring>
 #include"tools.h"
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wparentheses"
-#pragma GCC diagnostic ignored "-Wformat="
-//common ascii stuff
-//0~9 => 48~57
-//a~z => 97~122
-//A~Z => 65~90
 
-int main(){
+
+int main(int argc, char **argv){
 	//unless malloc or new, everything else is on stack.
 	//by that standard, everything here is on stack.
 	char a[]="fuck off"; //spawn an array		//right operand is basically a static char arr[9]="fuck off"; pre-defined even before this. also, its NOT constant.
@@ -25,7 +17,7 @@ int main(){
 	//the above code is basically the same as the under code.
 	char *ptf="motherfucker"; //truncated
 	//printf("%d\n", a);
-	append(ptf, "SEIG HEIL HITLER ‎REICHSFüHRER-SS", 4);
+	append(ptf, "SEIG HEIL HITLER ‎REICHSFüHRER-SS", (argv[1])?atoi(argv[1]):4 );
 	printf("%s %s\n", ptr, ptf); //printf's %s needs an ADDRESS of the first character of an array.
 	return 0;
 }
