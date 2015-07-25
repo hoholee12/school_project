@@ -6,11 +6,13 @@
 //#include<ctype.h> //isalpha()
 #include<type_traits>
 int main(){
-	char test[]="linux sucks bsd dick";
+	char test[]="linux sucks sucks bsd dick";
 	char *str=test; //use this method if you dont want to get some BS.
-	printf("%x\n", str); // %x -> hex address
-	strstr(str, "linux");
-	printf("%s\t%x\n", str, str);
+	printf("%d\n", str); // %x -> hex address
+	strstr(str, "sucks");
+	printf("%s\t%d\n", str, str);
+	strrstr(str, "sucks", 1);
+	printf("%s\t%d\n", str, str);
 	
 	return 0;
 }
