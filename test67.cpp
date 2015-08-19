@@ -61,9 +61,14 @@ template<typename T>void myassert(T exp){
 void my_perror(const char *str){
 	printf("%s: %s\n", str, strerror(errno));
 }
+//int hello;
+//hello=0; //this is not possible outside of function.
+
+//int hello=0; //only this works. global variable
 
 int main(int argc, char **argv){
-	errno=0; //initialize. cant do it on global because its already from extern.
+	
+	errno=0; //initialize.
 	
 	char opt; //or int
 	opterr=0; //if you dont want two error msgs popping out at the same time...
