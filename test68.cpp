@@ -72,24 +72,24 @@ void my_perror(const char *str){
 
 
 void stuff(int *hello){
-	hello=(int *)malloc(sizeof(int));
+	hello=(int *)malloc(1*sizeof(int));
 	hello[0]=420;
-
+	printf("%d\n", hello[0]);
 }
 
 void stuff2(int **hello){
-	*hello=(int *)malloc(sizeof(int));
+	*hello=(int *)malloc(1*sizeof(int));
 	*hello[0]=420;
 
 }
 
+//always declare heap inside main function.
+//if you want to do it on other function, you will have to use the double pointer to pass back to main.(otherwise segfault happens)
+
 int main(int argc, char *argv[]){
-	errno=0; //initialize.
-	
-	int *hello=0;
-	//stuff(hello); //for some reason, this one seg faults...
-	stuff2(&hello);
-	printf("%d\n", hello[0]);
+	int *hello=NULL; //best to initialize pointers with NULL
+	stuff(hello);
+	//printf("%d\n", hello[0]);
 	
 	
 	
