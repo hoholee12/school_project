@@ -94,6 +94,11 @@ void output_file(FILE *fp){
 }
 
 void testprint(char **arr){
+	static int seed_ready=0;
+	if(seed_ready!=1){
+		seed();
+		seed_ready=1;
+	}
 	int x=rand()%3;
 	int y=rand()%3;
 	printf("%c\n", arr[y][x]);
@@ -102,7 +107,6 @@ void testprint(char **arr){
 
 int main(int argc, char *argv[]){
 	errno=0;
-	seed();
 	char a[]={'a', 'b', 'c'};
 	char b[]={'d', 'e', 'f'};
 	char c[]={'g', 'h', 'i'};
