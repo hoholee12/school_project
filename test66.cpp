@@ -71,7 +71,7 @@ int main(int argc, char **argv){
 	errno=0; //initialize.
 	
 	char opt; //or int
-	while((opt=getopt(argc, argv, "lf:ai"))!=-1){
+	while((opt=getopt(argc, argv, "lf:ai"))!=-1){ //getopt returns -1 when nothing available.
 		switch(opt){
 			case 'l':
 			case 'a':

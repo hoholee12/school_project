@@ -61,33 +61,96 @@ template<typename T>void myassert(T exp){
 void my_perror(const char *str){
 	printf("%s: %s\n", str, strerror(errno));
 }
+
 //int hello;
 //hello=0; //this is not possible outside of function.
 
 //int hello=0; //only this works. global variable
 
-int main(int argc, char **argv){
+//char str[] == array of chars aka string
+//char *str[] == pointer of strings aka ??
+
+
+void stuff(int *hello){
+	hello=(int *)malloc(1*sizeof(int));
+	hello[0]=420;
+	printf("%d\n", hello[0]);
+}
+
+void stuff2(int **hello){
+	*hello=(int *)malloc(1*sizeof(int));
+	*hello[0]=420;
+
+}
+
+//always declare heap inside main function.
+//if you want to do it on other function, you will have to use the double pointer to pass back to main.(otherwise segfault happens)
+
+void output_file(FILE *fp){
+	int ch;
+	while((ch=getc(fp))!=EOF){
+		putc(ch, stdout);
+	}
+}
+
+void testprint(char **arr){
+	static int seed_ready=0;
+	if(seed_ready!=1){
+		seed();
+		seed_ready=1;
+	}
+	int x=rand()%3;
+	int y=rand()%3;
+	printf("%c\n", arr[y][x]);
+
+}
+
+int main(int argc, char *argv[]){
+	errno=0;
 	
-	errno=0; //initialize.
+	FILE *fp;
+	char opt;
 	
-	char opt; //or int
-	opterr=0; //if you dont want two error msgs popping out at the same time...
-	while((opt=getopt(argc, argv, "lf:ai"))!=-1){ //getopt returns -1 when nothing available.
-		switch(opt){
-			case 'l':
-			case 'a':
-			case 'i':
-				printf("option: %c\n", opt);
-				break;
-			case 'f':
-				printf("option: %c's argument: %s\n", opt, optarg); //current opt's argument is 'optarg' string
-				break;
-			default:
-				printf("unknown option: %c\n", optopt); //unknown opt is 'optopt' char/int
-		}
+	static int flag=0;
+	
+	
+	if(argc==1){
+		printf("Usage: a.exe [-n] filename ...\n");
+		exit(1);
 	}
 	
-	for(; optind<argc; optind++) printf("%d argument: %s\n", optind, argv[optind]);
+	while((opt=getopt(argc, argv, "n"))!=-1){ //getopt returns -1 when nothing available.
+		//printf("%d\n", opt);
+		switch(opt){
+			case 'n':
+				flag=1;
+				break;
+			default:
+				printf("unknown option: %c\n", optopt);
+		}
+	
+	}
+	
+	if(flag==1) argv++; //skip -n
+	
+	while(*(++argv)){
+		printf("\n[filename: %s]\n", *argv);
+		if((fp=fopen(*argv, "r"))==NULL){
+			perror("fopen failed");
+			exit(2);
+		}
+		output_file(fp);
+		fclose(fp);
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	return errno;
 }
