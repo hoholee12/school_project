@@ -118,7 +118,7 @@ int main(int argc, char *argv[]){
 		printf("Usage: a.exe [-n] filename ...\n");
 		exit(1);
 	}
-	
+	opterr=0; //dont print error twice!!
 	while((opt=getopt(argc, argv, "n"))!=-1){ //getopt returns -1 when nothing available.
 		//printf("%d\n", opt);
 		switch(opt){
