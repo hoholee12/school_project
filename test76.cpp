@@ -129,8 +129,8 @@ int main(int argc, char *argv[]){
 	//printf("%s\n", str);
 	putenv(str);
 	printf("%s\n", getenv("PATH"));
-	
-	
+
+
 	return errno;
 }
 
