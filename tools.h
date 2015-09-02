@@ -6,7 +6,7 @@
 
 //	stuff<<=1; => stuff*=2;
 //	stuff<<=2; => stuff*=2*2;
-//	stuff<<=2; => stuff*=2*2*2;
+//	stuff<<=3; => stuff*=2*2*2;
 /*
 *	i*2 = i<<1
 *	i*3 = (i<<1) + i
