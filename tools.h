@@ -13,6 +13,14 @@
 *	i*10 = (i<<3) + (i<<1)
 */
 
+// stdin==0, stdout==1, stderr==2
+//how to redirect stderr to stdout and grep stuff?
+/*this is how:
+*
+*	./a.out -i ready 2>&1 | grep not
+*	(a.out outputs "not ready" in stderr.)
+*/
+
 //0 1 2 3 4 5 6 7 8 9 a  b  c  d  e  f
 //0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 
