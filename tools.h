@@ -162,7 +162,7 @@ void string_delete(int){asdf.string_delete();} //unnecessary but whatever.
 #include<csignal> //unnecessary but whatever.
 void mappend(char *&a, char *b, int x=0){
 	asdf.mappend(a, b, x);
-	
+
 	//unnecessary but whatever.
 	signal(SIGINT, string_delete); //^C politely ask
 	signal(SIGTSTP, string_delete); //^Z pause a process
