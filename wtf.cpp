@@ -7,5 +7,8 @@ int main(){
 	printf("%s %s\n", getenv("LINES"), getenv("COLUMNS"));
 
 	//Heisenbug?
+	//undefined behaviour, system() sets these exports on itself. system() itself is child process.
+	//therefore NULL will return in getenv and cause all this shitty grief!!
+	//use setenv()..
 	return 0;
 }
