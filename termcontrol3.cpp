@@ -15,7 +15,7 @@ int main(){
 
 	mvprintw(row-2, 0, "this screen has %d rows and %d cols\n", row, col);
 
-
+	move(row/2, col-strlen(mesg));
 	refresh();
 	getch();
 	endwin(); //close stdscr mode bullshit happen on terminal if not called!
