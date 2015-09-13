@@ -25,8 +25,20 @@ source standard.sh --source --bbpass --supass
 #	-'x6' cyan
 #	-'x7' white
 
+#	^[ == ESC
+#	A == up, B == down, C == right, D == left
+#	^[[A		^[[B		^[[C		^[[D
+#	n=how much
+#	\e[nA		\e[nB		\e[nC		\e[nD
+
+#	\e7 - save position
+#	\e8 - restore position
+
 #MORE STUFF: http://www.braun-home.net/michael/mbedit/info/misc/VT100_commands.htm
 
 titlemate Hello, World!
+
+
+echo -e "playstation motherfucker\e7\e[18Dfuck\e8boy"
 debug_shell
 
