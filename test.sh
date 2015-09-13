@@ -36,7 +36,44 @@ source standard.sh --source --bbpass --supass
 
 #MORE STUFF: http://www.braun-home.net/michael/mbedit/info/misc/VT100_commands.htm
 
-titlemate Hello, World!
+
+
+
+#titlemate Hello, World!
+arrowkeys(){
+	#bak=$(stty -g)
+	#trap "stty $bak; return 0" 2
+	while read -rsn1 ui; do
+		case "$ui" in
+		$'\x1b')    # Handle ESC sequence.
+			# Flush read. We account for sequences for Fx keys as
+			# well. 6 should suffice far more then enough.
+			read -rsn1 -t 0.1 tmp
+			if [ "$tmp" == "[" ]; then
+				read -rsn1 -t 0.1 tmp
+			fi
+			echo $tmp
+			# Flush "stdin" with 0.1  sec timeout.
+			read -rsn5 -t 0.1
+			break
+			;;
+		*)
+			echo $tmp
+			break;
+		;;
+		esac
+	done
+}
+
+while true; do
+	loc=$(arrowkeys)
+	echo $loc
+done
+
+echo -e "playstation motherfucker\e7\e[18Dfuck\e8boy"
+debug_shell
+
+
 while read -rsn1 ui; do
     case "$ui" in
     $'\x1b')    # Handle ESC sequence.
@@ -59,8 +96,3 @@ while read -rsn1 ui; do
     q) break;;
     esac
 done
-echo
-
-echo -e "playstation motherfucker\e7\e[18Dfuck\e8boy"
-debug_shell
-
