@@ -20,7 +20,7 @@ void printbit(int arg=0, int count=8){
 	}
 }
 
-
+//int arr[SIZE]={0}; //do this and it will initialize everything! very convenient aint it?
 int main(int argc, char *argv[]){
 	printbit(atoi(argv[1]), atoi(argv[2]));
 	exit(1);
