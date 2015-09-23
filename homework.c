@@ -78,15 +78,15 @@ int advinput(){
 	char *input = (char *)calloc(1, sizeof(char));
 	scanf("%s", input); //scanf address to string goes like this...
 	if (input[0] == 'q') return 'q';
-	int var1 = atoi(input);
-	int var2 = 1;
+	int val1 = atoi(input);
+	int val2 = 1;
 	for (int i = 0; input[i]; i++){
 		if (input[i] == 'x'){
-			var2 = atoi(&input[i + 1]);
+			val2 = atoi(&input[i + 1]);
 			break;
 		}
 	}
-	return var1*var2;
+	return val1*val2;
 }
 
 typedef struct input_alt{
@@ -100,14 +100,14 @@ input_alt *advinput_alt(){
 	char *input = (char *)calloc(1, sizeof(char));
 	scanf("%s", input); //scanf address to string goes like this...
 	if (input[0] == 'q'){
-		test->var1 = 'q';
+		test->val1 = 'q';
 		return test;
 	}
-	test->var1 = atoi(input);
-	test->var2 = 1;
+	test->val1 = atoi(input)-1; //offset-1
+	test->val2 = 0; //offset-1
 	for (int i = 0; input[i]; i++){
 		if (input[i] == 'x'){
-			test->var2=atoi(&input[i + 1]);
+			test->val2=atoi(&input[i + 1])-1; //offset-1
 			break;
 		}
 	}
@@ -115,7 +115,7 @@ input_alt *advinput_alt(){
 }
 
 int userinput_alt(int **arr, int row, int col, int user){
-	int result_r = row, result_c = col, max = row*col, min = 1;
+	int result_r = row, result_c = col, max = row*col-1, min = 0; //offset-1
 	input_alt *pass;
 	printf("player%d>>", user);
 	pass = advinput_alt();
@@ -125,14 +125,14 @@ int userinput_alt(int **arr, int row, int col, int user){
 #else
 	//Sleep(1000); //1sec
 #endif
-	if (pass->var1 == 'q') return -2;
+	if (pass->val1 == 'q') return -2;
 	//input -= 48; //ascii 1 is 49 //we dont need this anymore
-	if (pass->var1>max || pass->var1<min) return -1;
-	if (pass->var2>max || pass->var2<min) return -1;
+	if (pass->val1>max || pass->val1<min) return -1;
+	if (pass->val2>max || pass->val2<min) return -1;
 
 	//printf("%dx%d", result_r, result_c);
-	if (arr[pass->var1][pass->var2] != NULL) return -1; //problem
-	arr[pass->var1][pass->var2] = user;
+	if (arr[pass->val1][pass->val2] != NULL) return -1; //problem
+	arr[pass->val1][pass->val2] = user;
 	return 0;
 }
 
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]){
 
 		user = switchuser % 2 + 1;
 		printarr_alt(arr, row, col, user);
-		for (; (inputstate = userinput(arr, row, col, user))!=0;){
+		for (; (inputstate = userinput_alt(arr, row, col, user)) != 0;){
 			switch (inputstate){
 			case -1: printarr_alt(arr, row, col, inputstate); break;
 			case -2: printstatus(arr, row, col, inputstate); break;
