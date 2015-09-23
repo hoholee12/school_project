@@ -9,11 +9,13 @@
 
 
 
-//inputstate notes:
-//user== 1,2
-//error== -1
-//quit== -2
-
+/*inputstate notes:
+	user	==	1,2
+	OOB		==	-1
+	quit	==	-2
+	typo	==	-3
+*always sort with switch statement!!
+*/
 
 
 void printarr(int **arr, int row, int col, int user){ //print 2d array
@@ -61,10 +63,13 @@ void printarr_alt(int **arr, int row, int col, int user){ //print 2d array
 			else if (arr[i][j] == 1) printf("O\t"); //player1==O
 			else if (arr[i][j] == 2) printf("X\t"); //player2==X
 		}
-		if (i == 1) switch (user){
-		case -1: printf("\t\tyou can't go there!"); break;
-		default: printf("\t\tplayer%d's turn!", user); break;
-		}
+		if (i == 1)
+			switch (user){
+			case -1: printf("\t\tyou can't go there!"); break;
+			case -2: printf("\t\tHOW DID YOU GET HERE?! xDDD"); break;
+			case -3: printf("\t\twhat?"); break;
+			default: printf("\t\tplayer%d's turn!", user); break;
+			}
 		printf("\n");
 
 	}
@@ -104,18 +109,20 @@ input_alt *advinput_alt(){
 		return test;
 	}
 	test->val1 = atoi(input)-1; //offset-1
-	test->val2 = 0; //offset-1
+	test->val2 = -1; //offset-1
 	for (int i = 0; input[i]; i++){
 		if (input[i] == 'x'){
 			test->val2=atoi(&input[i + 1])-1; //offset-1
 			break;
 		}
+		
 	}
+	if (test->val2 == -1) test->val1=-3; //typo err
 	return test;
 }
 
 int userinput_alt(int **arr, int row, int col, int user){
-	int result_r = row, result_c = col, max = row*col-1, min = 0; //offset-1
+	int result_r = row, result_c = col, max = row-1, min = 0; //offset-1
 	input_alt *pass;
 	printf("player%d>>", user);
 	pass = advinput_alt();
@@ -125,7 +132,11 @@ int userinput_alt(int **arr, int row, int col, int user){
 #else
 	//Sleep(1000); //1sec
 #endif
-	if (pass->val1 == 'q') return -2;
+	switch (pass->val1){
+	case 'q': return -2;
+	case -3: return -3;
+	}
+
 	//input -= 48; //ascii 1 is 49 //we dont need this anymore
 	if (pass->val1>max || pass->val1<min) return -1;
 	if (pass->val2>max || pass->val2<min) return -1;
@@ -203,6 +214,7 @@ int main(int argc, char *argv[]){
 			switch (inputstate){
 			case -1: printarr_alt(arr, row, col, inputstate); break;
 			case -2: printstatus(arr, row, col, inputstate); break;
+			case -3: printarr_alt(arr, row, col, inputstate); break;
 			default:;
 			}
 			//printf("inputstate:%d", inputstate);
