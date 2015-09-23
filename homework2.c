@@ -8,8 +8,10 @@
 #define ROW 10
 #define COL 10
 
+#ifdef _WIN32
 HWND hwnd;
 HDC hdc;
+#endif
 
 void seed(){
 	srand((unsigned)time(0));
@@ -22,8 +24,10 @@ typedef struct bug{
 
 
 int main(){
+#ifdef _WIN32
 	hwnd = GetForegroundWindow();
 	hdc = GetWindowDC(hwnd);
+#endif
 	seed();
 	int tile[ROW][COL] = { 0 };
 	bug lonebug = { ROW / 2, COL / 2 };
