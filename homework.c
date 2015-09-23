@@ -37,10 +37,14 @@ void printarr(int **arr, int row, int col, int user){ //print 2d array
 
 }
 
+
 int advinput(){
 	fflush(stdin); //flush any remaining cr
-	int input = getchar();
-	return input;
+	
+	char *input = (char *)calloc(1, sizeof(char));
+	scanf("%s", input); //scanf address to string goes like this...
+	if (input[0] == 'q') return 'q';
+	return atoi(input);
 }
 
 int userinput(int **arr, int row, int col, int user){
@@ -54,7 +58,7 @@ int userinput(int **arr, int row, int col, int user){
 	//Sleep(1000); //1sec
 #endif
 	if (input == 'q') return -2;
-	input -= 48; //ascii 1 is 49
+	//input -= 48; //ascii 1 is 49 //we dont need this anymore
 	if (input>max||input<min) return -1;
 	input--; //offset =input-1
 	result_r = input / col;
