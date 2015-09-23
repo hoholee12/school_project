@@ -204,6 +204,19 @@ void printstatus(int **arr, int row, int col, int inputstate, int user){
 	}
 }
 
+/*
+checkcondition properties:
+-return 1 => player1 wins
+-return 2 => player2 wins
+how simple :3
+*/
+
+int checkcondition(int **arr, int row, int col){
+	int jackpotsize = row; //obvious
+
+	return 0;
+}
+
 int main(int argc, char *argv[]){
 
 	int row=3, col=3;
@@ -216,12 +229,13 @@ int main(int argc, char *argv[]){
 
 	int **arr = NULL;
 	arr = allocarr(arr, row, col);
-	int switchuser = 0, user;
+	int switchuser = 0;
+	int user = switchuser % 2 + 1; //pre
 
 	int inputstate;
 	for (;; switchuser++){ //mainloop
 
-		user = switchuser % 2 + 1;
+		
 		printarr_alt(arr, row, col, user);
 		for (; (inputstate = userinput_alt(arr, row, col, user)) != 0;){
 			switch (inputstate){
@@ -232,6 +246,7 @@ int main(int argc, char *argv[]){
 			}
 			//printf("inputstate:%d", inputstate);
 		}
+		user = switchuser % 2 + 1;
 	}
 
 	return 0;
