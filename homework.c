@@ -196,9 +196,12 @@ char *xtarget(char *arg){ //parse string
 	return NULL;
 }
 
-void printstatus(int **arr, int row, int col, int inputstate){
-	printf("asdf");
-	if (inputstate==-2) exit(0);
+void printstatus(int **arr, int row, int col, int inputstate, int user){
+
+	if (inputstate == -2){
+		printf("you have forfeited your turn! player%d wins!\n", 3-user);
+		exit(0);
+	}
 }
 
 int main(int argc, char *argv[]){
@@ -223,7 +226,7 @@ int main(int argc, char *argv[]){
 		for (; (inputstate = userinput_alt(arr, row, col, user)) != 0;){
 			switch (inputstate){
 			case -1: printarr_alt(arr, row, col, inputstate); break;
-			case -2: printstatus(arr, row, col, inputstate); break;
+			case -2: printstatus(arr, row, col, inputstate, user); break;
 			case -3: printarr_alt(arr, row, col, inputstate); break;
 			default:;
 			}
