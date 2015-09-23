@@ -7,10 +7,10 @@
 #include<windows.h> //Sleep()
 #endif
 
-//signal notes:
-
-//error==-1
-//quit==-2
+//inputstate notes:
+//user== 1,2
+//error== -1
+//quit== -2
 
 void printarr(int **arr, int row, int col, int user){ //print 2d array
 #ifndef _WIN32
@@ -77,6 +77,11 @@ char *xtarget(char *arg){ //parse string
 	return NULL;
 }
 
+void printstatus(int **arr, int row, int col, int inputstate){
+	printf("asdf");
+	if (inputstate==-2) exit(0);
+}
+
 int main(int argc, char *argv[]){
 	int row=3, col=3;
 	if (argc == 2){
@@ -98,7 +103,7 @@ int main(int argc, char *argv[]){
 		for (; (inputstate = userinput(arr, row, col, user))!=0;){
 			switch (inputstate){
 			case -1: printarr(arr, row, col, inputstate); break;
-			case -2: exit(0); break;
+			case -2: printstatus(arr, row, col, inputstate); break;
 			default:;
 			}
 			//printf("inputstate:%d", inputstate);
