@@ -54,11 +54,11 @@ int main(){
 		for (int i = 0; i < ROW; i++){
 			for (int j = 0; j < COL; j++){
 #ifdef _WIN32
-				if (tile[i][j]) Rectangle(hdc, j*30, i*30, j*30+20, i*30+20);
-				else Ellipse(hdc, j * 30, i * 30, j * 30 + 20, i * 30 + 20);
+				if (tile[i][j]) Rectangle(hdc, j*60, i*60, j*60+40, i*60+40);
+				else Ellipse(hdc, j * 60, i * 60, j * 60 + 40, i * 60 + 40);
 #else
-				if(tile[i][j]) printf("1 ");
-				else printf("0 ");
+				if(tile[i][j]) printf("O ");
+				else printf(". ");
 #endif
 				if (tile[i][j] == 0) empty++;
 			}
@@ -70,7 +70,7 @@ int main(){
 			break;
 		}
 		//Sleep(100); //100ms
-		getchar();
+		//getchar();
 		system("cls");
 	}
 
