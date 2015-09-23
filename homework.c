@@ -37,11 +37,16 @@ void printarr(int **arr, int row, int col, int user){ //print 2d array
 
 }
 
+int advinput(){
+	fflush(stdin); //flush any remaining cr
+	int input = getchar();
+	return input;
+}
+
 int userinput(int **arr, int row, int col, int user){
 	int input = NULL, result_r = row, result_c = col, max = row*col, min = 1;
 	printf("player%d>>", user);
-	fflush(stdin); //flush any remaining cr
-	input=getchar();
+	input = advinput();
 	//printf("%c %d", input, input);
 #ifndef _WIN32
 	sleep(1); //1sec
