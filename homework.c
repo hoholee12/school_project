@@ -24,6 +24,7 @@
 	OOB		==	-1
 	quit	==	-2
 	typo	==	-3
+	str		==	-4
 *always sort with switch statement!!
 */
 
@@ -55,7 +56,7 @@ void printarr(int **arr, int row, int col, int user){ //print 2d array
 /*printarr counts generationally
 **printarr_alt counts by row*col */
 
-void printarr_alt(int **arr, int row, int col, int user){ //print 2d array
+void printarr_alt(int **arr, int row, int col, int user, const char *str=""){ //print 2d array
 #ifndef _WIN32
 	printf("\x1b[2J");
 #else
@@ -78,6 +79,7 @@ void printarr_alt(int **arr, int row, int col, int user){ //print 2d array
 			case -1: printf("\t\tyou can't go there!"); break;
 			case -2: printf("\t\tHOW DID YOU GET HERE?! xDDD"); break;
 			case -3: printf("\t\twhat?"); break;
+			case -4: printf("\t\t%s", str); break;
 			default: printf("\t\tplayer%d's turn!", user); break;
 			}
 		printf("\n");
@@ -208,11 +210,58 @@ void printstatus(int **arr, int row, int col, int inputstate, int user){
 checkcondition properties:
 -return 1 => player1 wins
 -return 2 => player2 wins
+-return 0 => nothing happens
 how simple :3
 */
 
 int checkcondition(int **arr, int row, int col){
-	int jackpotsize = row; //obvious
+	int i, j, bak, bad;
+	//row
+	for (i = 0; i < row; i++){
+		bak = arr[i][0];
+		bad = 0;
+		for (j = 1; j < col; j++){
+			if (arr[i][j] != bak){
+				bad = 1;
+				break; //not it
+				
+			}
+		}
+		if (!bad) return bak;
+	}
+	//col
+	for (i = 0; i < row; i++){
+		bak = arr[0][i];
+		bad = 0;
+		for (j = 1; j < col; j++){
+			if (arr[j][i] != bak){
+				bad = 1;
+				break; //not it
+
+			}
+		}
+		if (!bad) return bak;
+	}
+	//symmetric
+	bak = arr[0][0];
+	bad = 0;
+	for (i = 1; i < row; i++){
+		if (arr[i][i] != bak){
+			break;
+			bad = 1;
+		}
+	}
+	if (!bad) return bak;
+	bak = arr[0][row-1];
+	bad = 0;
+	for (i = 1; i < row; i++){
+		if (arr[i][row-i] != bak){
+			break;
+			bad = 1;
+		}
+	}
+	if (!bad) return bak;
+
 
 	return 0;
 }
@@ -237,6 +286,10 @@ int main(int argc, char *argv[]){
 
 		
 		printarr_alt(arr, row, col, user);
+		switch (checkcondition(arr, row, col)){
+		case 1: printarr_alt(arr, row, col, -4, "player1 wins!"); return 0;
+		case 2: printarr_alt(arr, row, col, -4, "player2 wins!"); return 0;
+		}
 		for (; (inputstate = userinput_alt(arr, row, col, user)) != 0;){
 			switch (inputstate){
 			case -1: printarr_alt(arr, row, col, inputstate); break;
@@ -246,6 +299,7 @@ int main(int argc, char *argv[]){
 			}
 			//printf("inputstate:%d", inputstate);
 		}
+		
 		user = switchuser % 2 + 1;
 	}
 
