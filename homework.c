@@ -1,3 +1,13 @@
+/*homework.c - a tic-tac-toe game!
+* Copyright (C) 2015  hoholee12@naver.com
+*
+* May be freely distributed and modified as long as copyright
+* is retained.
+*/
+
+
+
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
