@@ -1,8 +1,23 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
+#ifndef _WIN32
+#include<unistd.h> //sleep()
+#else
+#include<windows.h> //Sleep()
+#endif
+
+//signal notes:
+
+//error==-1
+//quit==-2
 
 void printarr(int **arr, int row, int col, int user){ //print 2d array
+#ifndef _WIN32
+	printf("\x1b[2J");
+#else
+	system("cls");
+#endif
 	int count = 0;
 	for (int i = 0; i<row; i++){
 		for (int j = 0; j<col; j++){
@@ -11,25 +26,37 @@ void printarr(int **arr, int row, int col, int user){ //print 2d array
 			else if (arr[i][j] == 1) printf("O\t"); //player1==O
 			else if (arr[i][j] == 2) printf("X\t"); //player2==X
 		}
-		if (i == 1) printf("\t\tplayer%d's turn!", user);
+		if (i == 1) switch(user){
+		case -1: printf("\t\tyou can't go there!"); break;
+		default: printf("\t\tplayer%d's turn!", user); break;
+		}
 		printf("\n");
 
 	}
-
+	
 
 }
 
 int userinput(int **arr, int row, int col, int user){
-	int input = NULL, result_r = row, result_c = col, max = row*col, min = 0;
-	scanf("%d", &input);
-	if (input>max) return 1;
-	else if (input<min) return 1;
+	int input = NULL, result_r = row, result_c = col, max = row*col, min = 1;
+	printf("player%d>>", user);
+	fflush(stdin); //flush any remaining cr
+	input=getchar();
+	//printf("%c %d", input, input);
+#ifndef _WIN32
+	sleep(1); //1sec
+#else
+	//Sleep(1000); //1sec
+#endif
+	if (input == 'q') return -2;
+	input -= 48; //ascii 1 is 49
+	if (input>max||input<min) return -1;
 	input--; //offset =input-1
 	result_r = input / col;
 	result_c = input % col;
 
 	//printf("%dx%d", result_r, result_c);
-	if (arr[result_r][result_c] != NULL) return 1; //problem
+	if (arr[result_r][result_c] != NULL) return -1; //problem
 	arr[result_r][result_c] = user;
 	return 0;
 }
@@ -63,19 +90,19 @@ int main(int argc, char *argv[]){
 	arr = allocarr(arr, row, col);
 	int switchuser = 0, user;
 
-	
+	int inputstate;
 	for (;; switchuser++){ //mainloop
-#ifndef _WIN32
-		printf("\x1b[2J");
-#else
-		system("cls");
-#endif
+
 		user = switchuser % 2 + 1;
 		printarr(arr, row, col, user);
-		printf("player%d>>", user);
-		for (; userinput(arr, row, col, user); printf("try again!>>"));
-
-
+		for (; (inputstate = userinput(arr, row, col, user))!=0;){
+			switch (inputstate){
+			case -1: printarr(arr, row, col, inputstate); break;
+			case -2: exit(0); break;
+			default:;
+			}
+			//printf("inputstate:%d", inputstate);
+		}
 	}
 
 	return 0;
