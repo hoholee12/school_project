@@ -70,17 +70,34 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str = ""){ 
 #else
 	system("cls");
 #endif
-	int count = 0;
+	int player1_count = 0, player2_count = 0;
 	printf("\t");
 	for (int i = 1; i <= row; i++) printf("%d\t", i);
 	printf("\n");
+
+	//preprocessing for player1_count, player2_count
+	for (int i = 0; i < row; i++){
+		for (int j = 0; j < col; j++){
+			switch (arr[i][j]){
+			case 0: break;
+			case 1: player1_count++; break;
+			case 2: player2_count++; break;
+			}
+		}
+	}
+
+	//mainloop output
 	for (int i = 0; i<row; i++){
 		printf("%d\t", i + 1);
 		for (int j = 0; j<col; j++){
-			count++;
-			if (arr[i][j] == 0) printf(".\t");
-			else if (arr[i][j] == 1) printf("O\t"); //player1==O
-			else if (arr[i][j] == 2) printf("X\t"); //player2==X
+			switch (arr[i][j]){
+			case 0: printf(".\t"); break;
+			case 1: printf("O\t"); break;
+			case 2: printf("X\t"); break;
+			}
+		}
+		if (i == 0){
+			printf("\tplayer1=%d  player2=%d  total=%d/%d", player1_count, player2_count, player1_count+player2_count, row*row);
 		}
 		if (i == 1)
 			switch (user){
