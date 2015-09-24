@@ -2,7 +2,9 @@
 #include<time.h>
 #include<stdlib.h>
 #ifdef _WIN32
-#include<windows.h>
+#include<windows.h>//hwnd, Sleep
+#else
+#include<unistd.h> //usleep
 #endif
 
 #define ROW 10
@@ -71,7 +73,12 @@ int main(){
 		}
 		//Sleep(100); //100ms
 		//getchar();
+#ifdef _WIN32
 		system("cls");
+#else
+	usleep(10000);
+	printf("\x1b[2J");
+#endif
 	}
 
 
