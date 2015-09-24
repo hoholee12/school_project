@@ -3,6 +3,7 @@
 *
 * May be freely distributed and modified as long as copyright
 * is retained.
+* except for those motherfuckers who want to steal my homework without doing any hard work - go kill yourselves!!
 */
 
 
@@ -17,6 +18,11 @@
 #include<windows.h> //Sleep()
 #endif
 
+
+typedef struct scoredat{
+	int score;
+	int count;
+}scoredat;
 
 
 /*inputstate notes:
@@ -198,13 +204,7 @@ char *xtarget(char *arg){ //parse string
 	return NULL;
 }
 
-void printstatus(int **arr, int row, int col, int inputstate, int user){
 
-	if (inputstate == -2){
-		printf("you have forfeited your turn! player%d wins!\n", 3-user);
-		exit(0);
-	}
-}
 
 /*
 checkcondition properties:
@@ -281,16 +281,36 @@ int checkcondition(int **arr, int row, int col){
 	return 0;
 }
 
-int main(int argc, char *argv[]){
+void printstatus(int inputstate, int totalplaytime = NULL, scoredat *player1 = NULL, scoredat *player2 = NULL, int user = NULL){
+	switch (inputstate){
+	case -2: printf("you have forfeited your turn! player%d wins!\n", 3 - user);
+		if (3 - user == 1) player1->score++;
+		else player2->score++;
+		break;
+	case -5: if (totalplaytime < 10 || totalplaytime>20){
+					switch (totalplaytime % 10){
+					case 1: printf("%dst round", totalplaytime); break;
+					case 2: printf("%dnd round", totalplaytime); break;
+					case 3: printf("%drd round", totalplaytime); break;
+					default: printf("%dth round", totalplaytime); break;
+					}
+				}
+			 else printf("%dth round", totalplaytime);
+			printf(", player1 score=%d", player1->score);
+			printf(", player2 score=%d", player2->score);
 
-	int row=3, col=3;
-	if (argc == 2){
-		row = atoi(argv[1]);
-		col = atoi(xtarget(argv[1]));
+			if (player1->score > player2->score) printf("\nplayer1 won by +%d points", player1->score - player2->score);
+			else if (player1->score == player2->score) printf("\nits a tie.");
+			else printf("\nplayer2 won by +%d points", player2->score - player1->score);
+
+			break;
+	default:;
+
 	}
-	if (col != row) col = row; //needed for square det
-	//printf("%d x %d\n", row, col);
+	printf("\n\n");
+}
 
+int game(int row, int col, scoredat *player1, scoredat *player2, int totalplaytime){
 	int **arr = NULL;
 	arr = allocarr(arr, row, col);
 	int switchuser = 0;
@@ -299,17 +319,17 @@ int main(int argc, char *argv[]){
 	int inputstate;
 	for (;;){ //mainloop
 
-		
+
 		printarr_alt(arr, row, col, user);
 		switch (checkcondition(arr, row, col)){
-		case 1: printarr_alt(arr, row, col, -4, "player1 wins!"); return 0;
-		case 2: printarr_alt(arr, row, col, -4, "player2 wins!"); return 0;
-		case 3: printarr_alt(arr, row, col, -4, "its a tie!"); return 0;
+		case 1: printarr_alt(arr, row, col, -4, "player1 wins!"); return 1;
+		case 2: printarr_alt(arr, row, col, -4, "player2 wins!"); return 2;
+		case 3: printarr_alt(arr, row, col, -4, "its a tie!"); return 3;
 		}
 		for (; (inputstate = userinput_alt(arr, row, col, user)) != 0;){
 			switch (inputstate){
 			case -1: printarr_alt(arr, row, col, inputstate); break;
-			case -2: printstatus(arr, row, col, inputstate, user); break;
+			case -2: printstatus(inputstate, totalplaytime, player1, player2, user); return 0;
 			case -3: printarr_alt(arr, row, col, inputstate); break;
 			default:;
 			}
@@ -318,11 +338,54 @@ int main(int argc, char *argv[]){
 		switchuser++;
 		user = switchuser % 2 + 1;
 	}
+	printf("go fuck yourselves, this code is broken!!!\n"); //you will never reach this line >:o
+	exit(123);
+	return 0;
+
+}
+
+/*game return info
+	-return 1: player1 wins
+	-return 2: player2 wins
+	-return 3: its a tie*/
+
+int main(int argc, char *argv[]){
+	scoredat *player1 = (scoredat *)calloc(1, sizeof(scoredat));
+	scoredat *player2 = (scoredat *)calloc(1, sizeof(scoredat));
+
+	//scoredat test1 = {0}; //you can also init struct using this method, how nice!
+
+	int row=3, col=3;
+	if (argc == 2){
+		row = atoi(argv[1]);
+		col = atoi(xtarget(argv[1]));
+	}
+	if (col != row) col = row; //needed for square det
+	//printf("%d x %d\n", row, col);
+	char next;
+	int totalplaytime;
+	for (totalplaytime=1;;totalplaytime++){
+		switch (game(row, col, player1, player2, totalplaytime)){
+		case 1: player1->score++; break;
+		case 2: player2->score++; break;
+		case 3: break;//tie must be processed on before this...		
+		}
+		printstatus(-5, totalplaytime, player1, player2, NULL);
+		printf("next round? Y/N:");
+		fflush(stdin);
+		next=getchar();
+		switch (next){
+		case 'y':;
+		case 'Y':;
+		case 10:break; //linefeed
+		default: return 0; //quit game
+		}
+
+	}
 
 	return 0;
 }
 
 /*TODO:
--make a struct for storing all the info
--and print it using printarr_alt and printstatus
+-still have scoredat->count lying around...maybe i can use it for internal game engine??
 */
