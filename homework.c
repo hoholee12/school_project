@@ -8,7 +8,7 @@
 
 
 
-
+#include<getopt.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
@@ -454,5 +454,6 @@ int main(int argc, char *argv[]){
 
 /*TODO:
 -still have scoredat->count lying around...maybe i can use it for internal game engine??
--some bullshit happening on freeing array on xcode platform...>:o
+-some bullshit happening on freeing array on xcode platform...>:o    -.- will fix later
+-lets do some proper parsing first, yeah?
 */
