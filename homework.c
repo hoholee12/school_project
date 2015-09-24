@@ -328,7 +328,7 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 		for (; (inputstate = userinput_alt(arr, row, col, user)) != 0;){
 			switch (inputstate){
 			case -1: printarr_alt(arr, row, col, inputstate); break;
-			case -2: printstatus(inputstate, totalplaytime, player1, player2, user); return 0;
+			case -2: printstatus(inputstate, totalplaytime, player1, player2, user); (*switchuser)++; return 0;
 			case -3: printarr_alt(arr, row, col, inputstate); break;
 			default:;
 			}
@@ -351,7 +351,8 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 int main(int argc, char *argv[]){
 	scoredat *player1 = (scoredat *)calloc(1, sizeof(scoredat));
 	scoredat *player2 = (scoredat *)calloc(1, sizeof(scoredat));
-
+	//printf("%d %d\n", player1->score, player1->count); //works
+	//exit(0);
 	//scoredat test1 = {0}; //you can also init struct using this method, how nice!
 
 	int row=3, col=3;
@@ -365,9 +366,9 @@ int main(int argc, char *argv[]){
 	int totalplaytime, switchuser=0;
 	for (totalplaytime=1;;totalplaytime++){
 		switch (game(row, col, player1, player2, totalplaytime, &switchuser)){
-		case 1: player1->score++; break;
-		case 2: player2->score++; break;
-		case 3: break;//tie must be processed on before this...		
+		case 1: player1->score++; switchuser++; break;
+		case 2: player2->score++; switchuser++; break;
+		case 3: break;//tie must be processed on printstatus before this...		
 		}
 		printstatus(-5, totalplaytime, player1, player2, NULL);
 		printf("next round? Y/N:");
