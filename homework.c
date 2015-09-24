@@ -243,7 +243,7 @@ int checkcondition(int **arr, int row, int col){
 		}
 		if ((!bad) && (bak != 0)) return bak;
 	}
-	//symmetric
+	//diagonal
 	bak = arr[0][0];
 	bad = 0;
 	for (i = 1; i < row; i++){
