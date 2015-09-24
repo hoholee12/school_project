@@ -175,7 +175,7 @@ int userinput_alt(int **arr, int row, int col, int user, Option *option){
 	advinput_alt(&pass, row); //row or col
 	//printf("%c %d", input, input);
 #ifndef _WIN32
-	sleep(1); //1sec
+	//sleep(1); //1sec
 #else
 	//Sleep(1000); //1sec
 #endif
@@ -206,7 +206,7 @@ int userinput(int **arr, int row, int col, int user){
 	input = advinput();
 	//printf("%c %d", input, input);
 #ifndef _WIN32
-	sleep(1); //1sec
+	//sleep(1); //1sec
 #else
 	//Sleep(1000); //1sec
 #endif
@@ -418,6 +418,7 @@ int main(int argc, char *argv[]){
 #ifdef _WIN32
 				Sleep(200); //0.2 seconds
 #else
+				fflush(stdout);
 				usleep(200000);
 #endif
 				printf(". ");
@@ -453,4 +454,5 @@ int main(int argc, char *argv[]){
 
 /*TODO:
 -still have scoredat->count lying around...maybe i can use it for internal game engine??
+-some bullshit happening on freeing array on xcode platform...>:o
 */
