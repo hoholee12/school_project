@@ -40,25 +40,25 @@ str		==	-4
 /*
 void printarr(int **arr, int row, int col, int user){ //print 2d array
 #ifndef _WIN32
-	printf("\x1b[2J");
+printf("\x1b[2J");
 #else
-	system("cls");
+system("cls");
 #endif
-	int count = 0;
-	for (int i = 0; i<row; i++){
-		for (int j = 0; j<col; j++){
-			count++;
-			if (arr[i][j] == 0) printf("%d\t", count);
-			else if (arr[i][j] == 1) printf("O\t"); //player1==O
-			else if (arr[i][j] == 2) printf("X\t"); //player2==X
-		}
-		if (i == 1) switch (user){
-		case -1: printf("\t\tyou can't go there!"); break;
-		default: printf("\t\tplayer%d's turn!", user); break;
-		}
-		printf("\n");
+int count = 0;
+for (int i = 0; i<row; i++){
+for (int j = 0; j<col; j++){
+count++;
+if (arr[i][j] == 0) printf("%d\t", count);
+else if (arr[i][j] == 1) printf("O\t"); //player1==O
+else if (arr[i][j] == 2) printf("X\t"); //player2==X
+}
+if (i == 1) switch (user){
+case -1: printf("\t\tyou can't go there!"); break;
+default: printf("\t\tplayer%d's turn!", user); break;
+}
+printf("\n");
 
-	}
+}
 
 
 }
@@ -99,7 +99,7 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str){ //pri
 			}
 		}
 		if (i == 0){
-			printf("\tplayer1=%d  player2=%d  total=%d/%d", player1_count, player2_count, player1_count+player2_count, row*row);
+			printf("\tplayer1=%d  player2=%d  total=%d/%d", player1_count, player2_count, player1_count + player2_count, row*row);
 		}
 		if (i == 1)
 			switch (user){
@@ -117,20 +117,20 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str){ //pri
 }
 /*
 int advinput(){
-	fflush(stdin); //flush any remaining cr
+fflush(stdin); //flush any remaining cr
 
-	char *input = (char *)calloc(1, sizeof(char));
-	scanf("%s", input); //scanf address to string goes like this...
-	if (input[0] == 'q') return 'q';
-	int val1 = atoi(input);
-	int val2 = 1;
-	for (int i = 0; input[i]; i++){
-		if (input[i] == 'x'){
-			val2 = atoi(&input[i + 1]);
-			break;
-		}
-	}
-	return val1*val2;
+char *input = (char *)calloc(1, sizeof(char));
+scanf("%s", input); //scanf address to string goes like this...
+if (input[0] == 'q') return 'q';
+int val1 = atoi(input);
+int val2 = 1;
+for (int i = 0; input[i]; i++){
+if (input[i] == 'x'){
+val2 = atoi(&input[i + 1]);
+break;
+}
+}
+return val1*val2;
 }
 */
 typedef struct input_alt{
@@ -140,15 +140,15 @@ typedef struct input_alt{
 
 int dividenum(int row){
 	int count = 0;
-	for (int i = 1;row/i; i *= 10) count++;
+	for (int i = 1; row / i; i *= 10) count++;
 	return count;
 }
 
 int advinput_alt(input_alt *pass, int row){
 	fflush(stdin); //flush any remaining cr
-	char *input=calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
-										//you should use heap memory for that.
-										//dont use more than already assigned, free() will complain about corrupted heap memory!!
+	char *input = calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
+	//you should use heap memory for that.
+	//dont use more than already assigned, free() will complain about corrupted heap memory!!
 	scanf("%s", input); //scanf address to string goes like this...
 	if (input[0] == 'q'){
 		pass->val1 = 'q';
@@ -170,7 +170,7 @@ int advinput_alt(input_alt *pass, int row){
 
 int userinput_alt(int **arr, int row, int col, int user, Option *option){
 	int result_r = row, result_c = col, max = row - 1, min = 0; //offset-1
-	input_alt pass = {0};
+	input_alt pass = { 0 };
 	printf("player%d>>", user);
 	advinput_alt(&pass, row); //row or col
 	//printf("%c %d", input, input);
@@ -201,26 +201,26 @@ int userinput_alt(int **arr, int row, int col, int user, Option *option){
 }
 /*
 int userinput(int **arr, int row, int col, int user){
-	int input = NULL, result_r = row, result_c = col, max = row*col, min = 1;
-	printf("player%d>>", user);
-	input = advinput();
-	//printf("%c %d", input, input);
+int input = NULL, result_r = row, result_c = col, max = row*col, min = 1;
+printf("player%d>>", user);
+input = advinput();
+//printf("%c %d", input, input);
 #ifndef _WIN32
-	//sleep(1); //1sec
+//sleep(1); //1sec
 #else
-	//Sleep(1000); //1sec
+//Sleep(1000); //1sec
 #endif
-	if (input == 'q') return -2;
-	//input -= 48; //ascii 1 is 49 //we dont need this anymore
-	if (input>max || input<min) return -1;
-	input--; //offset =input-1
-	result_r = input / col;
-	result_c = input % col;
+if (input == 'q') return -2;
+//input -= 48; //ascii 1 is 49 //we dont need this anymore
+if (input>max || input<min) return -1;
+input--; //offset =input-1
+result_r = input / col;
+result_c = input % col;
 
-	//printf("%dx%d", result_r, result_c);
-	if (arr[result_r][result_c] != 0) return -1; //problem
-	arr[result_r][result_c] = user;
-	return 0;
+//printf("%dx%d", result_r, result_c);
+if (arr[result_r][result_c] != 0) return -1; //problem
+arr[result_r][result_c] = user;
+return 0;
 }
 */
 int **allocarr(int **arr, int row, int col){ //allocate 2d array
@@ -396,10 +396,10 @@ void seed(){
 
 int main(int argc, char *argv[]){
 	seed();
-	scoredat player1 = {0};
-	scoredat player2 = {0};
+	scoredat player1 = { 0 };
+	scoredat player2 = { 0 };
 	//scoredat test1 = {0}; //you can also init struct using this method, how nice!
-	Option option = {0};
+	Option option = { 0 };
 	int row = 3, col = 3;
 	if (argc == 2){
 		row = atoi(argv[1]);
