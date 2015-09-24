@@ -387,8 +387,13 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 -return 2: player2 wins
 -return 3: its a tie*/
 
-int main(int argc, char *argv[]){
+void seed(){
+	srand((unsigned)time(NULL));
 
+}
+
+int main(int argc, char *argv[]){
+	seed();
 	scoredat player1 = {0};
 	scoredat player2 = {0};
 	//scoredat test1 = {0}; //you can also init struct using this method, how nice!
@@ -403,6 +408,26 @@ int main(int argc, char *argv[]){
 	char next;
 	int totalplaytime, switchuser = 0;
 	for (totalplaytime = 1;; totalplaytime++){
+		if (totalplaytime == 1){ //flip the coin!
+			printf("lets flip the coin! head is player1, tail is player2"
+				"\npress any key to start flipping!...");
+			getchar();
+			for (int i = 0; i < 3; i++){
+#ifdef _WIN32
+				Sleep(200); //0.2 seconds
+#else
+				usleep(200000);
+#endif
+				printf(". ");
+			}
+			switch (rand() % 2 + 1){
+			case 1: printf("heads.\n"); break;
+			case 2: printf("tails.\n"); switchuser++; break;
+			}
+			printf("press any key to continue...");
+			getchar();
+		}
+
 		switch (game(row, col, &player1, &player2, totalplaytime, &switchuser, &option)){
 		case 1: player1.score++; switchuser++; break;
 		case 2: player2.score++; switchuser++; break;
