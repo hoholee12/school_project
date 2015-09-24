@@ -119,9 +119,17 @@ typedef struct input_alt{
 	int val2;
 } input_alt;
 
-int advinput_alt(input_alt *pass){
+int dividenum(int row){
+	int count = 0;
+	for (int i = 1;row/i; i *= 10) count++;
+	return count;
+}
+
+int advinput_alt(input_alt *pass, int row){
 	fflush(stdin); //flush any remaining cr
-	char *input = (char *)calloc(2, sizeof(char)*2); //null terminator required for free(input) //i dont know wtf is going on >:<
+	char *input=(char *)calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
+																					//you should use heap memory for that.
+																					//dont use more than already assigned, free() will complain about corrupted heap memory!!
 	scanf("%s", input); //scanf address to string goes like this...
 	if (input[0] == 'q'){
 		pass->val1 = 'q';
@@ -137,7 +145,7 @@ int advinput_alt(input_alt *pass){
 
 	}
 	if (pass->val2 == -1) pass->val1 = -3; //typo err
-	free(input); //free memory
+	free(input);
 	return 0;
 }
 
@@ -145,7 +153,7 @@ int userinput_alt(int **arr, int row, int col, int user, Option *option){
 	int result_r = row, result_c = col, max = row - 1, min = 0; //offset-1
 	input_alt pass = {0};
 	printf("player%d>>", user);
-	advinput_alt(&pass);
+	advinput_alt(&pass, row); //row or col
 	//printf("%c %d", input, input);
 #ifndef _WIN32
 	sleep(1); //1sec
@@ -363,6 +371,7 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 -return 3: its a tie*/
 
 int main(int argc, char *argv[]){
+
 	scoredat player1 = {0};
 	scoredat player2 = {0};
 	//scoredat test1 = {0}; //you can also init struct using this method, how nice!
@@ -399,6 +408,5 @@ int main(int argc, char *argv[]){
 }
 
 /*TODO:
--bugfix input heap string not freeing properly
 -still have scoredat->count lying around...maybe i can use it for internal game engine??
 */
