@@ -321,3 +321,8 @@ int main(int argc, char *argv[]){
 
 	return 0;
 }
+
+/*TODO:
+-make a struct for storing all the info
+-and print it using printarr_alt and printstatus
+*/
