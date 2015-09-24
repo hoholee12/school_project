@@ -227,7 +227,7 @@ int checkcondition(int **arr, int row, int col){
 				
 			}
 		}
-		if (!bad) return bak;
+		if ((!bad)&&(bak!=0)) return bak;
 	}
 	//col
 	for (i = 0; i < row; i++){
@@ -240,29 +240,29 @@ int checkcondition(int **arr, int row, int col){
 
 			}
 		}
-		if (!bad) return bak;
+		if ((!bad) && (bak != 0)) return bak;
 	}
 	//symmetric
 	bak = arr[0][0];
 	bad = 0;
 	for (i = 1; i < row; i++){
 		if (arr[i][i] != bak){
-			break;
 			bad = 1;
+			break;
 		}
 	}
-	if (!bad) return bak;
+	if ((!bad) && (bak != 0)) return bak;
+	
 	bak = arr[0][row-1];
 	bad = 0;
 	for (i = 1; i < row; i++){
-		if (arr[i][row-i] != bak){
-			break;
+		if (arr[i][row-i-1] != bak){
 			bad = 1;
+			break;
 		}
 	}
-	if (!bad) return bak;
-
-
+	if ((!bad) && (bak != 0)) return bak;
+	
 	return 0;
 }
 
@@ -282,7 +282,7 @@ int main(int argc, char *argv[]){
 	int user = switchuser % 2 + 1; //pre
 
 	int inputstate;
-	for (;; switchuser++){ //mainloop
+	for (;;){ //mainloop
 
 		
 		printarr_alt(arr, row, col, user);
@@ -299,7 +299,7 @@ int main(int argc, char *argv[]){
 			}
 			//printf("inputstate:%d", inputstate);
 		}
-		
+		switchuser++;
 		user = switchuser % 2 + 1;
 	}
 
