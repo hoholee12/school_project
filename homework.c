@@ -310,11 +310,10 @@ void printstatus(int inputstate, int totalplaytime = NULL, scoredat *player1 = N
 	printf("\n\n");
 }
 
-int game(int row, int col, scoredat *player1, scoredat *player2, int totalplaytime){
+int game(int row, int col, scoredat *player1, scoredat *player2, int totalplaytime, int *switchuser){
 	int **arr = NULL;
 	arr = allocarr(arr, row, col);
-	int switchuser = 0;
-	int user = switchuser % 2 + 1; //pre
+	int user = *switchuser % 2 + 1; //pre
 
 	int inputstate;
 	for (;;){ //mainloop
@@ -335,8 +334,8 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 			}
 			//printf("inputstate:%d", inputstate);
 		}
-		switchuser++;
-		user = switchuser % 2 + 1;
+		(*switchuser)++; //no brackets will actually mean *(switchuser++) so be careful!!
+		user = *switchuser % 2 + 1;
 	}
 	printf("go fuck yourselves, this code is broken!!!\n"); //you will never reach this line >:o
 	exit(123);
@@ -363,9 +362,9 @@ int main(int argc, char *argv[]){
 	if (col != row) col = row; //needed for square det
 	//printf("%d x %d\n", row, col);
 	char next;
-	int totalplaytime;
+	int totalplaytime, switchuser=0;
 	for (totalplaytime=1;;totalplaytime++){
-		switch (game(row, col, player1, player2, totalplaytime)){
+		switch (game(row, col, player1, player2, totalplaytime, &switchuser)){
 		case 1: player1->score++; break;
 		case 2: player2->score++; break;
 		case 3: break;//tie must be processed on before this...		
