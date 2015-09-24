@@ -37,6 +37,7 @@ str		==	-4
 */
 
 //non _alt versions are all deprecated and should not be used!!
+/*
 void printarr(int **arr, int row, int col, int user){ //print 2d array
 #ifndef _WIN32
 	printf("\x1b[2J");
@@ -61,10 +62,11 @@ void printarr(int **arr, int row, int col, int user){ //print 2d array
 
 
 }
+*/
 /*printarr counts generationally
 **printarr_alt counts by row*col */
 
-void printarr_alt(int **arr, int row, int col, int user, const char *str = ""){ //print 2d array
+void printarr_alt(int **arr, int row, int col, int user, const char *str){ //print 2d array
 #ifndef _WIN32
 	printf("\x1b[2J");
 #else
@@ -113,7 +115,7 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str = ""){ 
 
 
 }
-
+/*
 int advinput(){
 	fflush(stdin); //flush any remaining cr
 
@@ -130,7 +132,7 @@ int advinput(){
 	}
 	return val1*val2;
 }
-
+*/
 typedef struct input_alt{
 	int val1;
 	int val2;
@@ -144,9 +146,9 @@ int dividenum(int row){
 
 int advinput_alt(input_alt *pass, int row){
 	fflush(stdin); //flush any remaining cr
-	char *input=(char *)calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
-																					//you should use heap memory for that.
-																					//dont use more than already assigned, free() will complain about corrupted heap memory!!
+	char *input=calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
+										//you should use heap memory for that.
+										//dont use more than already assigned, free() will complain about corrupted heap memory!!
 	scanf("%s", input); //scanf address to string goes like this...
 	if (input[0] == 'q'){
 		pass->val1 = 'q';
@@ -188,16 +190,16 @@ int userinput_alt(int **arr, int row, int col, int user, Option *option){
 
 	//this is where you can swap row & col, default should be val1=row, val2=col
 	if (option->swap == 1){
-		if (arr[pass.val2][pass.val1] != NULL) return -1; //problem
+		if (arr[pass.val2][pass.val1] != 0) return -1; //problem
 		arr[pass.val2][pass.val1] = user;
 	}
 	else{
-		if (arr[pass.val1][pass.val2] != NULL) return -1; //problem
+		if (arr[pass.val1][pass.val2] != 0) return -1; //problem
 		arr[pass.val1][pass.val2] = user;
 	}
 	return 0;
 }
-
+/*
 int userinput(int **arr, int row, int col, int user){
 	int input = NULL, result_r = row, result_c = col, max = row*col, min = 1;
 	printf("player%d>>", user);
@@ -216,14 +218,14 @@ int userinput(int **arr, int row, int col, int user){
 	result_c = input % col;
 
 	//printf("%dx%d", result_r, result_c);
-	if (arr[result_r][result_c] != NULL) return -1; //problem
+	if (arr[result_r][result_c] != 0) return -1; //problem
 	arr[result_r][result_c] = user;
 	return 0;
 }
-
+*/
 int **allocarr(int **arr, int row, int col){ //allocate 2d array
-	arr = (int **)calloc(row, sizeof(int)); //allocate row first
-	for (int i = 0; i<row; i++) arr[i] = (int *)calloc(col, sizeof(int)); //allocate cols next
+	arr = calloc(row, sizeof(int)); //allocate row first
+	for (int i = 0; i<row; i++) arr[i] = calloc(col, sizeof(int)); //allocate cols next
 
 	return arr;
 }
@@ -320,7 +322,7 @@ int checkcondition(int **arr, int row, int col){
 	return 0;
 }
 
-void printstatus(int inputstate, int totalplaytime = NULL, scoredat *player1 = NULL, scoredat *player2 = NULL, int user = NULL){
+void printstatus(int inputstate, int totalplaytime, scoredat *player1, scoredat *player2, int user){
 	switch (inputstate){
 	case -2: printf("you have forfeited your turn! player%d wins!\n", 3 - user);
 		if (3 - user == 1) player1->score++;
@@ -358,7 +360,7 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 	for (;;){ //mainloop
 
 
-		printarr_alt(arr, row, col, user);
+		printarr_alt(arr, row, col, user, "");
 		switch (checkcondition(arr, row, col)){
 		case 1: printarr_alt(arr, row, col, -4, "player1 wins!"); freearr(arr, row, col); return 1;
 		case 2: printarr_alt(arr, row, col, -4, "player2 wins!"); freearr(arr, row, col); return 2;
@@ -366,9 +368,9 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 		}
 		for (; (inputstate = userinput_alt(arr, row, col, user, option)) != 0;){
 			switch (inputstate){
-			case -1: printarr_alt(arr, row, col, inputstate); break;
+			case -1: printarr_alt(arr, row, col, inputstate, ""); break;
 			case -2: printstatus(inputstate, totalplaytime, player1, player2, user); (*switchuser)++; freearr(arr, row, col); return 0;
-			case -3: printarr_alt(arr, row, col, inputstate); break;
+			case -3: printarr_alt(arr, row, col, inputstate, ""); break;
 			default:;
 			}
 			//printf("inputstate:%d", inputstate);
@@ -433,7 +435,7 @@ int main(int argc, char *argv[]){
 		case 2: player2.score++; switchuser++; break;
 		case 3: break;//tie must be processed on printstatus before this...		
 		}
-		printstatus(-5, totalplaytime, &player1, &player2, NULL);
+		printstatus(-5, totalplaytime, &player1, &player2, 0);
 		printf("next round? Y/N:");
 		fflush(stdin);
 		next = getchar();
