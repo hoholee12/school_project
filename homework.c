@@ -210,6 +210,7 @@ void printstatus(int **arr, int row, int col, int inputstate, int user){
 checkcondition properties:
 -return 1 => player1 wins
 -return 2 => player2 wins
+-return 3 => its a tie!
 -return 0 => nothing happens
 how simple :3
 */
@@ -262,6 +263,20 @@ int checkcondition(int **arr, int row, int col){
 		}
 	}
 	if ((!bad) && (bak != 0)) return bak;
+
+	//final sequence
+	bad = 0;
+	for (i = 0; i < row; i++){
+		for (j = 0; j < col; j++){
+			if (!arr[i][j]){
+				bad = 1;
+				break;
+			}
+		
+		}
+		if (bad == 1) break;
+	}
+	if (!bad) return 3; //tie
 	
 	return 0;
 }
@@ -289,6 +304,7 @@ int main(int argc, char *argv[]){
 		switch (checkcondition(arr, row, col)){
 		case 1: printarr_alt(arr, row, col, -4, "player1 wins!"); return 0;
 		case 2: printarr_alt(arr, row, col, -4, "player2 wins!"); return 0;
+		case 3: printarr_alt(arr, row, col, -4, "its a tie!"); return 0;
 		}
 		for (; (inputstate = userinput_alt(arr, row, col, user)) != 0;){
 			switch (inputstate){
