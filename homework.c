@@ -15,7 +15,7 @@
 #else
 #include<windows.h> //Sleep()
 #endif
-
+#include<string.h>
 
 typedef struct scoredat{
 	int score;
@@ -66,7 +66,7 @@ printf("\n");
 
 void printarr_alt(int **arr, int row, int col, int user, const char *str, Option *option){ //print 2d array
 #ifndef _WIN32
-	printf("\x1b[2J");
+	printf("\x1b[2J\x1b[0;0H");
 #else
 	system("cls");
 #endif
@@ -407,7 +407,7 @@ typedef struct getopt_struct{
 void simplegetopt(int argc, char **argv, getopt_struct *ioption, getopt_struct *roption, getopt_struct *hoption){
 	for (int i = 1; i<argc; i++){
 		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
-			if (strlen(argv[i + 1])>0xFE){ fprintf(stderr, "buffer overflow!\n"); abort(1); }
+			if (strlen(argv[i + 1])>0xFE){ fprintf(stderr, "buffer overflow!\n"); abort(); }
 			ioption->on++;
 			strcpy(&ioption->optstr, argv[++i]);
 		}
