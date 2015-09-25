@@ -151,7 +151,7 @@ int dividenum(int row){
 int advinput_alt(input_alt *pass, int row){
 	fflush(stdin); //flush any remaining cr
 	char *input = calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
-	input = realloc(input, 0xFF); //fail proof *** i dont need to initialize the rest of the appending memory
+	input = realloc(input, 0xFFF); //fail proof *** i dont need to initialize the rest of the appending memory
 	//you should use heap memory for that.
 	//dont use more than already assigned, free() will complain about corrupted heap memory!!
 	scanf("%s", input); //scanf address to string goes like this...
@@ -408,7 +408,7 @@ typedef struct getopt_struct{
 void simplegetopt(int argc, char **argv, getopt_struct *ioption, getopt_struct *roption, getopt_struct *hoption){
 	for (int i = 1; i<argc; i++){
 		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
-			if (strlen(argv[i + 1])>0xFE){ fprintf(stderr, "buffer overflow!\n"); abort(); }
+			if (strlen(argv[i + 1])>0xFD){ fprintf(stderr, "buffer overflow!\n"); abort(); } //0xFE - "null terminator"
 			ioption->on++;
 			strcpy(&ioption->optstr, argv[++i]);
 		}
