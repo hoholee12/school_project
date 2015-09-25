@@ -7,8 +7,6 @@
 */
 
 
-
-#include<getopt.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
@@ -66,7 +64,7 @@ printf("\n");
 /*printarr counts generationally
 **printarr_alt counts by row*col */
 
-void printarr_alt(int **arr, int row, int col, int user, const char *str){ //print 2d array
+void printarr_alt(int **arr, int row, int col, int user, const char *str, Option *option){ //print 2d array
 #ifndef _WIN32
 	printf("\x1b[2J");
 #else
@@ -75,6 +73,12 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str){ //pri
 	int player1_count = 0, player2_count = 0;
 	printf("\t");
 	for (int i = 1; i <= row; i++) printf("%d\t", i);
+	
+	
+	
+	//input option menu here, three letters each!
+	printf("\tOptions: ");
+	if (option->swap == 1) printf("SWP ");
 	printf("\n");
 
 	//preprocessing for player1_count, player2_count
@@ -360,17 +364,17 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 	for (;;){ //mainloop
 
 
-		printarr_alt(arr, row, col, user, "");
+		printarr_alt(arr, row, col, user, "", option);
 		switch (checkcondition(arr, row, col)){
-		case 1: printarr_alt(arr, row, col, -4, "player1 wins!"); freearr(arr, row, col); return 1;
-		case 2: printarr_alt(arr, row, col, -4, "player2 wins!"); freearr(arr, row, col); return 2;
-		case 3: printarr_alt(arr, row, col, -4, "its a tie!"); freearr(arr, row, col); return 3;
+		case 1: printarr_alt(arr, row, col, -4, "player1 wins!", option); freearr(arr, row, col); return 1;
+		case 2: printarr_alt(arr, row, col, -4, "player2 wins!", option); freearr(arr, row, col); return 2;
+		case 3: printarr_alt(arr, row, col, -4, "its a tie!", option); freearr(arr, row, col); return 3;
 		}
 		for (; (inputstate = userinput_alt(arr, row, col, user, option)) != 0;){
 			switch (inputstate){
-			case -1: printarr_alt(arr, row, col, inputstate, ""); break;
+			case -1: printarr_alt(arr, row, col, inputstate, "", option); break;
 			case -2: printstatus(inputstate, totalplaytime, player1, player2, user); (*switchuser)++; freearr(arr, row, col); return 0;
-			case -3: printarr_alt(arr, row, col, inputstate, ""); break;
+			case -3: printarr_alt(arr, row, col, inputstate, "", option); break;
 			default:;
 			}
 			//printf("inputstate:%d", inputstate);
@@ -394,20 +398,69 @@ void seed(){
 
 }
 
-int main(int argc, char *argv[]){
+//user defined getopt_struct
+typedef struct getopt_struct{
+	int on;
+	char *optstr; //strcpy needs the address of it! not itself...
+} getopt_struct;
+
+void simplegetopt(int argc, char **argv, getopt_struct *ioption, getopt_struct *roption, getopt_struct *hoption){
+	for (int i = 1; i<argc; i++){
+		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
+			if (strlen(argv[i + 1])>0xFE){ fprintf(stderr, "buffer overflow!\n"); abort(1); }
+			ioption->on++;
+			strcpy(&ioption->optstr, argv[++i]);
+		}
+		else if(!strcmp(argv[i], "-r")){
+			roption->on++;
+		}
+		else if (!strcmp(argv[i], "-h")){
+			hoption->on++;
+		}
+	}
+
+}
+
+void help(int argc, char **argv, getopt_struct *ioption, getopt_struct *roption, getopt_struct *hoption){
+	fprintf(stderr, "homework.c - a tic-tac-toe game!"
+		"\nCopyright(C) 2015  hoholee12@naver.com"
+		"\nUsage: %s -i [row]x[col] -r"
+		"\n\t-i sets derterminant size by [row]x[col]"
+		"\n\t-r reverses [row][col] input ingame\n\n", argv[0]);
+
+
+	free(ioption);
+	free(roption);
+	free(hoption);
+	exit(0);
+};
+
+int main(int argc, char **argv){
+	//initial parsing
 	seed();
 	scoredat player1 = { 0 };
 	scoredat player2 = { 0 };
 	//scoredat test1 = {0}; //you can also init struct using this method, how nice!
 	Option option = { 0 };
 	int row = 3, col = 3;
-	if (argc == 2){
-		row = atoi(argv[1]);
-		col = atoi(xtarget(argv[1]));
+	getopt_struct *ioption = calloc(0xFF, sizeof(getopt_struct)); /*0x1 for int on, 0xFE for char *str*/
+	getopt_struct *roption = calloc(0xFF, sizeof(getopt_struct));
+	getopt_struct *hoption = calloc(0xFF, sizeof(getopt_struct));
+	simplegetopt(argc, argv, ioption, roption, hoption);
+	if (ioption->on > 0){
+		row = atoi(&ioption->optstr);
+		col = atoi(xtarget(&ioption->optstr));
 	}
+	if (roption->on > 0) option.swap = 1;
 	if (col != row) col = row; //needed for square det
-	//printf("%d x %d\n", row, col);
-	char next;
+	if (hoption->on > 0) help(argc, argv, ioption, roption, hoption);
+	free(ioption);
+	free(roption);
+	free(hoption);
+	if (col < 2){ fprintf(stderr, "determinant is too small!\n"); return 1;}
+	
+
+	//main game
 	int totalplaytime, switchuser = 0;
 	for (totalplaytime = 1;; totalplaytime++){
 		if (totalplaytime == 1){ //flip the coin!
@@ -439,11 +492,11 @@ int main(int argc, char *argv[]){
 		printstatus(-5, totalplaytime, &player1, &player2, 0);
 		printf("next round? Y/N:");
 		fflush(stdin);
-		next = getchar();
+		char next = getchar();
 		switch (next){
 		case 'y':;
 		case 'Y':;
-		case 10:break; //linefeed
+		case 0xA:break; //linefeed
 		default: return 0; //quit game
 		}
 
@@ -455,5 +508,4 @@ int main(int argc, char *argv[]){
 /*TODO:
 -still have scoredat->count lying around...maybe i can use it for internal game engine??
 -some bullshit happening on freeing array on xcode platform...>:o    -.- will fix later
--lets do some proper parsing first, yeah?
 */
