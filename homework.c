@@ -70,9 +70,9 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 #else
 	system("cls");
 #endif
-	int player1_count = 0, player2_count = 0;
+	int player1_count = 0, player2_count = 0, i, j;
 	printf("\t");
-	for (int i = 1; i <= row; i++) printf("%d\t", i);
+	for (i = 1; i <= row; i++) printf("%d\t", i);
 
 
 
@@ -82,8 +82,8 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 	printf("\n");
 
 	//preprocessing for player1_count, player2_count
-	for (int i = 0; i < row; i++){
-		for (int j = 0; j < col; j++){
+	for (i = 0; i < row; i++){
+		for (j = 0; j < col; j++){
 			switch (arr[i][j]){
 			case 0: break;
 			case 1: player1_count++; break;
@@ -93,9 +93,9 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 	}
 
 	//mainloop output
-	for (int i = 0; i<row; i++){
+	for (i = 0; i<row; i++){
 		printf("%d\t", i + 1);
-		for (int j = 0; j<col; j++){
+		for (j = 0; j<col; j++){
 			switch (arr[i][j]){
 			case 0: printf(".\t"); break;
 			case 1: printf("O\t"); break;
@@ -143,12 +143,13 @@ typedef struct input_alt{
 } input_alt;
 
 int dividenum(int row){
-	int count = 0;
-	for (int i = 1; row / i; i *= 10) count++;
+	int count = 0, i;
+	for (i = 1; row / i; i *= 10) count++;
 	return count;
 }
 
 int advinput_alt(input_alt *pass, int row){
+	int i;
 	fflush(stdin); //flush any remaining cr
 	char *input = calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
 	input = realloc(input, 0xFFF); //fail proof *** i dont need to initialize the rest of the appending memory
@@ -161,7 +162,8 @@ int advinput_alt(input_alt *pass, int row){
 	}
 	pass->val1 = atoi(input) - 1; //offset-1
 	pass->val2 = -1; //offset-1
-	for (int i = 0; input[i]; i++){
+
+	for (i = 0; input[i]; i++){
 		if (input[i] == 'x'){
 			pass->val2 = atoi(&input[i + 1]) - 1; //offset-1
 			break;
@@ -229,14 +231,16 @@ return 0;
 }
 */
 int **allocarr(int **arr, int row, int col){ //allocate 2d array
+	int i;
 	arr = calloc(row, sizeof(int)); //allocate row first
-	for (int i = 0; i<row; i++) arr[i] = calloc(col, sizeof(int)); //allocate cols next
+	for (i = 0; i<row; i++) arr[i] = calloc(col, sizeof(int)); //allocate cols next
 
 	return arr;
 }
 
 void freearr(int **arr, int row, int col){ //free all memory from 2d array
-	for (int i = 0; i < row; i++) free(arr[i]);
+	int i;
+	for (i = 0; i < row; i++) free(arr[i]);
 	free(arr);
 
 }
@@ -406,7 +410,8 @@ typedef struct getopt_struct{
 } getopt_struct;
 
 void simplegetopt(int argc, char **argv, getopt_struct *ioption, getopt_struct *roption, getopt_struct *hoption){
-	for (int i = 1; i<argc; i++){
+	int i;
+	for (i = 1; i<argc; i++){
 		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
 			if (strlen(argv[i + 1])>0xFD){ fprintf(stderr, "buffer overflow!\n"); abort(); } //0xFE - "null terminator"
 			ioption->on++;
@@ -462,7 +467,7 @@ int main(int argc, char **argv){
 
 
 	//main game
-	int totalplaytime, switchuser = 0;
+	int totalplaytime, switchuser = 0, i;
 	for (totalplaytime = 1;; totalplaytime++){
 		if (totalplaytime == 1){ //flip the coin!
 #ifndef _WIN32
@@ -473,7 +478,7 @@ int main(int argc, char **argv){
 			printf("lets flip the coin! head is player1, tail is player2"
 				"\npress any key to start flipping!...");
 			getchar();
-			for (int i = 0; i < 3; i++){
+			for (i = 0; i < 3; i++){
 #ifdef _WIN32
 				Sleep(200); //0.2 seconds
 #else
