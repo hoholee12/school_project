@@ -73,9 +73,9 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 	int player1_count = 0, player2_count = 0;
 	printf("\t");
 	for (int i = 1; i <= row; i++) printf("%d\t", i);
-	
-	
-	
+
+
+
 	//input option menu here, three letters each!
 	printf("\tOptions: ");
 	if (option->swap == 1) printf("SWP ");
@@ -411,7 +411,7 @@ void simplegetopt(int argc, char **argv, getopt_struct *ioption, getopt_struct *
 			ioption->on++;
 			strcpy(&ioption->optstr, argv[++i]);
 		}
-		else if(!strcmp(argv[i], "-r")){
+		else if (!strcmp(argv[i], "-r")){
 			roption->on++;
 		}
 		else if (!strcmp(argv[i], "-h")){
@@ -457,13 +457,18 @@ int main(int argc, char **argv){
 	free(ioption);
 	free(roption);
 	free(hoption);
-	if (col < 2){ fprintf(stderr, "determinant is too small!\n"); return 1;}
-	
+	if (col < 2){ fprintf(stderr, "determinant is too small!\n"); return 1; }
+
 
 	//main game
 	int totalplaytime, switchuser = 0;
 	for (totalplaytime = 1;; totalplaytime++){
 		if (totalplaytime == 1){ //flip the coin!
+#ifndef _WIN32
+			printf("\x1b[2J\x1b[0;0H");
+#else
+			system("cls");
+#endif
 			printf("lets flip the coin! head is player1, tail is player2"
 				"\npress any key to start flipping!...");
 			getchar();
