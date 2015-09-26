@@ -410,35 +410,33 @@ typedef struct getopt_struct{
 	char *optstr; //strcpy needs the address of it! not itself...
 } getopt_struct;
 
-void simplegetopt(int argc, char **argv, getopt_struct *ioption, getopt_struct *roption, getopt_struct *hoption){
+void simplegetopt(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, getopt_struct *hparam){
 	int i;
 	for (i = 1; i<argc; i++){
 		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
 			if (strlen(argv[i + 1])>0xFD){ fprintf(stderr, "buffer overflow!\n"); abort(); } //0xFE - "null terminator"
-			ioption->on++;
-			strcpy(&ioption->optstr, argv[++i]);
+			iparam->on++;
+			strcpy(iparam->optstr, argv[++i]);
 		}
 		else if (!strcmp(argv[i], "-r")){
-			roption->on++;
+			rparam->on++;
 		}
 		else if (!strcmp(argv[i], "-h")){
-			hoption->on++;
+			hparam->on++;
 		}
 	}
 
 }
 
-void help(int argc, char **argv, getopt_struct *ioption, getopt_struct *roption, getopt_struct *hoption){
+void help(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, getopt_struct *hparam){
 	fprintf(stderr, "homework.c - a tic-tac-toe game!"
 		"\nCopyright(C) 2015  hoholee12@naver.com"
 		"\nUsage: %s -i [row]x[col] -r"
 		"\n\t-i sets derterminant size by [row]x[col]"
 		"\n\t-r reverses [row][col] input ingame\n\n", argv[0]);
-
-
-	free(ioption);
-	free(roption);
-	free(hoption);
+	free(iparam->optstr);
+	free(rparam->optstr);
+	free(hparam->optstr);
 	exit(0);
 };
 
@@ -450,20 +448,20 @@ int main(int argc, char **argv){
 	//scoredat test1 = {0}; //you can also init struct using this method, how nice!
 	Option option = { 0 };
 	int row = 3, col = 3;
-	getopt_struct *ioption = calloc(0xFF, sizeof(getopt_struct)); /*0x1 for int on, 0xFE for char *str*/
-	getopt_struct *roption = calloc(0xFF, sizeof(getopt_struct));
-	getopt_struct *hoption = calloc(0xFF, sizeof(getopt_struct));
-	simplegetopt(argc, argv, ioption, roption, hoption);
-	if (ioption->on > 0){
-		row = atoi(&ioption->optstr);
-		col = atoi(xtarget(&ioption->optstr));
+	getopt_struct iparam = { 0 }; iparam.optstr = calloc(0xfe, sizeof(char)); //allocate struct in stack first, allocate string contents in the heap after.
+	getopt_struct rparam = { 0 }; rparam.optstr = calloc(0xfe, sizeof(char));
+	getopt_struct hparam = { 0 }; hparam.optstr = calloc(0xfe, sizeof(char));
+	simplegetopt(argc, argv, &iparam, &rparam, &hparam);
+	if (iparam.on > 0){
+		row = atoi(iparam.optstr);
+		col = atoi(xtarget(iparam.optstr));
 	}
-	if (roption->on > 0) option.swap = 1;
+	if (rparam.on > 0) option.swap = 1;
 	if (col != row) col = row; //needed for square det
-	if (hoption->on > 0) help(argc, argv, ioption, roption, hoption);
-	free(ioption);
-	free(roption);
-	free(hoption);
+	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam);
+	free(iparam.optstr);
+	free(rparam.optstr);
+	free(hparam.optstr);
 	if (col < 2){ fprintf(stderr, "determinant is too small!\n"); return 1; }
 
 
