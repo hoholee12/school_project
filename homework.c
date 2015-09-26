@@ -93,6 +93,7 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 	}
 
 	//mainloop output
+	printf("\n");
 	for (i = 0; i<row; i++){
 		printf("%d\t", i + 1);
 		for (j = 0; j<col; j++){
@@ -103,7 +104,7 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 			}
 		}
 		if (i == 0){
-			printf("\tplayer1=%d  player2=%d  total=%d/%d", player1_count, player2_count, player1_count + player2_count, row*row);
+			printf("\tplayer1=%d/%d  player2=%d/%d  total=%d/%d", player1_count, row*row/2, player2_count, row*row/2, player1_count + player2_count, row*row);
 		}
 		if (i == 1)
 			switch (user){
@@ -113,7 +114,7 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 			case -4: printf("\t\t%s", str); break;
 			default: printf("\t\tplayer%d's turn!", user); break;
 		}
-		printf("\n");
+		printf("\n\n");
 
 	}
 
