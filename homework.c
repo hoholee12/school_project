@@ -80,6 +80,7 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 	//input option menu here, three letters each!
 	printf("\tOptions: ");
 	if (option->swap == 1) printf("SWP ");
+	if (option->playa2 == 1) printf("AUTO ");
 	printf("\n");
 
 	//preprocessing for player1_count, player2_count
