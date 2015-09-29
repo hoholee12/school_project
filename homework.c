@@ -23,6 +23,7 @@ typedef struct scoredat{
 }scoredat;
 typedef struct Option{
 	int swap;
+	int playa2;
 } Option;
 
 /*inputstate notes:
@@ -332,6 +333,20 @@ int checkcondition(int **arr, int row, int col){
 	return 0;
 }
 
+//*****************************************TODO
+
+int quickcheck(int **arr, int row, int col){
+	int **test = NULL;
+	test=allocarr(test, row, col);
+	
+	
+	checkcondition(arr, row, col);
+	return 0;
+}
+
+
+//*****************************************TODO
+
 void printstatus(int inputstate, int totalplaytime, scoredat *player1, scoredat *player2, int user){
 	switch (inputstate){
 	case -2: printf("you have forfeited your turn! player%d wins!\n", 3 - user);
@@ -410,7 +425,7 @@ typedef struct getopt_struct{
 	char *optstr; //strcpy needs the address of it! not itself...
 } getopt_struct;
 
-void simplegetopt(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, getopt_struct *hparam){
+void simplegetopt(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, getopt_struct *hparam, getopt_struct *aparam){
 	int i;
 	for (i = 1; i<argc; i++){
 		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
@@ -424,11 +439,15 @@ void simplegetopt(int argc, char **argv, getopt_struct *iparam, getopt_struct *r
 		else if (!strcmp(argv[i], "-h")){
 			hparam->on++;
 		}
+		else if (!strcmp(argv[i], "-a")){
+			aparam->on++;
+		
+		}
 	}
 
 }
 
-void help(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, getopt_struct *hparam){
+void help(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, getopt_struct *hparam, getopt_struct *aparam){
 	fprintf(stderr, "homework.c - a tic-tac-toe game!"
 		"\nCopyright(C) 2015  hoholee12@naver.com"
 		"\nUsage: %s -i [row]x[col] -r"
@@ -437,8 +456,46 @@ void help(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, g
 	free(iparam->optstr);
 	free(rparam->optstr);
 	free(hparam->optstr);
+	free(aparam->optstr);
 	exit(0);
 };
+
+
+
+//*****************************************TODO
+//the cpu will always be player2!
+/*
+first start=>returns 0
+second start=? returns 1
+and so on...
+
+
+*/
+
+
+int player2engine(int **arr, int row, int col, Option *option){
+	//if game first start, start at center
+	int i, j, nostart=0;
+	for (i = 0; i < row; i++){
+		for (j = 0; j < row; j++){
+			if (arr[i][j]){
+				nostart++;
+				break;
+			}
+		}
+	}
+	if (!nostart){
+		arr[row / 2][row / 2] = 2;
+		return 0;
+	}
+	//if start second, put right next to the player1, random
+
+	//
+
+	return 0;
+}
+
+//*****************************************TODO
 
 int main(int argc, char **argv){
 	//initial parsing
@@ -449,19 +506,22 @@ int main(int argc, char **argv){
 	Option option = { 0 };
 	int row = 3, col = 3;
 	getopt_struct iparam = { 0 }; iparam.optstr = calloc(0xfe, sizeof(char)); //allocate struct in stack first, allocate string contents in the heap after.
-	getopt_struct rparam = { 0 }; rparam.optstr = calloc(0xfe, sizeof(char));
+	getopt_struct rparam = { 0 }; rparam.optstr = calloc(0xfe, sizeof(char)); //option>>swap
 	getopt_struct hparam = { 0 }; hparam.optstr = calloc(0xfe, sizeof(char));
-	simplegetopt(argc, argv, &iparam, &rparam, &hparam);
+	getopt_struct aparam = { 0 }; aparam.optstr = calloc(0xfe, sizeof(char)); //option>>playa2
+	simplegetopt(argc, argv, &iparam, &rparam, &hparam, &aparam);
 	if (iparam.on > 0){
 		row = atoi(iparam.optstr);
 		col = atoi(xtarget(iparam.optstr));
 	}
 	if (rparam.on > 0) option.swap = 1;
+	if (aparam.on > 0) option.playa2 = 1;
 	if (col != row) col = row; //needed for square det
-	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam);
+	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam, &aparam);
 	free(iparam.optstr);
 	free(rparam.optstr);
 	free(hparam.optstr);
+	free(aparam.optstr);
 	if (col < 2){ fprintf(stderr, "determinant is too small!\n"); return 1; }
 
 
