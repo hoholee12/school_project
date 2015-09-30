@@ -192,7 +192,10 @@ int userinput_alt(int **arr, int row, int col, int user, Option *option){
 			usleep(200000);
 #endif
 		}
-		player2engine(&pass, arr, row, col, option);
+		if (player2engine(&pass, arr, row, col, option) == -1){
+			fprintf(stderr, "player2engine() crashed!!");
+			abort();
+		}
 	}
 	else{
 		printf("player%d>>", user);
@@ -262,6 +265,7 @@ void freearr(int **arr, int row, int col){ //free all memory from 2d array
 	free(arr);
 
 }
+
 
 
 char *xtarget(char *arg){ //parse string
@@ -490,6 +494,10 @@ return 1 => abnormal(won or lost)
 */
 
 int player2engine(input_alt *pass, int **arr, int row, int col, Option *option){
+	//inform that nothings been touched
+	pass->val1 = -1;
+	pass->val2 = -1;
+
 	//if game first start, start at center
 	int i, j, nostart = 0, startloc_x, startloc_y;
 	for (i = 0; i < row; i++){
@@ -518,9 +526,9 @@ int player2engine(input_alt *pass, int **arr, int row, int col, Option *option){
 
 
 
-	//
-
-	return 0;
+	//return -1 when nothings been touched.
+	if (pass->val1 == -1 || pass->val1 == -1) return -1;
+	else return 0;
 }
 
 //*****************************************TODO
