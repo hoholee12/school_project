@@ -141,8 +141,8 @@ return val1*val2;
 }
 */
 typedef struct input_alt{
-	int val1;
-	int val2;
+	int val1; //y row
+	int val2; //x col
 } input_alt;
 
 int dividenum(int row){
@@ -151,7 +151,7 @@ int dividenum(int row){
 	return count;
 }
 
-int advinput_alt(input_alt *pass, int row){
+int advinput_alt(input_alt *pass, int row, int col){
 	int i;
 	fflush(stdin); //flush any remaining cr
 	char *input = calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
@@ -179,15 +179,30 @@ int advinput_alt(input_alt *pass, int row){
 }
 
 int userinput_alt(int **arr, int row, int col, int user, Option *option){
-	int result_r = row, result_c = col, max = row - 1, min = 0; //offset-1
+	int i, result_r = row, result_c = col, max = row - 1, min = 0; //offset-1
 	input_alt pass = { 0 };
-	printf("player%d>>", user);
-	advinput_alt(&pass, row); //row or col
-	//printf("%c %d", input, input);
-#ifndef _WIN32
-	//sleep(1); //1sec
+	if (option->playa2 == 1 && user == 2){
+		printf("player2 is thinking");
+		for (i = 0; i < 3; i++){
+			printf(".");
+#ifdef _WIN32
+			Sleep(200); //0.2 seconds
 #else
-	//Sleep(1000); //1sec
+			fflush(stdout);
+			usleep(200000);
+#endif
+		}
+		player2engine(&pass, arr, row, col, option);
+	}
+	else{
+		printf("player%d>>", user);
+		advinput_alt(&pass, row, col);
+	}
+#ifdef _WIN32
+	//Sleep(200); //0.2 seconds
+#else
+	//fflush(stdout);
+	//usleep(200000);
 #endif
 	switch (pass.val1){
 	case 'q': return -2;
@@ -463,33 +478,45 @@ void help(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, g
 
 
 
+
+
+
 //*****************************************TODO
 //the cpu will always be player2!
 /*
-first start=>returns 0
-second start=? returns 1
-and so on...
-
+return 0 => normal
+return 1 => abnormal(won or lost)
 
 */
 
-
-int player2engine(int **arr, int row, int col, Option *option){
+int player2engine(input_alt *pass, int **arr, int row, int col, Option *option){
 	//if game first start, start at center
-	int i, j, nostart=0;
+	int i, j, nostart = 0, startloc_x, startloc_y;
 	for (i = 0; i < row; i++){
-		for (j = 0; j < row; j++){
+		for (j = 0; j < col; j++){
 			if (arr[i][j]){
 				nostart++;
+				startloc_y = row;
+				startloc_x = col;
 				break;
 			}
 		}
 	}
 	if (!nostart){
-		arr[row / 2][row / 2] = 2;
+		pass->val1 = row / 2;
+		pass->val2 = col / 2;
 		return 0;
 	}
 	//if start second, put right next to the player1, random
+	if (nostart == 1){
+		pass->val1 = startloc_y + (rand() % 3 - 1);
+		pass->val2 = startloc_x + (rand() % 3 - 1);
+		return 0;
+	}
+	//
+
+
+
 
 	//
 
