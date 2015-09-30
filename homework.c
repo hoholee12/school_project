@@ -489,8 +489,8 @@ void help(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, g
 //the cpu will always be player2!
 /*
 return 0 => normal
-return 1 => abnormal(won or lost)
-
+return 1 => normal(won or lost)
+return -1 => abnormal(undecided, crashed)
 */
 
 int player2engine(input_alt *pass, int **arr, int row, int col, Option *option){
