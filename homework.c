@@ -28,6 +28,8 @@ typedef struct Option{
 
 /*inputstate notes:
 user	==	1,2
+****************** lets not mix things up...
+err:
 OOB		==	-1
 quit	==	-2
 typo	==	-3
@@ -65,7 +67,15 @@ printf("\n");
 /*printarr counts generationally
 **printarr_alt counts by row*col */
 
-void printarr_alt(int **arr, int row, int col, int user, const char *str, Option *option){ //print 2d array
+void printarr_alt(
+	int **arr,
+	int row,
+	int col,
+	int user,
+	int err, //just one user variable is not enough
+	const char *str,
+	Option *option
+	){
 #ifndef _WIN32
 	printf("\x1b[2J\x1b[0;0H");
 #else
@@ -108,13 +118,23 @@ void printarr_alt(int **arr, int row, int col, int user, const char *str, Option
 		if (i == 0){
 			printf("\tplayer1=%d/%d  player2=%d/%d  total=%d/%d", player1_count, row*row/2, player2_count, row*row/2, player1_count + player2_count, row*row);
 		}
-		if (i == 1)
-			switch (user){
-			case -1: printf("\t\tyou can't go there!"); break;
-			case -2: printf("\t\tHOW DID YOU GET HERE?! xDDD"); break;
-			case -3: printf("\t\twhat?"); break;
-			case -4: printf("\t\t%s", str); break;
-			default: printf("\t\tplayer%d's turn!", user); break;
+		if (i == 1){
+			if (option->playa2 == 1 && user == 2){
+				switch (err){
+				case -4: printf("\t\t%s", str); break;
+				default: printf("\t\tplayer%d's turn!", user); break;
+				}
+			
+			}
+			else{
+				switch (err){
+				case -1: printf("\t\tyou can't go there!"); break;
+				case -2: printf("\t\tHOW DID YOU GET HERE?! xDDD"); break;
+				case -3: printf("\t\twhat?"); break;
+				case -4: printf("\t\t%s", str); break;
+				default: printf("\t\tplayer%d's turn!", user); break;
+				}
+			}
 		}
 		printf("\n\n");
 
@@ -158,7 +178,7 @@ int advinput_alt(input_alt *pass, int row, int col){
 	input = realloc(input, 0xFFF); //fail proof *** i dont need to initialize the rest of the appending memory
 	//you should use heap memory for that.
 	//dont use more than already assigned, free() will complain about corrupted heap memory!!
-	scanf("%s", input); //scanf address to string goes like this...
+	gets(input); //i want to include spaces too.
 	if (input[0] == 'q'){
 		pass->val1 = 'q';
 		return 0;
@@ -193,7 +213,7 @@ int userinput_alt(int **arr, int row, int col, int user, Option *option){
 #endif
 		}
 		if (player2engine(&pass, arr, row, col, option) == -1){
-			fprintf(stderr, "player2engine() crashed!!");
+			fprintf(stderr, "player2engine() crashed!!"); //exception error
 			abort();
 		}
 	}
@@ -405,17 +425,17 @@ int game(int row, int col, scoredat *player1, scoredat *player2, int totalplayti
 	for (;;){ //mainloop
 
 
-		printarr_alt(arr, row, col, user, "", option);
+		printarr_alt(arr, row, col, user, 0, "", option);
 		switch (checkcondition(arr, row, col)){
-		case 1: printarr_alt(arr, row, col, -4, "player1 wins!", option); freearr(arr, row, col); return 1;
-		case 2: printarr_alt(arr, row, col, -4, "player2 wins!", option); freearr(arr, row, col); return 2;
-		case 3: printarr_alt(arr, row, col, -4, "its a tie!", option); freearr(arr, row, col); return 3;
+		case 1: printarr_alt(arr, row, col, user, -4, "player1 wins!", option); freearr(arr, row, col); return 1;
+		case 2: printarr_alt(arr, row, col, user, -4, "player2 wins!", option); freearr(arr, row, col); return 2;
+		case 3: printarr_alt(arr, row, col, user, -4, "its a tie!", option); freearr(arr, row, col); return 3;
 		}
 		for (; (inputstate = userinput_alt(arr, row, col, user, option)) != 0;){
 			switch (inputstate){
-			case -1: printarr_alt(arr, row, col, inputstate, "", option); break;
+			case -1: printarr_alt(arr, row, col, user, inputstate, "", option); break;
 			case -2: printstatus(inputstate, totalplaytime, player1, player2, user); (*switchuser)++; freearr(arr, row, col); return 0;
-			case -3: printarr_alt(arr, row, col, inputstate, "", option); break;
+			case -3: printarr_alt(arr, row, col, user, inputstate, "", option); break;
 			default:;
 			}
 			//printf("inputstate:%d", inputstate);
@@ -504,8 +524,8 @@ int player2engine(input_alt *pass, int **arr, int row, int col, Option *option){
 		for (j = 0; j < col; j++){
 			if (arr[i][j]){
 				nostart++;
-				startloc_y = row;
-				startloc_x = col;
+				startloc_y = i;
+				startloc_x = j;
 				break;
 			}
 		}
