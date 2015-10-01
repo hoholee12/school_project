@@ -549,7 +549,9 @@ int player2engine(
 	pass->val1 = -1;
 	pass->val2 = -1;
 
-	//if game first start, start at center
+
+
+	//main thinker
 	int i, j, nostart = 0, startloc_x, startloc_y;
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
@@ -561,13 +563,18 @@ int player2engine(
 			}
 		}
 	}
+
+	//piece finder
+
+
+	//if start first, put at center
 	if (!nostart){
 		pass->val1 = row / 2;
 		pass->val2 = col / 2;
 		return 0;
 	}
-	//if start second, put right next to the player1, random
-	if (nostart == 1){
+	//if start second, put right next to the player1, random direction.
+	if (nostart >= row-1){
 		pass->val1 = startloc_y + (rand() % 3 - 1);
 		pass->val2 = startloc_x + (rand() % 3 - 1);
 		return 0;
