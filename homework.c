@@ -67,10 +67,7 @@ printf("\n");
 /*printarr counts generationally
 **printarr_alt counts by row*col */
 
-void printarr_alt(
-	int **arr,
-	int row,
-	int col,
+void printarr_alt(int **arr, int row, int col,
 	int user,
 	int err, //just one user variable is not enough
 	const char *str,
@@ -116,7 +113,8 @@ void printarr_alt(
 			}
 		}
 		if (i == 0){
-			printf("\tplayer1=%d/%d  player2=%d/%d  total=%d/%d", player1_count, row*row/2, player2_count, row*row/2, player1_count + player2_count, row*row);
+			printf("\tplayer1=%d/%d  player2=%d/%d  total=%d/%d",
+				player1_count, row*row/2, player2_count, row*row/2, player1_count + player2_count, row*row);
 		}
 		if (i == 1){
 			if (option->playa2 == 1 && user == 2){
@@ -171,7 +169,10 @@ int dividenum(int row){
 	return count;
 }
 
-int advinput_alt(input_alt *pass, int row, int col){
+int advinput_alt(
+	input_alt *pass,
+	int row, int col
+	){
 	int i;
 	fflush(stdin); //flush any remaining cr
 	char *input = calloc(dividenum(row) * 2 + 2/*'+'+NULL*/, sizeof(char));	//char input[size] wont work if 'size' is not available on compile time!!
@@ -198,7 +199,10 @@ int advinput_alt(input_alt *pass, int row, int col){
 	return 0;
 }
 
-int userinput_alt(int **arr, int row, int col, int user, Option *option){
+int userinput_alt(int **arr, int row, int col,
+	int user,
+	Option *option
+	){
 	int i, result_r = row, result_c = col, max = row - 1, min = 0; //offset-1
 	input_alt pass = { 0 };
 	if (option->playa2 == 1 && user == 2){
@@ -387,7 +391,13 @@ int quickcheck(int **arr, int row, int col){
 
 //*****************************************TODO
 
-void printstatus(int inputstate, int totalplaytime, scoredat *player1, scoredat *player2, int user){
+void printstatus(
+	int inputstate,
+	int totalplaytime,
+	scoredat *player1,
+	scoredat *player2,
+	int user
+	){
 	switch (inputstate){
 	case -2: printf("you have forfeited your turn! player%d wins!\n", 3 - user);
 		if (3 - user == 1) player1->score++;
@@ -416,7 +426,13 @@ void printstatus(int inputstate, int totalplaytime, scoredat *player1, scoredat 
 	printf("\n\n");
 }
 
-int game(int row, int col, scoredat *player1, scoredat *player2, int totalplaytime, int *switchuser, Option *option){
+int game(int row, int col,
+	scoredat *player1,
+	scoredat *player2,
+	int totalplaytime,
+	int *switchuser,
+	Option *option
+	){
 	int **arr = NULL;
 	arr = allocarr(arr, row, col);
 	int user = *switchuser % 2 + 1; //pre
@@ -465,7 +481,13 @@ typedef struct getopt_struct{
 	char *optstr; //strcpy needs the address of it! not itself...
 } getopt_struct;
 
-void simplegetopt(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, getopt_struct *hparam, getopt_struct *aparam){
+void simplegetopt(
+	int argc, char **argv,
+	getopt_struct *iparam,
+	getopt_struct *rparam,
+	getopt_struct *hparam,
+	getopt_struct *aparam
+	){
 	int i;
 	for (i = 1; i<argc; i++){
 		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
@@ -487,7 +509,12 @@ void simplegetopt(int argc, char **argv, getopt_struct *iparam, getopt_struct *r
 
 }
 
-void help(int argc, char **argv, getopt_struct *iparam, getopt_struct *rparam, getopt_struct *hparam, getopt_struct *aparam){
+void help(int argc, char **argv,
+	getopt_struct *iparam,
+	getopt_struct *rparam,
+	getopt_struct *hparam,
+	getopt_struct *aparam
+	){
 	fprintf(stderr, "homework.c - a tic-tac-toe game!"
 		"\nCopyright(C) 2015  hoholee12@naver.com"
 		"\nUsage: %s -i [row]x[col] -r"
@@ -513,7 +540,11 @@ return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
 
-int player2engine(input_alt *pass, int **arr, int row, int col, Option *option){
+int player2engine(
+	input_alt *pass,
+	int **arr, int row, int col,
+	Option *option
+	){
 	//inform that nothings been touched
 	pass->val1 = -1;
 	pass->val2 = -1;
