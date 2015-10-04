@@ -553,6 +553,7 @@ int player2engine(
 
 	//declare here
 	int i, j, k, broken=0, prev_brain=3/*maximum*/, nostart = 0, startloc_x, startloc_y, bak, worse, minor_y = -1, minor_x = -1, wow=0, prev_wow=0;
+	int final_offset = 1;
 
 
 	//if start first, put at center
@@ -670,11 +671,17 @@ int player2engine(
 	//col
 	for (i = 0; i < row; i++){
 		worse = 0;
+		broken = 0;
 		for (j = 0; j < col; j++){ //one col loop
 			if (arr[i][j] == 1) worse++;
+			else if (arr[i][j] == 2){
+				broken = 1;
+				break;
+			}
 			else minor_x = j;
 		}
-		if (worse == row - 1 && !arr[i][minor_x]){
+		if (broken == 1);
+		else if (worse >= row - 1){
 			pass->val1 = i;
 			pass->val2 = minor_x;
 			printf("col %d %d ;;", pass->val1, pass->val2);
@@ -683,11 +690,17 @@ int player2engine(
 	//row
 	for (i = 0; i < row; i++){
 		worse = 0;
+		broken = 0;
 		for (j = 0; j < col; j++){ //one col loop
 			if (arr[j][i] == 1) worse++;
+			else if (arr[j][i] == 2){ 
+				broken = 1;
+				break; 
+			}
 			else minor_y = j;
 		}
-		if (worse == row - 1 && !arr[minor_y][i]){
+		if (broken == 1);
+		else if (worse >= row - 1){
 			pass->val1 = minor_y;
 			pass->val2 = i;
 			printf("row %d %d ;;", pass->val1, pass->val2);
@@ -697,11 +710,17 @@ int player2engine(
 
 	//diagonal
 	worse = 0;
+	broken = 0;
 	for (i = 0; i < row; i++){
 			if (arr[i][i] == 1) worse++;
+			else if (arr[i][i] == 2){
+				broken = 1;
+				break;
+			}
 			else minor_x = i;
 	}
-	if (worse == row - 1 && !arr[minor_x][minor_x]){
+	if (broken == 1);
+	else if (worse >= row - 1){
 		pass->val1 = minor_x;
 		pass->val2 = minor_x;
 		printf("diag %d %d ;;", pass->val1, pass->val2);
@@ -710,14 +729,20 @@ int player2engine(
 
 	//reverse diag
 	worse = 0;
+	broken = 0;
 	for (i = 0; i < row; i++){
 		if (arr[i][row-i-1] == 1) worse++;
+		else if (arr[i][row - i - 1] == 2){
+			broken = 1;
+			break;
+		}
 		else{
 			minor_y = i;
 			minor_x = row - i - 1;
 		}
 	}
-	if (worse == row - 1 && !arr[minor_y][minor_x]){
+	if (broken == 1);
+	else if (worse >= row - 1){
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
 		printf("rev diag %d %d ;;", pass->val1, pass->val2);
@@ -729,57 +754,81 @@ int player2engine(
 		//col
 		for (i = 0; i < row; i++){
 			worse = 0;
+			broken = 0;
 			for (j = 0; j < col; j++){ //one col loop
 				if (arr[i][j] == 2) worse++;
+				else if (arr[i][j] == 1){
+					broken = 1;
+					break;
+				}
 				else minor_x = j;
 			}
-			if (worse == row - 1 && !arr[i][minor_x]){
+			if (broken == 1);
+			else if (worse >= row - 1){
 				pass->val1 = i;
 				pass->val2 = minor_x;
-				printf("col %d %d ;;", pass->val1, pass->val2);
+				printf("fcol %d %d ;;", pass->val1, pass->val2);
 			}
 		}
 		//row
 		for (i = 0; i < row; i++){
 			worse = 0;
+			broken = 0;
 			for (j = 0; j < col; j++){ //one col loop
 				if (arr[j][i] == 2) worse++;
+				else if (arr[j][i] == 1){
+					broken = 1;
+					break;
+				}
 				else minor_y = j;
 			}
-			if (worse == row - 1 && !arr[minor_y][i]){
+			if (broken == 1);
+			else if (worse >= row - 1){
 				pass->val1 = minor_y;
 				pass->val2 = i;
-				printf("row %d %d ;;", pass->val1, pass->val2);
+				printf("frow %d %d ;;", pass->val1, pass->val2);
 			}
 		}
 
 
 		//diagonal
 		worse = 0;
+		broken = 0;
 		for (i = 0; i < row; i++){
 			if (arr[i][i] == 2) worse++;
+			else if (arr[i][i] == 1){
+				broken = 1;
+				break;
+			}
 			else minor_x = i;
 		}
-		if (worse == row - 1 && !arr[minor_x][minor_x]){
+		if (broken == 1);
+		else if (worse >= row - 1){
 			pass->val1 = minor_x;
 			pass->val2 = minor_x;
-			printf("diag %d %d ;;", pass->val1, pass->val2);
+			printf("fdiag %d %d ;;", pass->val1, pass->val2);
 		}
 
 
 		//reverse diag
 		worse = 0;
+		broken = 0;
 		for (i = 0; i < row; i++){
 			if (arr[i][row - i - 1] == 2) worse++;
+			else if (arr[i][row - i - 1] == 1){
+				broken = 1;
+				break;
+			}
 			else{
 				minor_y = i;
 				minor_x = row - i - 1;
 			}
 		}
-		if (worse == row - 1 && !arr[minor_y][minor_x]){
+		if (broken == 1);
+		else if (worse >= row - 1){
 			pass->val1 = minor_y;
 			pass->val2 = minor_x;
-			printf("rev diag %d %d ;;", pass->val1, pass->val2);
+			printf("frev diag %d %d ;;", pass->val1, pass->val2);
 		}
 	}
 
