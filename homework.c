@@ -848,7 +848,7 @@ int player2engine(
 		printf("nothing to do...%d %d", pass->val1, pass->val2);
 	}
 	else printf("result...%d %d", pass->val1, pass->val2);
-	Sleep(1000);
+	Sleep(500);
 	//getchar();
 
 	/*
@@ -990,7 +990,7 @@ int player2engine(
 	
 	}
 	*/
-	
+	freearr(brain, row, col); //free memory
 	//return -1 when nothings been touched.
 	if (pass->val1 == -1 || pass->val1 == -1) return -1;
 	else return 0;
