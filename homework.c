@@ -553,7 +553,6 @@ int player2engine(
 
 	//declare here
 	int i, j, k, broken=0, prev_brain=3/*maximum*/, nostart = 0, startloc_x, startloc_y, bak, worse, minor_y = -1, minor_x = -1, wow=0, prev_wow=0;
-	int final_offset = 1;
 
 
 	//if start first, put at center
@@ -667,6 +666,85 @@ int player2engine(
 	
 	}
 
+	//final shot
+	//col
+	for (i = 0; i < row; i++){
+		worse = 0;
+		broken = 0;
+		for (j = 0; j < col; j++){ //one col loop
+			if (arr[i][j] == 2) worse++;
+			else if (arr[i][j] == 1){
+				broken = 1;
+				break;
+			}
+			else minor_x = j;
+		}
+		if (broken == 1);
+		else if (worse > row / 2){
+			pass->val1 = i;
+			pass->val2 = minor_x;
+			printf("fcol %d %d ;;", pass->val1, pass->val2);
+		}
+	}
+	//row
+	for (i = 0; i < row; i++){
+		worse = 0;
+		broken = 0;
+		for (j = 0; j < col; j++){ //one col loop
+			if (arr[j][i] == 2) worse++;
+			else if (arr[j][i] == 1){
+				broken = 1;
+				break;
+			}
+			else minor_y = j;
+		}
+		if (broken == 1);
+		else if (worse > row / 2){
+			pass->val1 = minor_y;
+			pass->val2 = i;
+			printf("frow %d %d ;;", pass->val1, pass->val2);
+		}
+	}
+
+	//diagonal
+	worse = 0;
+	broken = 0;
+	for (i = 0; i < row; i++){
+		if (arr[i][i] == 2) worse++;
+		else if (arr[i][i] == 1){
+			broken = 1;
+			break;
+		}
+		else minor_x = i;
+	}
+	if (broken == 1);
+	else if (worse > row / 2){
+		pass->val1 = minor_x;
+		pass->val2 = minor_x;
+		printf("fdiag %d %d ;;", pass->val1, pass->val2);
+	}
+
+	//reverse diag
+	worse = 0;
+	broken = 0;
+	for (i = 0; i < row; i++){
+		if (arr[i][row - i - 1] == 2) worse++;
+		else if (arr[i][row - i - 1] == 1){
+			broken = 1;
+			break;
+		}
+		else{
+			minor_y = i;
+			minor_x = row - i - 1;
+		}
+	}
+	if (broken == 1);
+	else if (worse > row / 2){
+		pass->val1 = minor_y;
+		pass->val2 = minor_x;
+		printf("frev diag %d %d ;;", pass->val1, pass->val2);
+	}
+
 	//defense
 	//col
 	for (i = 0; i < row; i++){
@@ -749,88 +827,7 @@ int player2engine(
 	}
 
 
-	//final shot
-	if (worse){
-		//col
-		for (i = 0; i < row; i++){
-			worse = 0;
-			broken = 0;
-			for (j = 0; j < col; j++){ //one col loop
-				if (arr[i][j] == 2) worse++;
-				else if (arr[i][j] == 1){
-					broken = 1;
-					break;
-				}
-				else minor_x = j;
-			}
-			if (broken == 1);
-			else if (worse >= row - 1){
-				pass->val1 = i;
-				pass->val2 = minor_x;
-				printf("fcol %d %d ;;", pass->val1, pass->val2);
-			}
-		}
-		//row
-		for (i = 0; i < row; i++){
-			worse = 0;
-			broken = 0;
-			for (j = 0; j < col; j++){ //one col loop
-				if (arr[j][i] == 2) worse++;
-				else if (arr[j][i] == 1){
-					broken = 1;
-					break;
-				}
-				else minor_y = j;
-			}
-			if (broken == 1);
-			else if (worse >= row - 1){
-				pass->val1 = minor_y;
-				pass->val2 = i;
-				printf("frow %d %d ;;", pass->val1, pass->val2);
-			}
-		}
-
-
-		//diagonal
-		worse = 0;
-		broken = 0;
-		for (i = 0; i < row; i++){
-			if (arr[i][i] == 2) worse++;
-			else if (arr[i][i] == 1){
-				broken = 1;
-				break;
-			}
-			else minor_x = i;
-		}
-		if (broken == 1);
-		else if (worse >= row - 1){
-			pass->val1 = minor_x;
-			pass->val2 = minor_x;
-			printf("fdiag %d %d ;;", pass->val1, pass->val2);
-		}
-
-
-		//reverse diag
-		worse = 0;
-		broken = 0;
-		for (i = 0; i < row; i++){
-			if (arr[i][row - i - 1] == 2) worse++;
-			else if (arr[i][row - i - 1] == 1){
-				broken = 1;
-				break;
-			}
-			else{
-				minor_y = i;
-				minor_x = row - i - 1;
-			}
-		}
-		if (broken == 1);
-		else if (worse >= row - 1){
-			pass->val1 = minor_y;
-			pass->val2 = minor_x;
-			printf("frev diag %d %d ;;", pass->val1, pass->val2);
-		}
-	}
+	
 
 
 	//print brain
@@ -843,15 +840,16 @@ int player2engine(
 	
 	}
 
-	Sleep(1000);
+	
 	//in case something fails...
-	if (pass->val1 == -1 && pass->val2 == -1){
+	if (pass->val1 == -1 || pass->val2 == -1){
 		pass->val1 = rand() % row;
 		pass->val2 = rand() % row;
 		printf("nothing to do...%d %d", pass->val1, pass->val2);
 	}
 	else printf("result...%d %d", pass->val1, pass->val2);
-	getchar();
+	Sleep(1000);
+	//getchar();
 
 	/*
 
