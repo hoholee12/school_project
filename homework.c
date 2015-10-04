@@ -241,7 +241,7 @@ int userinput_alt(int **arr, int row, int col,
 	if (pass.val2>max || pass.val2<min) return -1;
 
 	//this is where you can swap row & col, default should be val1=row, val2=col
-	if (option->swap == 1){
+	if (option->swap == 1&&user!=2){
 		if (arr[pass.val2][pass.val1] != 0) return -1; //problem
 		arr[pass.val2][pass.val1] = user;
 	}
@@ -551,39 +551,399 @@ int player2engine(
 
 
 
-	//main thinker
-	int i, j, nostart = 0, startloc_x, startloc_y;
+	//declare here
+	int i, j, k, broken=0, prev_brain=3/*maximum*/, nostart = 0, startloc_x, startloc_y, bak, worse, minor_y = -1, minor_x = -1, wow=0, prev_wow=0;
+
+
+	//if start first, put at center
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
 			if (arr[i][j]){
 				nostart++;
-				startloc_y = i;
-				startloc_x = j;
-				break;
+				if (arr[i][j] == 1){
+					startloc_y = i;
+					startloc_x = j;
+				}
 			}
 		}
 	}
-
-	//piece finder
-
-
-	//if start first, put at center
 	if (!nostart){
 		pass->val1 = row / 2;
 		pass->val2 = col / 2;
 		return 0;
 	}
 	//if start second, put right next to the player1, random direction.
-	if (nostart >= row-1){
-		pass->val1 = startloc_y + (rand() % 3 - 1);
-		pass->val2 = startloc_x + (rand() % 3 - 1);
+	if (nostart == 1){
+		for (;;){
+			pass->val1 = startloc_y + (rand() % 3 - 1);
+			pass->val2 = startloc_x + (rand() % 3 - 1);
+			if ((pass->val1 >= 0 && pass->val1 <= row) && (pass->val2 >= 0 && pass->val2 <= row) && ((pass->val1 != startloc_y) || (pass->val2 != startloc_x))) break;
+		}
 		return 0;
 	}
-	//
+	
+
+	//third step - offense
+	/*
+	3==row col diag combined
+	2==two of these combined
+	1==just one
+	something like that...
+
+	we want to have the number negative to win!
+	*/
 
 
 
+	int **brain = NULL;
+	brain=allocarr(brain, row, col);
+	//col
+	for (i = 0; i < row; i++){
+		for (j = 0; j < col; j++){
+			if (arr[i][j] == 1){
+				for (k = 0; k < col; k++) brain[i][k]++; //fill whole line
+				break;
+			}
+			if (arr[i][j] == 2){
+				for (k = 0; k < col; k++) brain[i][k]--; //fill whole line
+				break;
+			}
+		}
+	
+	}
+	//row
+	for (i = 0; i < row; i++){
+		for (j = 0; j < col; j++){
+			if (arr[j][i] == 1){
+				for (k = 0; k < col; k++) brain[k][i]++; //fill whole line
+				break;
+			}
+			if (arr[j][i] == 2){
+				for (k = 0; k < col; k++) brain[k][i]--; //fill whole line
+				break;
+			}
+		}
 
+	}
+	//diagonal
+	for (i = 0; i < row; i++){
+		if (arr[i][i] == 1){
+			for (k = 0; k < col; k++) brain[k][k]++; //fill whole line
+			break;
+		
+		}
+		if (arr[i][i] == 2){
+			for (k = 0; k < col; k++) brain[k][k]--; //fill whole line
+			break;
+
+		}
+	}
+	//reverse-diagonal
+	for (i = 0; i < row; i++){
+		if (arr[i][row - i - 1] == 1){
+			for (k = 0; k < col; k++) brain[k][row - k - 1]++; //fill whole line
+			break;
+
+		}
+		if (arr[i][row - i - 1] == 2){
+			for (k = 0; k < col; k++) brain[k][row - k - 1]--; //fill whole line
+			break;
+
+		}
+	}
+
+
+	//input to brain
+	for (i = 0; i < row; i++){
+		for (j = 0; j < col; j++){
+			if (brain[i][j]<prev_brain&&arr[i][j]==0){
+				prev_brain = brain[i][j];
+				pass->val1 = i;
+				pass->val2 = j;
+			}
+		
+		}
+	
+	}
+
+	//defense
+	//col
+	for (i = 0; i < row; i++){
+		worse = 0;
+		for (j = 0; j < col; j++){ //one col loop
+			if (arr[i][j] == 1) worse++;
+			else minor_x = j;
+		}
+		if (worse == row - 1 && !arr[i][minor_x]){
+			pass->val1 = i;
+			pass->val2 = minor_x;
+			printf("col %d %d ;;", pass->val1, pass->val2);
+		}
+	}
+	//row
+	for (i = 0; i < row; i++){
+		worse = 0;
+		for (j = 0; j < col; j++){ //one col loop
+			if (arr[j][i] == 1) worse++;
+			else minor_y = j;
+		}
+		if (worse == row - 1 && !arr[minor_y][i]){
+			pass->val1 = minor_y;
+			pass->val2 = i;
+			printf("row %d %d ;;", pass->val1, pass->val2);
+		}
+	}
+
+
+	//diagonal
+	worse = 0;
+	for (i = 0; i < row; i++){
+			if (arr[i][i] == 1) worse++;
+			else minor_x = i;
+	}
+	if (worse == row - 1 && !arr[minor_x][minor_x]){
+		pass->val1 = minor_x;
+		pass->val2 = minor_x;
+		printf("diag %d %d ;;", pass->val1, pass->val2);
+	}
+
+
+	//reverse diag
+	worse = 0;
+	for (i = 0; i < row; i++){
+		if (arr[i][row-i-1] == 1) worse++;
+		else{
+			minor_y = i;
+			minor_x = row - i - 1;
+		}
+	}
+	if (worse == row - 1 && !arr[minor_y][minor_x]){
+		pass->val1 = minor_y;
+		pass->val2 = minor_x;
+		printf("rev diag %d %d ;;", pass->val1, pass->val2);
+	}
+
+
+	//final shot
+	if (worse){
+		//col
+		for (i = 0; i < row; i++){
+			worse = 0;
+			for (j = 0; j < col; j++){ //one col loop
+				if (arr[i][j] == 2) worse++;
+				else minor_x = j;
+			}
+			if (worse == row - 1 && !arr[i][minor_x]){
+				pass->val1 = i;
+				pass->val2 = minor_x;
+				printf("col %d %d ;;", pass->val1, pass->val2);
+			}
+		}
+		//row
+		for (i = 0; i < row; i++){
+			worse = 0;
+			for (j = 0; j < col; j++){ //one col loop
+				if (arr[j][i] == 2) worse++;
+				else minor_y = j;
+			}
+			if (worse == row - 1 && !arr[minor_y][i]){
+				pass->val1 = minor_y;
+				pass->val2 = i;
+				printf("row %d %d ;;", pass->val1, pass->val2);
+			}
+		}
+
+
+		//diagonal
+		worse = 0;
+		for (i = 0; i < row; i++){
+			if (arr[i][i] == 2) worse++;
+			else minor_x = i;
+		}
+		if (worse == row - 1 && !arr[minor_x][minor_x]){
+			pass->val1 = minor_x;
+			pass->val2 = minor_x;
+			printf("diag %d %d ;;", pass->val1, pass->val2);
+		}
+
+
+		//reverse diag
+		worse = 0;
+		for (i = 0; i < row; i++){
+			if (arr[i][row - i - 1] == 2) worse++;
+			else{
+				minor_y = i;
+				minor_x = row - i - 1;
+			}
+		}
+		if (worse == row - 1 && !arr[minor_y][minor_x]){
+			pass->val1 = minor_y;
+			pass->val2 = minor_x;
+			printf("rev diag %d %d ;;", pass->val1, pass->val2);
+		}
+	}
+
+
+	//print brain
+	printf("\n");
+	for (i = 0; i < row; i++){
+		for (j = 0; j < col; j++){
+			printf("%d\t", brain[i][j]);
+		}
+		printf("\n");
+	
+	}
+
+	Sleep(1000);
+	//in case something fails...
+	if (pass->val1 == -1 && pass->val2 == -1){
+		pass->val1 = rand() % row;
+		pass->val2 = rand() % row;
+		printf("nothing to do...%d %d", pass->val1, pass->val2);
+	}
+	else printf("result...%d %d", pass->val1, pass->val2);
+	getchar();
+
+	/*
+
+	//col
+	for (i = 0; i < row; i++){
+		worse = 0;
+		wow = 0;
+		for (j = 1; j < col; j++){ //one col loop
+			if (!arr[i][j]){ //if no block
+				minor_y = i;
+				minor_x = j;
+			}
+			else if (arr[i][j] == 1){ //discovered p1 block
+				worse++;
+				break;
+			
+			}
+			else if (arr[i][j] == 2) wow++;
+		}
+		if (worse==0){
+			if (wow>prev_wow){ //compare
+				pass->val1 = minor_y;
+				pass->val2 = minor_x;
+				prev_wow=wow;
+				printf("col wow %d %d ;;", pass->val1, pass->val2);
+			}
+		}
+	}
+	//row
+	for (i = 0; i < row; i++){
+		worse = 0;
+		wow = 0;
+		for (j = 1; j < col; j++){ //one col loop
+			if (!arr[j][i]){ //if no block
+				minor_y = j;
+				minor_x = i;
+			}
+			else if (arr[j][i] == 1){ //discovered p1 block
+				worse++;
+				break;
+
+			}
+			else if (arr[j][i] == 2) wow++;
+		}
+		if (worse == 0){
+			if (wow>prev_wow){ //compare
+				pass->val1 = minor_y;
+				pass->val2 = minor_x;
+				prev_wow = wow;
+				printf("row wow %d %d ;;", pass->val1, pass->val2);
+			}
+		}
+	}
+
+	
+	//diagonal
+	bak = arr[0][0];
+	worse = 0;
+	wow = 0;
+	for (i = 1; i < row; i++){
+		if (!arr[i][i]){
+			minor_y = i;
+			minor_x = i;
+		}
+		else if (arr[i][i] == 1){ //discovered p1 block
+			worse++;
+			break;
+
+		}
+		else if (arr[i][i] == 2) wow++;
+	}
+	if (worse == 0){
+		if (wow>prev_wow){ //compare
+			pass->val1 = minor_y;
+			pass->val2 = minor_x;
+			prev_wow = wow;
+			printf("diag wow %d %d ;;", pass->val1, pass->val2);
+		}
+	}
+	
+	//reverse diag
+	bak = arr[0][row - 1];
+	worse = 0;
+	wow = 0;
+	for (i = 1; i < row; i++){
+		if (!arr[i][row - i - 1]){
+			minor_y = i;
+			minor_x = i;
+		}
+		else if (arr[i][row - i - 1] == 1){ //discovered p1 block
+			worse++;
+			break;
+
+		}
+		else if (arr[i][row - i - 1] == 2) wow++;
+	}
+	if (worse == 0){
+		if (wow>prev_wow){ //compare
+			pass->val1 = minor_y;
+			pass->val2 = minor_x;
+			prev_wow = wow;
+			printf("rev diag wow %d %d ;;", pass->val1, pass->val2);
+		}
+	}
+
+	Sleep(1000);
+	//in case something fails...
+	if (pass->val1 == -1 && pass->val2 == -1){
+		pass->val1 = rand() % row;
+		pass->val2 = rand() % row;
+		printf("nothing to do...%d %d", pass->val1, pass->val2);
+		Sleep(1000);
+	}
+
+
+	/*
+	int minor_x = -1, minor_y = -1;
+
+	for (i=0;i<row;i++){
+		for (j = 0; j < row; j++){
+			startloc_y = i;
+			startloc_x = j;
+			if (arr[i][j] == 2){
+				for (minor_y = -1; minor_y < 2; minor_y++){
+					for (minor_x = -1; minor_x < 2; minor_x++){
+						if (arr[startloc_y + minor_y][startloc_x + minor_x] == 0){
+							pass->val1 = startloc_y + minor_y;
+							pass->val2 = startloc_x + minor_x;
+							return 0;
+						}
+					}
+				}
+				if (minor_y==2&&minor_x==2) continue;//if no opening
+			
+			}
+		}
+	
+	
+	}
+	*/
+	
 	//return -1 when nothings been touched.
 	if (pass->val1 == -1 || pass->val1 == -1) return -1;
 	else return 0;
