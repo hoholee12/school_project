@@ -13,7 +13,7 @@
 #include<windows.h> //Sleep()
 #include<string.h>
 
-#define DEBUG 1
+//#define DEBUG
 
 typedef struct scoredat{
 	int score;
@@ -452,7 +452,7 @@ int player2engine(
 		}
 	}
 
-#ifdef DEBUG 1
+#ifdef DEBUG
 	for (i = 0; i < row; i++){
 		printf("\n\n");
 		for (j = 0; j < col; j++){
