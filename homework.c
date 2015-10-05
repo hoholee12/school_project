@@ -13,14 +13,22 @@
 #include<windows.h> //Sleep()
 #include<string.h>
 
+#define DEBUG 1
+
 typedef struct scoredat{
 	int score;
 	int count;
 }scoredat;
-typedef struct Option{
+typedef struct _option{
 	int swap;
 	int playa2;
-} Option;
+	int level;
+} _option;
+
+typedef struct input_alt{
+	int val1; //y row
+	int val2; //x col
+} input_alt;
 
 /*inputstate notes:
 user	==	1,2
@@ -37,7 +45,7 @@ void printarr_alt(int **arr, int row, int col,
 	int user,
 	int err, //just one user variable is not enough
 	const char *str,
-	Option *option
+	_option *option
 	){
 	system("cls");
 	int player1_count = 0, player2_count = 0, i, j;
@@ -50,6 +58,7 @@ void printarr_alt(int **arr, int row, int col,
 	printf("\tOptions: ");
 	if (option->swap == 1) printf("SWP ");
 	if (option->playa2 == 1) printf("AUTO ");
+	if (option->level) printf("LVL%d ", option->level);
 	printf("\n");
 
 	//preprocessing for player1_count, player2_count
@@ -105,12 +114,6 @@ void printarr_alt(int **arr, int row, int col,
 
 
 
-
-typedef struct input_alt{
-	int val1; //y row
-	int val2; //x col
-} input_alt;
-
 int dividenum(int row){
 	int count = 0, i;
 	for (i = 1; row / i; i *= 10) count++;
@@ -149,7 +152,7 @@ int advinput_alt(
 
 int userinput_alt(int **arr, int row, int col,
 	int user,
-	Option *option
+	_option *option
 	){
 	int i, result_r = row, result_c = col, max = row - 1, min = 0; //offset-1
 	input_alt pass = { 0 };
@@ -159,7 +162,7 @@ int userinput_alt(int **arr, int row, int col,
 			printf(".");
 			Sleep(200); //0.2 seconds
 		}
-		if (player2engine(arr, row, col, &pass) == -1){
+		if (player2engine(arr, row, col, &pass, option) == -1){
 			fprintf(stderr, "player2engine() crashed!!"); //exception error
 			abort();
 		}
@@ -209,14 +212,6 @@ void freearr(int **arr, int row, int col){ //free all memory from 2d array
 }
 
 
-
-char *xtarget(char *arg){ //parse string
-	int i;
-	for (i = 0; arg[i]; i++){
-		if (arg[i] == 'x') return &arg[i + 1];
-	}
-	return NULL;
-}
 
 
 
@@ -336,145 +331,6 @@ int checkcondition(int **arr, int row, int col){
 	return 0;
 }
 
-
-
-void printstatus(
-	int inputstate,
-	int totalplaytime,
-	scoredat *player1,
-	scoredat *player2,
-	int user
-	){
-	switch (inputstate){
-	case -2: printf("you have forfeited your turn! player%d wins!\n", 3 - user);
-		if (3 - user == 1) player1->score++;
-		else player2->score++;
-		break;
-	case -5: if (totalplaytime < 10 || totalplaytime>20){
-		switch (totalplaytime % 10){
-		case 1: printf("%dst round", totalplaytime); break;
-		case 2: printf("%dnd round", totalplaytime); break;
-		case 3: printf("%drd round", totalplaytime); break;
-		default: printf("%dth round", totalplaytime); break;
-		}
-	}
-			 else printf("%dth round", totalplaytime);
-			 printf(", player1 score=%d", player1->score);
-			 printf(", player2 score=%d", player2->score);
-
-			 if (player1->score > player2->score) printf("\nplayer1 won by +%d points", player1->score - player2->score);
-			 else if (player1->score == player2->score) printf("\nits a tie.");
-			 else printf("\nplayer2 won by +%d points", player2->score - player1->score);
-
-			 break;
-	default:;
-
-	}
-	printf("\n\n");
-}
-
-int game(int row, int col,
-	scoredat *player1,
-	scoredat *player2,
-	int totalplaytime,
-	int *switchuser,
-	Option *option
-	){
-	int **arr = NULL;
-	arr = allocarr(arr, row, col);
-	int user = *switchuser % 2 + 1; //pre
-
-	int inputstate;
-	for (;;){ //mainloop
-
-
-		printarr_alt(arr, row, col, user, 0, "", option);
-		switch (checkcondition(arr, row, col)){
-		case 1: printarr_alt(arr, row, col, user, -4, "player1 wins!", option); freearr(arr, row, col); return 1;
-		case 2: printarr_alt(arr, row, col, user, -4, "player2 wins!", option); freearr(arr, row, col); return 2;
-		case 3: printarr_alt(arr, row, col, user, -4, "its a tie!", option); freearr(arr, row, col); return 3;
-		}
-		for (; (inputstate = userinput_alt(arr, row, col, user, option)) != 0;){
-			switch (inputstate){
-			case -1: printarr_alt(arr, row, col, user, inputstate, "", option); break;
-			case -2: printstatus(inputstate, totalplaytime, player1, player2, user); (*switchuser)++; freearr(arr, row, col); return 0;
-			case -3: printarr_alt(arr, row, col, user, inputstate, "", option); break;
-			default:;
-			}
-			//printf("inputstate:%d", inputstate);
-		}
-		(*switchuser)++; //no brackets will actually mean *(switchuser++) so be careful!!
-		user = *switchuser % 2 + 1;
-	}
-	return 0;
-
-}
-
-/*game return info
--return 1: player1 wins
--return 2: player2 wins
--return 3: its a tie*/
-
-void seed(){
-	srand((unsigned)time(NULL));
-
-}
-
-//user defined getopt_struct
-typedef struct getopt_struct{
-	int on;
-	char *optstr; //strcpy needs the address of it! not itself...
-} getopt_struct;
-
-void simplegetopt(
-	int argc, char **argv,
-	getopt_struct *iparam,
-	getopt_struct *rparam,
-	getopt_struct *hparam,
-	getopt_struct *aparam
-	){
-	int i;
-	for (i = 1; i<argc; i++){
-		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
-			if (strlen(argv[i + 1])>0xFD){ fprintf(stderr, "buffer overflow!\n"); abort(); } //0xFE - "null terminator"
-			iparam->on++;
-			strcpy(iparam->optstr, argv[++i]);
-		}
-		else if (!strcmp(argv[i], "-r")){
-			rparam->on++;
-		}
-		else if (!strcmp(argv[i], "-h")){
-			hparam->on++;
-		}
-		else if (!strcmp(argv[i], "-a")){
-			aparam->on++;
-
-		}
-	}
-
-}
-
-void help(int argc, char **argv,
-	getopt_struct *iparam,
-	getopt_struct *rparam,
-	getopt_struct *hparam,
-	getopt_struct *aparam
-	){
-	fprintf(stderr, "homework.c - a tic-tac-toe game!"
-		"\nCopyright(C) 2015  hoholee12@naver.com"
-		"\nUsage: %s -i [row]x[col] -r"
-		"\n\t-i sets derterminant size by [row]x[col]"
-		"\n\t-r reverses [row][col] input ingame\n\n", argv[0]);
-	free(iparam->optstr);
-	free(rparam->optstr);
-	free(hparam->optstr);
-	free(aparam->optstr);
-	exit(0);
-};
-
-
-
-
 //the cpu will always be player2!
 /*
 return 0 => normal
@@ -484,12 +340,16 @@ return -1 => abnormal(undecided, crashed)
 
 int player2engine(
 	int **arr, int row, int col,	//main arr
-	input_alt *pass				//pass x,y to userinput_alt
+	input_alt *pass,				//pass x,y to userinput_alt
+	_option *option
 	){
 	//inform that nothings been touched
 	pass->val1 = -1;
 	pass->val2 = -1;
 
+	//option->level limiter
+	if (option->level < 2) option->level = 2;
+	else if (option->level>row - 1) option->level = row - 1;
 
 
 	//declare here
@@ -592,6 +452,16 @@ int player2engine(
 		}
 	}
 
+#ifdef DEBUG 1
+	for (i = 0; i < row; i++){
+		printf("\n\n");
+		for (j = 0; j < col; j++){
+			printf("\t%d", brain[i][j]);
+		}
+	}
+	getchar();
+
+#endif
 
 	//input to brain first
 	for (i = 0; i < row; i++){
@@ -606,7 +476,7 @@ int player2engine(
 
 	}
 
-	//offense
+	//controlled offense
 	//col
 	for (i = 0; i < row; i++){
 		worse = 0;
@@ -620,7 +490,7 @@ int player2engine(
 			else minor_x = j;
 		}
 		if (broken == 1);
-		else if (worse > row / 2){
+		else if (worse >= option->level){
 			pass->val1 = i;
 			pass->val2 = minor_x;
 		}
@@ -638,7 +508,7 @@ int player2engine(
 			else minor_y = j;
 		}
 		if (broken == 1);
-		else if (worse > row / 2){
+		else if (worse >= option->level){
 			pass->val1 = minor_y;
 			pass->val2 = i;
 		}
@@ -655,7 +525,7 @@ int player2engine(
 		else minor_x = i;
 	}
 	if (broken == 1);
-	else if (worse > row / 2){
+	else if (worse >= option->level){
 		pass->val1 = minor_x;
 		pass->val2 = minor_x;
 	}
@@ -674,11 +544,11 @@ int player2engine(
 		}
 	}
 	if (broken == 1);
-	else if (worse > row / 2){
+	else if (worse >= option->level){
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
 	}
-	
+
 	//defense
 	//col
 	for (i = 0; i < row; i++){
@@ -751,7 +621,7 @@ int player2engine(
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
 	}
-	
+
 	//more offense
 	//col
 	for (i = 0; i < row; i++){
@@ -784,7 +654,7 @@ int player2engine(
 			else minor_y = j;
 		}
 		if (broken == 1);
-		else if(worse >= row - 1){
+		else if (worse >= row - 1){
 			pass->val1 = minor_y;
 			pass->val2 = i;
 		}
@@ -840,12 +710,158 @@ int player2engine(
 	else return 0;
 }
 
+void printstatus(
+	int inputstate,
+	int totalplaytime,
+	scoredat *player1,
+	scoredat *player2,
+	int user
+	){
+	switch (inputstate){
+	case -2: printf("you have forfeited your turn! player%d wins!\n", 3 - user);
+		if (3 - user == 1) player1->score++;
+		else player2->score++;
+		break;
+	case -5: if (totalplaytime < 10 || totalplaytime>20){
+		switch (totalplaytime % 10){
+		case 1: printf("%dst round", totalplaytime); break;
+		case 2: printf("%dnd round", totalplaytime); break;
+		case 3: printf("%drd round", totalplaytime); break;
+		default: printf("%dth round", totalplaytime); break;
+		}
+	}
+			 else printf("%dth round", totalplaytime);
+			 printf(", player1 score=%d", player1->score);
+			 printf(", player2 score=%d", player2->score);
+
+			 if (player1->score > player2->score) printf("\nplayer1 won by +%d points", player1->score - player2->score);
+			 else if (player1->score == player2->score) printf("\nits a tie.");
+			 else printf("\nplayer2 won by +%d points", player2->score - player1->score);
+
+			 break;
+	default:;
+
+	}
+	printf("\n\n");
+}
+
+int game(int row, int col,
+	scoredat *player1,
+	scoredat *player2,
+	int totalplaytime,
+	int *switchuser,
+	_option *option
+	){
+	int **arr = NULL;
+	arr = allocarr(arr, row, col);
+	int user = *switchuser % 2 + 1; //pre
+
+	int inputstate;
+	for (;;){ //mainloop
+
+
+		printarr_alt(arr, row, col, user, 0, "", option);
+		switch (checkcondition(arr, row, col)){
+		case 1: printarr_alt(arr, row, col, user, -4, "player1 wins!", option); freearr(arr, row, col); return 1;
+		case 2: printarr_alt(arr, row, col, user, -4, "player2 wins!", option); freearr(arr, row, col); return 2;
+		case 3: printarr_alt(arr, row, col, user, -4, "its a tie!", option); freearr(arr, row, col); return 3;
+		}
+		for (; (inputstate = userinput_alt(arr, row, col, user, option)) != 0;){
+			switch (inputstate){
+			case -1: printarr_alt(arr, row, col, user, inputstate, "", option); break;
+			case -2: printstatus(inputstate, totalplaytime, player1, player2, user); (*switchuser)++; freearr(arr, row, col); return 0;
+			case -3: printarr_alt(arr, row, col, user, inputstate, "", option); break;
+			default:;
+			}
+			//printf("inputstate:%d", inputstate);
+		}
+		(*switchuser)++; //no brackets will actually mean *(switchuser++) so be careful!!
+		user = *switchuser % 2 + 1;
+	}
+	return 0;
+
+}
+
+/*game return info
+-return 1: player1 wins
+-return 2: player2 wins
+-return 3: its a tie*/
+
+void seed(){
+	srand((unsigned)time(NULL));
+
+}
+
+//user defined getopt_struct
+typedef struct getopt_struct{
+	int on;
+	char *optstr; //strcpy needs the address of it! not itself...
+} getopt_struct;
+
+void simplegetopt(
+	int argc, char **argv,
+	getopt_struct *iparam,
+	getopt_struct *rparam,
+	getopt_struct *hparam,
+	getopt_struct *aparam
+	){
+	int i;
+	for (i = 1; i<argc; i++){
+		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
+			if (strlen(argv[i + 1])>0xFD){ fprintf(stderr, "buffer overflow!\n"); abort(); } //0xFE - "null terminator"
+			iparam->on++;
+			if (i + 1 < argc) strcpy(iparam->optstr, argv[++i]); //row x col size
+			else strcpy(iparam->optstr, "3x3"); //default
+		}
+		else if (!strcmp(argv[i], "-r")){
+			rparam->on++;
+		}
+		else if (!strcmp(argv[i], "-h")){
+			hparam->on++;
+		}
+		else if (!strcmp(argv[i], "-a")){
+			aparam->on++;
+			if (i + 1 < argc) strcpy(aparam->optstr, argv[++i]); //difficulty level
+			else strcpy(aparam->optstr, "2"); //default
+		}
+	}
+
+}
+
+void help(int argc, char **argv,
+	getopt_struct *iparam,
+	getopt_struct *rparam,
+	getopt_struct *hparam,
+	getopt_struct *aparam
+	){
+	fprintf(stderr, "homework.c - a tic-tac-toe game!"
+		"\nCopyright(C) 2015  hoholee12@naver.com"
+		"\nUsage: %s -i [row]x[col] -r -a [level: 2(most aggressive) ~ row-1(least aggressive)]"
+		"\n\t-i sets derterminant size by [row]x[col]"
+		"\n\t-r reverses [row][col] input ingame"
+		"\n\t-a is a computer opponent\n\n", argv[0]);
+	free(iparam->optstr);
+	free(rparam->optstr);
+	free(hparam->optstr);
+	free(aparam->optstr);
+	exit(0);
+};
+
+
+char *xtarget(char *arg){ //parse string
+	int i;
+	for (i = 0; arg[i]; i++){
+		if (arg[i] == 'x') return &arg[i + 1];
+	}
+	return NULL;
+}
+
 int main(int argc, char **argv){
 	//initial parsing
 	seed();
 	scoredat player1 = { 0 };
 	scoredat player2 = { 0 };
-	Option option = { 0 };
+	_option option = { 0 };
 	int row = 3, col = 3;
 	getopt_struct iparam = { 0 }; iparam.optstr = calloc(0xfe, sizeof(char)); //allocate struct in stack first, allocate string contents in the heap after.
 	getopt_struct rparam = { 0 }; rparam.optstr = calloc(0xfe, sizeof(char)); //option>>swap
@@ -857,7 +873,11 @@ int main(int argc, char **argv){
 		col = atoi(xtarget(iparam.optstr));
 	}
 	if (rparam.on > 0) option.swap = 1;
-	if (aparam.on > 0) option.playa2 = 1;
+	if (aparam.on > 0){
+		option.playa2 = 1;
+		option.level = atoi(aparam.optstr);
+		if (!option.level) option.level = 2; //default
+	}
 	if (col != row) col = row; //needed for square det
 	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam, &aparam);
 	free(iparam.optstr);
