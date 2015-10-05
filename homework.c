@@ -230,7 +230,7 @@ how simple :3
 */
 
 int checkcondition(int **arr, int row, int col){
-	int i, j, bak, bad;
+	int i, j, bak, bad, p1_exists, p2_exists, notatie;
 	//row
 	for (i = 0; i < row; i++){
 		bak = arr[i][0];
@@ -279,18 +279,59 @@ int checkcondition(int **arr, int row, int col){
 	if ((!bad) && (bak != 0)) return bak;
 
 	//final sequence
-	bad = 0;
-	for (i = 0; i < row; i++){
-		for (j = 0; j < col; j++){
-			if (!arr[i][j]){
-				bad = 1;
-				break;
-			}
+	notatie = 0;
+	for (i = 0; i<row; i++){
+		p1_exists = 0;
+		p2_exists = 0;
+		for (j = 0; j<col; j++){
+			if (arr[i][j] == 1) p1_exists++;
+			else if (arr[i][j] == 2) p2_exists++;
+
+
 
 		}
-		if (bad == 1) break;
+		if ((p1_exists&&!p2_exists) || (!p1_exists&&p2_exists) || (!p1_exists&&!p2_exists)){
+			notatie++; //not a tie!
+			break;
+		}
 	}
-	if (!bad) return 3; //tie
+	for (i = 0; i<row; i++){
+		p1_exists = 0;
+		p2_exists = 0;
+		for (j = 0; j<col; j++){
+			if (arr[j][i] == 1) p1_exists++;
+			else if (arr[j][i] == 2) p2_exists++;
+
+
+
+		}
+		if ((p1_exists&&!p2_exists) || (!p1_exists&&p2_exists) || (!p1_exists&&!p2_exists)){
+			notatie++; //not a tie!
+			break;
+		}
+	}
+	p1_exists = 0;
+	p2_exists = 0;
+	for (i = 0; i<row; i++){
+		if (arr[i][i] == 1) p1_exists++;
+		else if (arr[i][i] == 2) p2_exists++;
+
+
+	}
+	if ((p1_exists&&!p2_exists) || (!p1_exists&&p2_exists) || (!p1_exists&&!p2_exists)) notatie++; //not a tie!
+
+	p1_exists = 0;
+	p2_exists = 0;
+	for (i = 0; i<row; i++){
+		if (arr[i][row - i - 1] == 1) p1_exists++;
+		else if (arr[i][row - i - 1] == 2) p2_exists++;
+
+
+	}
+	if ((p1_exists&&!p2_exists) || (!p1_exists&&p2_exists) || (!p1_exists&&!p2_exists)) notatie++; //not a tie!
+
+
+	if (!notatie) return 3; //its a tie!
 
 	return 0;
 }
@@ -454,7 +495,6 @@ int player2engine(
 	//declare here
 	int i, j, k, broken = 0, prev_brain = 3/*maximum*/, nostart = 0, startloc_x, startloc_y, worse, minor_y = -1, minor_x = -1;
 
-
 	//if start first, put at center
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
@@ -566,7 +606,7 @@ int player2engine(
 
 	}
 
-	//final shot
+	//offense
 	//col
 	for (i = 0; i < row; i++){
 		worse = 0;
@@ -603,7 +643,6 @@ int player2engine(
 			pass->val2 = i;
 		}
 	}
-
 	//diagonal
 	worse = 0;
 	broken = 0;
@@ -620,7 +659,6 @@ int player2engine(
 		pass->val1 = minor_x;
 		pass->val2 = minor_x;
 	}
-
 	//reverse diag
 	worse = 0;
 	broken = 0;
@@ -640,7 +678,7 @@ int player2engine(
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
 	}
-
+	
 	//defense
 	//col
 	for (i = 0; i < row; i++){
@@ -678,8 +716,6 @@ int player2engine(
 			pass->val2 = i;
 		}
 	}
-
-
 	//diagonal
 	worse = 0;
 	broken = 0;
@@ -696,8 +732,6 @@ int player2engine(
 		pass->val1 = minor_x;
 		pass->val2 = minor_x;
 	}
-
-
 	//reverse diag
 	worse = 0;
 	broken = 0;
@@ -717,6 +751,80 @@ int player2engine(
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
 	}
+	
+	//more offense
+	//col
+	for (i = 0; i < row; i++){
+		worse = 0;
+		broken = 0;
+		for (j = 0; j < col; j++){ //one col loop
+			if (arr[i][j] == 2) worse++;
+			else if (arr[i][j] == 1){
+				broken = 1;
+				break;
+			}
+			else minor_x = j;
+		}
+		if (broken == 1);
+		else if (worse >= row - 1){
+			pass->val1 = i;
+			pass->val2 = minor_x;
+		}
+	}
+	//row
+	for (i = 0; i < row; i++){
+		worse = 0;
+		broken = 0;
+		for (j = 0; j < col; j++){ //one col loop
+			if (arr[j][i] == 2) worse++;
+			else if (arr[j][i] == 1){
+				broken = 1;
+				break;
+			}
+			else minor_y = j;
+		}
+		if (broken == 1);
+		else if(worse >= row - 1){
+			pass->val1 = minor_y;
+			pass->val2 = i;
+		}
+	}
+	//diagonal
+	worse = 0;
+	broken = 0;
+	for (i = 0; i < row; i++){
+		if (arr[i][i] == 2) worse++;
+		else if (arr[i][i] == 1){
+			broken = 1;
+			break;
+		}
+		else minor_x = i;
+	}
+	if (broken == 1);
+	else if (worse >= row - 1){
+		pass->val1 = minor_x;
+		pass->val2 = minor_x;
+	}
+	//reverse diag
+	worse = 0;
+	broken = 0;
+	for (i = 0; i < row; i++){
+		if (arr[i][row - i - 1] == 2) worse++;
+		else if (arr[i][row - i - 1] == 1){
+			broken = 1;
+			break;
+		}
+		else{
+			minor_y = i;
+			minor_x = row - i - 1;
+		}
+	}
+	if (broken == 1);
+	else if (worse >= row - 1){
+		pass->val1 = minor_y;
+		pass->val2 = minor_x;
+	}
+
 
 
 
@@ -725,7 +833,7 @@ int player2engine(
 		pass->val1 = rand() % row;
 		pass->val2 = rand() % row;
 	}
-	
+
 	freearr(brain, row, col); //free memory
 	//return -1 when nothings been touched.
 	if (pass->val1 == -1 || pass->val2 == -1) return -1;
