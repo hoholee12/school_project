@@ -3,18 +3,14 @@
 *
 * May be freely distributed and modified as long as copyright
 * is retained.
-* except for those motherfuckers who want to steal my homework without doing any hard work - go kill yourselves!!
 */
 
 
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
-#ifndef _WIN32
-#include<unistd.h> //sleep()
-#else
+
 #include<windows.h> //Sleep()
-#endif
 #include<string.h>
 
 typedef struct scoredat{
@@ -37,47 +33,13 @@ str		==	-4
 *always sort with switch statement!!
 */
 
-//non _alt versions are all deprecated and should not be used!!
-/*
-void printarr(int **arr, int row, int col, int user){ //print 2d array
-#ifndef _WIN32
-printf("\x1b[2J");
-#else
-system("cls");
-#endif
-int count = 0;
-for (int i = 0; i<row; i++){
-for (int j = 0; j<col; j++){
-count++;
-if (arr[i][j] == 0) printf("%d\t", count);
-else if (arr[i][j] == 1) printf("O\t"); //player1==O
-else if (arr[i][j] == 2) printf("X\t"); //player2==X
-}
-if (i == 1) switch (user){
-case -1: printf("\t\tyou can't go there!"); break;
-default: printf("\t\tplayer%d's turn!", user); break;
-}
-printf("\n");
-
-}
-
-
-}
-*/
-/*printarr counts generationally
-**printarr_alt counts by row*col */
-
 void printarr_alt(int **arr, int row, int col,
 	int user,
 	int err, //just one user variable is not enough
 	const char *str,
 	Option *option
 	){
-#ifndef _WIN32
-	printf("\x1b[2J\x1b[0;0H");
-#else
 	system("cls");
-#endif
 	int player1_count = 0, player2_count = 0, i, j;
 	printf("\t");
 	for (i = 1; i <= row; i++) printf("%d\t", i);
@@ -114,7 +76,7 @@ void printarr_alt(int **arr, int row, int col,
 		}
 		if (i == 0){
 			printf("\tplayer1=%d/%d  player2=%d/%d  total=%d/%d",
-				player1_count, row*row/2, player2_count, row*row/2, player1_count + player2_count, row*row);
+				player1_count, row*row / 2, player2_count, row*row / 2, player1_count + player2_count, row*row);
 		}
 		if (i == 1){
 			if (option->playa2 == 1 && user == 2){
@@ -122,7 +84,7 @@ void printarr_alt(int **arr, int row, int col,
 				case -4: printf("\t\t%s", str); break;
 				default: printf("\t\tplayer%d's turn!", user); break;
 				}
-			
+
 			}
 			else{
 				switch (err){
@@ -140,24 +102,10 @@ void printarr_alt(int **arr, int row, int col,
 
 
 }
-/*
-int advinput(){
-fflush(stdin); //flush any remaining cr
 
-char *input = (char *)calloc(1, sizeof(char));
-scanf("%s", input); //scanf address to string goes like this...
-if (input[0] == 'q') return 'q';
-int val1 = atoi(input);
-int val2 = 1;
-for (int i = 0; input[i]; i++){
-if (input[i] == 'x'){
-val2 = atoi(&input[i + 1]);
-break;
-}
-}
-return val1*val2;
-}
-*/
+
+
+
 typedef struct input_alt{
 	int val1; //y row
 	int val2; //x col
@@ -209,14 +157,9 @@ int userinput_alt(int **arr, int row, int col,
 		printf("player2 is thinking");
 		for (i = 0; i < 3; i++){
 			printf(".");
-#ifdef _WIN32
 			Sleep(200); //0.2 seconds
-#else
-			fflush(stdout);
-			usleep(200000);
-#endif
 		}
-		if (player2engine(&pass, arr, row, col, option) == -1){
+		if (player2engine(arr, row, col, &pass) == -1){
 			fprintf(stderr, "player2engine() crashed!!"); //exception error
 			abort();
 		}
@@ -225,12 +168,6 @@ int userinput_alt(int **arr, int row, int col,
 		printf("player%d>>", user);
 		advinput_alt(&pass, row, col);
 	}
-#ifdef _WIN32
-	//Sleep(200); //0.2 seconds
-#else
-	//fflush(stdout);
-	//usleep(200000);
-#endif
 	switch (pass.val1){
 	case 'q': return -2;
 	case -3: return -3;
@@ -241,7 +178,7 @@ int userinput_alt(int **arr, int row, int col,
 	if (pass.val2>max || pass.val2<min) return -1;
 
 	//this is where you can swap row & col, default should be val1=row, val2=col
-	if (option->swap == 1&&user!=2){
+	if (option->swap == 1 && user != 2){
 		if (arr[pass.val2][pass.val1] != 0) return -1; //problem
 		arr[pass.val2][pass.val1] = user;
 	}
@@ -251,30 +188,11 @@ int userinput_alt(int **arr, int row, int col,
 	}
 	return 0;
 }
-/*
-int userinput(int **arr, int row, int col, int user){
-int input = NULL, result_r = row, result_c = col, max = row*col, min = 1;
-printf("player%d>>", user);
-input = advinput();
-//printf("%c %d", input, input);
-#ifndef _WIN32
-//sleep(1); //1sec
-#else
-//Sleep(1000); //1sec
-#endif
-if (input == 'q') return -2;
-//input -= 48; //ascii 1 is 49 //we dont need this anymore
-if (input>max || input<min) return -1;
-input--; //offset =input-1
-result_r = input / col;
-result_c = input % col;
 
-//printf("%dx%d", result_r, result_c);
-if (arr[result_r][result_c] != 0) return -1; //problem
-arr[result_r][result_c] = user;
-return 0;
-}
-*/
+
+
+
+
 int **allocarr(int **arr, int row, int col){ //allocate 2d array
 	int i;
 	arr = calloc(row, sizeof(int)); //allocate row first
@@ -377,19 +295,7 @@ int checkcondition(int **arr, int row, int col){
 	return 0;
 }
 
-//*****************************************TODO
 
-int quickcheck(int **arr, int row, int col){
-	int **test = NULL;
-	test=allocarr(test, row, col);
-	
-	
-	checkcondition(arr, row, col);
-	return 0;
-}
-
-
-//*****************************************TODO
 
 void printstatus(
 	int inputstate,
@@ -459,8 +365,6 @@ int game(int row, int col,
 		(*switchuser)++; //no brackets will actually mean *(switchuser++) so be careful!!
 		user = *switchuser % 2 + 1;
 	}
-	printf("go fuck yourselves, this code is broken!!!\n"); //you will never reach this line >:o
-	exit(123);
 	return 0;
 
 }
@@ -503,7 +407,7 @@ void simplegetopt(
 		}
 		else if (!strcmp(argv[i], "-a")){
 			aparam->on++;
-		
+
 		}
 	}
 
@@ -530,9 +434,6 @@ void help(int argc, char **argv,
 
 
 
-
-
-//*****************************************TODO
 //the cpu will always be player2!
 /*
 return 0 => normal
@@ -541,9 +442,8 @@ return -1 => abnormal(undecided, crashed)
 */
 
 int player2engine(
-	input_alt *pass,
-	int **arr, int row, int col,
-	Option *option
+	int **arr, int row, int col,	//main arr
+	input_alt *pass				//pass x,y to userinput_alt
 	){
 	//inform that nothings been touched
 	pass->val1 = -1;
@@ -552,7 +452,7 @@ int player2engine(
 
 
 	//declare here
-	int i, j, k, broken=0, prev_brain=3/*maximum*/, nostart = 0, startloc_x, startloc_y, bak, worse, minor_y = -1, minor_x = -1, wow=0, prev_wow=0;
+	int i, j, k, broken = 0, prev_brain = 3/*maximum*/, nostart = 0, startloc_x, startloc_y, worse, minor_y = -1, minor_x = -1;
 
 
 	//if start first, put at center
@@ -581,7 +481,7 @@ int player2engine(
 		}
 		return 0;
 	}
-	
+
 
 	//third step - offense
 	/*
@@ -596,7 +496,7 @@ int player2engine(
 
 
 	int **brain = NULL;
-	brain=allocarr(brain, row, col);
+	brain = allocarr(brain, row, col);
 	//col
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
@@ -609,7 +509,7 @@ int player2engine(
 				break;
 			}
 		}
-	
+
 	}
 	//row
 	for (i = 0; i < row; i++){
@@ -630,7 +530,7 @@ int player2engine(
 		if (arr[i][i] == 1){
 			for (k = 0; k < col; k++) brain[k][k]++; //fill whole line
 			break;
-		
+
 		}
 		if (arr[i][i] == 2){
 			for (k = 0; k < col; k++) brain[k][k]--; //fill whole line
@@ -653,17 +553,17 @@ int player2engine(
 	}
 
 
-	//input to brain
+	//input to brain first
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
-			if (brain[i][j]<prev_brain&&arr[i][j]==0){
+			if (brain[i][j]<prev_brain&&arr[i][j] == 0){
 				prev_brain = brain[i][j];
 				pass->val1 = i;
 				pass->val2 = j;
 			}
-		
+
 		}
-	
+
 	}
 
 	//final shot
@@ -683,7 +583,6 @@ int player2engine(
 		else if (worse > row / 2){
 			pass->val1 = i;
 			pass->val2 = minor_x;
-			printf("fcol %d %d ;;", pass->val1, pass->val2);
 		}
 	}
 	//row
@@ -702,7 +601,6 @@ int player2engine(
 		else if (worse > row / 2){
 			pass->val1 = minor_y;
 			pass->val2 = i;
-			printf("frow %d %d ;;", pass->val1, pass->val2);
 		}
 	}
 
@@ -721,7 +619,6 @@ int player2engine(
 	else if (worse > row / 2){
 		pass->val1 = minor_x;
 		pass->val2 = minor_x;
-		printf("fdiag %d %d ;;", pass->val1, pass->val2);
 	}
 
 	//reverse diag
@@ -742,7 +639,6 @@ int player2engine(
 	else if (worse > row / 2){
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
-		printf("frev diag %d %d ;;", pass->val1, pass->val2);
 	}
 
 	//defense
@@ -762,7 +658,6 @@ int player2engine(
 		else if (worse >= row - 1){
 			pass->val1 = i;
 			pass->val2 = minor_x;
-			printf("col %d %d ;;", pass->val1, pass->val2);
 		}
 	}
 	//row
@@ -771,9 +666,9 @@ int player2engine(
 		broken = 0;
 		for (j = 0; j < col; j++){ //one col loop
 			if (arr[j][i] == 1) worse++;
-			else if (arr[j][i] == 2){ 
+			else if (arr[j][i] == 2){
 				broken = 1;
-				break; 
+				break;
 			}
 			else minor_y = j;
 		}
@@ -781,7 +676,6 @@ int player2engine(
 		else if (worse >= row - 1){
 			pass->val1 = minor_y;
 			pass->val2 = i;
-			printf("row %d %d ;;", pass->val1, pass->val2);
 		}
 	}
 
@@ -790,18 +684,17 @@ int player2engine(
 	worse = 0;
 	broken = 0;
 	for (i = 0; i < row; i++){
-			if (arr[i][i] == 1) worse++;
-			else if (arr[i][i] == 2){
-				broken = 1;
-				break;
-			}
-			else minor_x = i;
+		if (arr[i][i] == 1) worse++;
+		else if (arr[i][i] == 2){
+			broken = 1;
+			break;
+		}
+		else minor_x = i;
 	}
 	if (broken == 1);
 	else if (worse >= row - 1){
 		pass->val1 = minor_x;
 		pass->val2 = minor_x;
-		printf("diag %d %d ;;", pass->val1, pass->val2);
 	}
 
 
@@ -809,7 +702,7 @@ int player2engine(
 	worse = 0;
 	broken = 0;
 	for (i = 0; i < row; i++){
-		if (arr[i][row-i-1] == 1) worse++;
+		if (arr[i][row - i - 1] == 1) worse++;
 		else if (arr[i][row - i - 1] == 2){
 			broken = 1;
 			break;
@@ -823,187 +716,27 @@ int player2engine(
 	else if (worse >= row - 1){
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
-		printf("rev diag %d %d ;;", pass->val1, pass->val2);
 	}
 
 
-	
 
-
-	//print brain
-	printf("\n");
-	for (i = 0; i < row; i++){
-		for (j = 0; j < col; j++){
-			printf("%d\t", brain[i][j]);
-		}
-		printf("\n");
-	
-	}
-
-	
 	//in case something fails...
 	if (pass->val1 == -1 || pass->val2 == -1){
 		pass->val1 = rand() % row;
 		pass->val2 = rand() % row;
-		printf("nothing to do...%d %d", pass->val1, pass->val2);
-	}
-	else printf("result...%d %d", pass->val1, pass->val2);
-	Sleep(500);
-	//getchar();
-
-	/*
-
-	//col
-	for (i = 0; i < row; i++){
-		worse = 0;
-		wow = 0;
-		for (j = 1; j < col; j++){ //one col loop
-			if (!arr[i][j]){ //if no block
-				minor_y = i;
-				minor_x = j;
-			}
-			else if (arr[i][j] == 1){ //discovered p1 block
-				worse++;
-				break;
-			
-			}
-			else if (arr[i][j] == 2) wow++;
-		}
-		if (worse==0){
-			if (wow>prev_wow){ //compare
-				pass->val1 = minor_y;
-				pass->val2 = minor_x;
-				prev_wow=wow;
-				printf("col wow %d %d ;;", pass->val1, pass->val2);
-			}
-		}
-	}
-	//row
-	for (i = 0; i < row; i++){
-		worse = 0;
-		wow = 0;
-		for (j = 1; j < col; j++){ //one col loop
-			if (!arr[j][i]){ //if no block
-				minor_y = j;
-				minor_x = i;
-			}
-			else if (arr[j][i] == 1){ //discovered p1 block
-				worse++;
-				break;
-
-			}
-			else if (arr[j][i] == 2) wow++;
-		}
-		if (worse == 0){
-			if (wow>prev_wow){ //compare
-				pass->val1 = minor_y;
-				pass->val2 = minor_x;
-				prev_wow = wow;
-				printf("row wow %d %d ;;", pass->val1, pass->val2);
-			}
-		}
-	}
-
-	
-	//diagonal
-	bak = arr[0][0];
-	worse = 0;
-	wow = 0;
-	for (i = 1; i < row; i++){
-		if (!arr[i][i]){
-			minor_y = i;
-			minor_x = i;
-		}
-		else if (arr[i][i] == 1){ //discovered p1 block
-			worse++;
-			break;
-
-		}
-		else if (arr[i][i] == 2) wow++;
-	}
-	if (worse == 0){
-		if (wow>prev_wow){ //compare
-			pass->val1 = minor_y;
-			pass->val2 = minor_x;
-			prev_wow = wow;
-			printf("diag wow %d %d ;;", pass->val1, pass->val2);
-		}
 	}
 	
-	//reverse diag
-	bak = arr[0][row - 1];
-	worse = 0;
-	wow = 0;
-	for (i = 1; i < row; i++){
-		if (!arr[i][row - i - 1]){
-			minor_y = i;
-			minor_x = i;
-		}
-		else if (arr[i][row - i - 1] == 1){ //discovered p1 block
-			worse++;
-			break;
-
-		}
-		else if (arr[i][row - i - 1] == 2) wow++;
-	}
-	if (worse == 0){
-		if (wow>prev_wow){ //compare
-			pass->val1 = minor_y;
-			pass->val2 = minor_x;
-			prev_wow = wow;
-			printf("rev diag wow %d %d ;;", pass->val1, pass->val2);
-		}
-	}
-
-	Sleep(1000);
-	//in case something fails...
-	if (pass->val1 == -1 && pass->val2 == -1){
-		pass->val1 = rand() % row;
-		pass->val2 = rand() % row;
-		printf("nothing to do...%d %d", pass->val1, pass->val2);
-		Sleep(1000);
-	}
-
-
-	/*
-	int minor_x = -1, minor_y = -1;
-
-	for (i=0;i<row;i++){
-		for (j = 0; j < row; j++){
-			startloc_y = i;
-			startloc_x = j;
-			if (arr[i][j] == 2){
-				for (minor_y = -1; minor_y < 2; minor_y++){
-					for (minor_x = -1; minor_x < 2; minor_x++){
-						if (arr[startloc_y + minor_y][startloc_x + minor_x] == 0){
-							pass->val1 = startloc_y + minor_y;
-							pass->val2 = startloc_x + minor_x;
-							return 0;
-						}
-					}
-				}
-				if (minor_y==2&&minor_x==2) continue;//if no opening
-			
-			}
-		}
-	
-	
-	}
-	*/
 	freearr(brain, row, col); //free memory
 	//return -1 when nothings been touched.
-	if (pass->val1 == -1 || pass->val1 == -1) return -1;
+	if (pass->val1 == -1 || pass->val2 == -1) return -1;
 	else return 0;
 }
-
-//*****************************************TODO
 
 int main(int argc, char **argv){
 	//initial parsing
 	seed();
 	scoredat player1 = { 0 };
 	scoredat player2 = { 0 };
-	//scoredat test1 = {0}; //you can also init struct using this method, how nice!
 	Option option = { 0 };
 	int row = 3, col = 3;
 	getopt_struct iparam = { 0 }; iparam.optstr = calloc(0xfe, sizeof(char)); //allocate struct in stack first, allocate string contents in the heap after.
@@ -1030,21 +763,12 @@ int main(int argc, char **argv){
 	int totalplaytime, switchuser = 0, i;
 	for (totalplaytime = 1;; totalplaytime++){
 		if (totalplaytime == 1){ //flip the coin!
-#ifndef _WIN32
-			printf("\x1b[2J\x1b[0;0H");
-#else
-			system("cls");
-#endif
+			system("cls"); //clear screen
 			printf("lets flip the coin! head is player1, tail is player2"
 				"\npress any key to start flipping!...");
 			getchar();
 			for (i = 0; i < 3; i++){
-#ifdef _WIN32
 				Sleep(200); //0.2 seconds
-#else
-				fflush(stdout);
-				usleep(200000);
-#endif
 				printf(". ");
 			}
 			switch (rand() % 2 + 1){
@@ -1075,8 +799,3 @@ int main(int argc, char **argv){
 
 	return 0;
 }
-
-/*TODO:
--still have scoredat->count lying around...maybe i can use it for internal game engine??
--some bullshit happening on freeing array on xcode platform...>:o    -.- will fix later
-*/
