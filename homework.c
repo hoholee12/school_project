@@ -337,7 +337,7 @@ return 0 => normal
 return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
-//#define REVERSE
+//#define REVERSE //will not make any difference when difficulty level is set to 1(most aggressive).
 
 int player2engine(
 	int **arr, int row, int col,	//main arr
