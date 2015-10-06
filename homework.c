@@ -360,7 +360,8 @@ int player2engine(
 #else
 	int prev_brain = 3;/*maximum*/
 #endif
-	//if start first, put at center
+
+	//first & second start here
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
 			if (arr[i][j]){
@@ -372,6 +373,7 @@ int player2engine(
 			}
 		}
 	}
+	//if start first, put at center
 	if (!nostart){
 		pass->val1 = row / 2;
 		pass->val2 = col / 2;
