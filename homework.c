@@ -14,15 +14,22 @@
 #include<string.h>
 
 //#define DEBUG
+#define QUICK_DEBUG
 
 typedef struct scoredat{
 	int score;
 	int count;
 }scoredat;
+
+typedef struct _level{
+	int on;
+	int level;
+
+} _level;
 typedef struct _option{
 	int swap;
-	int playa2;
-	int level;
+	_level playa1;
+	_level playa2;
 } _option;
 
 typedef struct input_alt{
@@ -57,8 +64,12 @@ void printarr_alt(int **arr, int row, int col,
 	//input option menu here, three letters each!
 	printf("\tOptions: ");
 	if (option->swap == 1) printf("SWP ");
-	if (option->playa2 == 1) printf("AUTO ");
-	if (option->level) printf("LVL%d ", option->level);
+	if (option->playa2.on == 1) printf("AUTO ");
+	if (option->playa2.level) printf("LVL%d ", option->playa2.level);
+
+	if (option->playa1.on == 1) printf("P1CPU ");
+	if (option->playa1.level) printf("LVL%d ", option->playa1.level);
+	
 	printf("\n");
 
 	//preprocessing for player1_count, player2_count
@@ -88,7 +99,14 @@ void printarr_alt(int **arr, int row, int col,
 				player1_count, row*row / 2, player2_count, row*row / 2, player1_count + player2_count, row*row);
 		}
 		if (i == 1){
-			if (option->playa2 == 1 && user == 2){
+			if (option->playa2.on == 1 && user == 2){
+				switch (err){
+				case -4: printf("\t\t%s", str); break;
+				default: printf("\t\tplayer%d's turn!", user); break;
+				}
+
+			}
+			else if (option->playa1.on == 1 && user == 1){
 				switch (err){
 				case -4: printf("\t\t%s", str); break;
 				default: printf("\t\tplayer%d's turn!", user); break;
@@ -150,20 +168,45 @@ int advinput_alt(
 	return 0;
 }
 
+//im here!
+int game_engine(
+	int **arr, int row, int col,	//main arr
+	input_alt *pass,				//pass x,y to userinput_alt
+	_option *option,
+	int user
+	);
+
+
+
 int userinput_alt(int **arr, int row, int col,
 	int user,
 	_option *option
 	){
 	int i, result_r = row, result_c = col, max = row - 1, min = 0; //offset-1
 	input_alt pass = { 0 };
-	if (option->playa2 == 1 && user == 2){
+	if (option->playa2.on == 1 && user == 2){
 		printf("player2 is thinking");
+#ifndef QUICK_DEBUG
 		for (i = 0; i < 3; i++){
 			printf(".");
 			Sleep(200); //0.2 seconds
 		}
-		if (player2engine(arr, row, col, &pass, option) == -1){
-			fprintf(stderr, "player2engine() crashed!!"); //exception error
+#endif
+		if (game_engine(arr, row, col, &pass, option, user) == -1){
+			fprintf(stderr, "game_engine() crashed!!"); //exception error
+			abort();
+		}
+	}
+	else if(option->playa1.on == 1 && user == 1){
+		printf("player1 is thinking");
+#ifndef QUICK_DEBUG
+		for (i = 0; i < 3; i++){
+			printf(".");
+			Sleep(200); //0.2 seconds
+		}
+#endif
+		if (game_engine(arr, row, col, &pass, option, user) == -1){
+			fprintf(stderr, "game_engine() crashed!!"); //exception error
 			abort();
 		}
 	}
@@ -339,19 +382,34 @@ return -1 => abnormal(undecided, crashed)
 */
 //#define REVERSE //will not make any difference when difficulty level is set to 1(most aggressive). it may even bypass the randomizer altogether!
 
-int player2engine(
+_level *player1_option(int row, _option *option){
+
+	//option->level limiter
+	if (option->playa1.level < 1) option->playa1.level = 1;
+	else if (option->playa1.level>row - 1) option->playa1.level = row - 1;
+	return &option->playa1;
+}
+
+_level *player2_option(int row, _option *option){
+
+	//option->level limiter
+	if (option->playa2.level < 1) option->playa2.level = 1;
+	else if (option->playa2.level>row - 1) option->playa2.level = row - 1;
+	return &option->playa2;
+}
+
+int game_engine(
 	int **arr, int row, int col,	//main arr
 	input_alt *pass,				//pass x,y to userinput_alt
-	_option *option
+	_option *option,
+	int user
 	){
 	//inform that nothings been touched
 	pass->val1 = -1;
 	pass->val2 = -1;
-
-	//option->level limiter
-	if (option->level < 1) option->level = 1;
-	else if (option->level>row - 1) option->level = row - 1;
-
+	_level *engine_option;
+	if (user == 1) engine_option = player1_option(row, option);
+	else if (user == 2) engine_option = player2_option(row, option);
 
 	//declare here
 	int i, j, k, broken = 0, nostart = 0, startloc_x, startloc_y, worse, minor_y = -1, minor_x = -1;
@@ -501,7 +559,7 @@ int player2engine(
 			else minor_x = j;
 		}
 		if (broken == 1);
-		else if (worse >= option->level){
+		else if (worse >= engine_option->level){
 			pass->val1 = i;
 			pass->val2 = minor_x;
 		}
@@ -519,7 +577,7 @@ int player2engine(
 			else minor_y = j;
 		}
 		if (broken == 1);
-		else if (worse >= option->level){
+		else if (worse >= engine_option->level){
 			pass->val1 = minor_y;
 			pass->val2 = i;
 		}
@@ -536,7 +594,7 @@ int player2engine(
 		else minor_x = i;
 	}
 	if (broken == 1);
-	else if (worse >= option->level){
+	else if (worse >= engine_option->level){
 		pass->val1 = minor_x;
 		pass->val2 = minor_x;
 	}
@@ -555,7 +613,7 @@ int player2engine(
 		}
 	}
 	if (broken == 1);
-	else if (worse >= option->level){
+	else if (worse >= engine_option->level){
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
 	}
@@ -814,7 +872,8 @@ void simplegetopt(
 	getopt_struct *iparam,
 	getopt_struct *rparam,
 	getopt_struct *hparam,
-	getopt_struct *aparam
+	getopt_struct *aparam,
+	getopt_struct *vparam
 	){
 	int i;
 	for (i = 1; i<argc; i++){
@@ -835,6 +894,11 @@ void simplegetopt(
 			if (i + 1 < argc) strcpy(aparam->optstr, argv[++i]); //difficulty level
 			else strcpy(aparam->optstr, "1"); //default
 		}
+		else if (!strcmp(argv[i], "-v")){
+			vparam->on++;
+			if (i + 1 < argc) strcpy(vparam->optstr, argv[++i]); //difficulty level
+			else strcpy(vparam->optstr, "1"); //default
+		}
 	}
 
 }
@@ -843,18 +907,21 @@ void help(int argc, char **argv,
 	getopt_struct *iparam,
 	getopt_struct *rparam,
 	getopt_struct *hparam,
-	getopt_struct *aparam
+	getopt_struct *aparam,
+	getopt_struct *vparam
 	){
 	fprintf(stderr, "homework.c - a tic-tac-toe game!"
 		"\nCopyright(C) 2015  hoholee12@naver.com"
-		"\nUsage: %s -i [row]x[col] -r -a [level: 1(most aggressive) ~ row-1(least aggressive)]"
+		"\nUsage: %s -i [row]x[col] -r -a [level: 1(most aggressive) ~ row-1(least aggressive)] -v [level: 1(most aggressive) ~ row-1(least aggressive)]"
 		"\n\t-i sets derterminant size by [row]x[col]"
 		"\n\t-r reverses [row][col] input ingame"
-		"\n\t-a is a computer opponent\n\n", argv[0]);
+		"\n\t-a is a computer opponent"
+		"\n\t-v player1 is a computer\n\n", argv[0]);
 	free(iparam->optstr);
 	free(rparam->optstr);
 	free(hparam->optstr);
 	free(aparam->optstr);
+	free(vparam->optstr);
 	exit(0);
 };
 
@@ -878,23 +945,30 @@ int main(int argc, char **argv){
 	getopt_struct rparam = { 0 }; rparam.optstr = calloc(0xfe, sizeof(char)); //option>>swap
 	getopt_struct hparam = { 0 }; hparam.optstr = calloc(0xfe, sizeof(char));
 	getopt_struct aparam = { 0 }; aparam.optstr = calloc(0xfe, sizeof(char)); //option>>playa2
-	simplegetopt(argc, argv, &iparam, &rparam, &hparam, &aparam);
+	getopt_struct vparam = { 0 }; vparam.optstr = calloc(0xfe, sizeof(char)); //option>>playa1
+	simplegetopt(argc, argv, &iparam, &rparam, &hparam, &aparam, &vparam);
 	if (iparam.on > 0){
 		row = atoi(iparam.optstr);
 		col = atoi(xtarget(iparam.optstr));
 	}
 	if (rparam.on > 0) option.swap = 1;
 	if (aparam.on > 0){
-		option.playa2 = 1;
-		option.level = atoi(aparam.optstr);
-		if (!option.level) option.level = 1; //default
+		option.playa2.on = 1;
+		option.playa2.level = atoi(aparam.optstr);
+		if (!option.playa2.level) option.playa2.level = 1; //default
+	}
+	if (vparam.on > 0){
+		option.playa1.on = 1;
+		option.playa1.level = atoi(vparam.optstr);
+		if (!option.playa1.level) option.playa1.level = 1; //default
 	}
 	if (col != row) col = row; //needed for square det
-	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam, &aparam);
+	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam, &aparam, &vparam);
 	free(iparam.optstr);
 	free(rparam.optstr);
 	free(hparam.optstr);
 	free(aparam.optstr);
+	free(vparam.optstr);
 	if (col < 2){ fprintf(stderr, "determinant is too small!\n"); return 1; }
 
 
