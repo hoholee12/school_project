@@ -14,7 +14,7 @@
 #include<string.h>
 
 //#define DEBUG //print game_engine brain array chart
-#define SPEEDY_GONZALES //no print delay
+//#define SPEEDY_GONZALES //no print delay
 
 typedef struct scoredat{
 	int score;
@@ -380,7 +380,7 @@ return 0 => normal
 return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
-#define REVERSE //will not make any difference when difficulty level is set to 1(most aggressive). it may even bypass the randomizer altogether!
+#define REVERSE //aims to place piece on a largest number possible instead of smallest number possible. REVERSE with LVL1 is the highest difficulty.
 
 _level *player1_option(int row, _option *option){
 
