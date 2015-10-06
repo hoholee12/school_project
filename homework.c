@@ -10,7 +10,11 @@
 #include<stdlib.h>
 #include<time.h>
 
+#ifdef _WIN32
 #include<windows.h> //Sleep()
+#else
+#include<unistd.h> //sleep(), usleep()
+#endif
 #include<string.h>
 
 //#define DEBUG //print game_engine brain array chart
@@ -54,7 +58,11 @@ void printarr_alt(int **arr, int row, int col,
 	const char *str,
 	_option *option
 	){
+#ifdef _WIN32
 	system("cls");
+#else
+	printf("\x1b[2J\x1b[0;0H");
+#endif
 	int player1_count = 0, player2_count = 0, i, j;
 	printf("\t");
 	for (i = 1; i <= row; i++) printf("%d\t", i);
@@ -189,7 +197,12 @@ int userinput_alt(int **arr, int row, int col,
 #ifndef SPEEDY_GONZALES
 		for (i = 0; i < 3; i++){
 			printf(".");
+#ifdef _WIN32
 			Sleep(200); //0.2 seconds
+#else
+			fflush(stdout);
+			usleep(200*1000);
+#endif
 		}
 #endif
 		if (game_engine(arr, row, col, &pass, option, user) == -1){
@@ -202,7 +215,12 @@ int userinput_alt(int **arr, int row, int col,
 #ifndef SPEEDY_GONZALES
 		for (i = 0; i < 3; i++){
 			printf(".");
+#ifdef _WIN32
 			Sleep(200); //0.2 seconds
+#else
+			fflush(stdout);
+			usleep(200*1000);
+#endif
 		}
 #endif
 		if (game_engine(arr, row, col, &pass, option, user) == -1){
@@ -1004,12 +1022,21 @@ int main(int argc, char **argv){
 	int totalplaytime, switchuser = 0, i;
 	for (totalplaytime = 1;; totalplaytime++){
 		if (totalplaytime == 1){ //flip the coin!
+#ifdef _WIN32
 			system("cls"); //clear screen
+#else
+			printf("\x1b[2J\x1b[0;0H");
+#endif
 			printf("lets flip the coin! head is player1, tail is player2"
 				"\npress any key to start flipping!...");
 			getchar();
 			for (i = 0; i < 3; i++){
+#ifdef _WIN32
 				Sleep(200); //0.2 seconds
+#else
+				fflush(stdout);
+				usleep(200*1000);
+#endif
 				printf(". ");
 			}
 			switch (rand() % 2 + 1){
