@@ -337,7 +337,7 @@ return 0 => normal
 return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
-//#define REVERSE //will not make any difference when difficulty level is set to 1(most aggressive).
+//#define REVERSE //will not make any difference when difficulty level is set to 1(most aggressive). it may even bypass the randomizer altogether!
 
 int player2engine(
 	int **arr, int row, int col,	//main arr
@@ -388,18 +388,18 @@ int player2engine(
 	}
 
 
-	//third step - offense
+	//third step - randomizer & offense
 	/*
 	3==row col diag combined
 	2==two of these combined
 	1==just one
 	something like that...
 
-	we want to have the number negative to win!
+	we want to place our piece in the smallest number possible(-3 is the smallest) to win faster!
 	*/
 
 
-
+	//randomizer
 	int **brain = NULL;
 	brain = allocarr(brain, row, col);
 	//col
