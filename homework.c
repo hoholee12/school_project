@@ -14,7 +14,7 @@
 #include<string.h>
 
 //#define DEBUG //print game_engine brain array chart
-//#define QUICK_DEBUG //no print delay
+#define SPEEDY_GONZALES //no print delay
 
 typedef struct scoredat{
 	int score;
@@ -186,7 +186,7 @@ int userinput_alt(int **arr, int row, int col,
 	input_alt pass = { 0 };
 	if (option->playa2.on == 1 && user == 2){
 		printf("player2 is thinking");
-#ifndef QUICK_DEBUG
+#ifndef SPEEDY_GONZALES
 		for (i = 0; i < 3; i++){
 			printf(".");
 			Sleep(200); //0.2 seconds
@@ -199,7 +199,7 @@ int userinput_alt(int **arr, int row, int col,
 	}
 	else if(option->playa1.on == 1 && user == 1){
 		printf("player1 is thinking");
-#ifndef QUICK_DEBUG
+#ifndef SPEEDY_GONZALES
 		for (i = 0; i < 3; i++){
 			printf(".");
 			Sleep(200); //0.2 seconds
@@ -380,7 +380,7 @@ return 0 => normal
 return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
-//#define REVERSE //will not make any difference when difficulty level is set to 1(most aggressive). it may even bypass the randomizer altogether!
+#define REVERSE //will not make any difference when difficulty level is set to 1(most aggressive). it may even bypass the randomizer altogether!
 
 _level *player1_option(int row, _option *option){
 
