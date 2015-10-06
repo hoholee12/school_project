@@ -337,6 +337,7 @@ return 0 => normal
 return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
+//#define REVERSE
 
 int player2engine(
 	int **arr, int row, int col,	//main arr
@@ -353,8 +354,12 @@ int player2engine(
 
 
 	//declare here
-	int i, j, k, broken = 0, prev_brain = 3/*maximum*/, nostart = 0, startloc_x, startloc_y, worse, minor_y = -1, minor_x = -1;
-
+	int i, j, k, broken = 0, nostart = 0, startloc_x, startloc_y, worse, minor_y = -1, minor_x = -1;
+#ifdef REVERSE
+	int prev_brain = -3;/*minimum*/
+#else
+	int prev_brain = 3;/*maximum*/
+#endif
 	//if start first, put at center
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
@@ -466,7 +471,11 @@ int player2engine(
 	//input to brain first
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
+#ifdef REVERSE
+			if (brain[i][j]>prev_brain&&arr[i][j] == 0){
+#else
 			if (brain[i][j]<prev_brain&&arr[i][j] == 0){
+#endif
 				prev_brain = brain[i][j];
 				pass->val1 = i;
 				pass->val2 = j;
