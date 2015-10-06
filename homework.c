@@ -349,7 +349,7 @@ int player2engine(
 	pass->val2 = -1;
 
 	//option->level limiter
-	if (option->level < 2) option->level = 2;
+	if (option->level < 1) option->level = 1;
 	else if (option->level>row - 1) option->level = row - 1;
 
 
@@ -831,7 +831,7 @@ void simplegetopt(
 		else if (!strcmp(argv[i], "-a")){
 			aparam->on++;
 			if (i + 1 < argc) strcpy(aparam->optstr, argv[++i]); //difficulty level
-			else strcpy(aparam->optstr, "2"); //default
+			else strcpy(aparam->optstr, "1"); //default
 		}
 	}
 
@@ -845,7 +845,7 @@ void help(int argc, char **argv,
 	){
 	fprintf(stderr, "homework.c - a tic-tac-toe game!"
 		"\nCopyright(C) 2015  hoholee12@naver.com"
-		"\nUsage: %s -i [row]x[col] -r -a [level: 2(most aggressive) ~ row-1(least aggressive)]"
+		"\nUsage: %s -i [row]x[col] -r -a [level: 1(most aggressive) ~ row-1(least aggressive)]"
 		"\n\t-i sets derterminant size by [row]x[col]"
 		"\n\t-r reverses [row][col] input ingame"
 		"\n\t-a is a computer opponent\n\n", argv[0]);
@@ -885,7 +885,7 @@ int main(int argc, char **argv){
 	if (aparam.on > 0){
 		option.playa2 = 1;
 		option.level = atoi(aparam.optstr);
-		if (!option.level) option.level = 2; //default
+		if (!option.level) option.level = 1; //default
 	}
 	if (col != row) col = row; //needed for square det
 	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam, &aparam);
