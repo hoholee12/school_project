@@ -13,8 +13,8 @@
 #include<windows.h> //Sleep()
 #include<string.h>
 
-//#define DEBUG
-#define QUICK_DEBUG
+//#define DEBUG //print game_engine brain array chart
+//#define QUICK_DEBUG //no print delay
 
 typedef struct scoredat{
 	int score;
@@ -412,7 +412,7 @@ int game_engine(
 	else if (user == 2) engine_option = player2_option(row, option);
 
 	//declare here
-	int i, j, k, broken = 0, nostart = 0, startloc_x, startloc_y, worse, minor_y = -1, minor_x = -1;
+	int i, j, k, broken = 0, nostart = 0, startloc_x=0, startloc_y=0, worse, minor_y = -1, minor_x = -1;
 #ifdef REVERSE
 	int prev_brain = -3;/*minimum*/
 #else
