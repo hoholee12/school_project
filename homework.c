@@ -69,7 +69,7 @@ void printarr_alt(int **arr, int row, int col,
 
 	if (option->playa1.on == 1) printf("P1CPU ");
 	if (option->playa1.level) printf("LVL%d ", option->playa1.level);
-	
+
 	printf("\n");
 
 	//preprocessing for player1_count, player2_count
@@ -197,7 +197,7 @@ int userinput_alt(int **arr, int row, int col,
 			abort();
 		}
 	}
-	else if(option->playa1.on == 1 && user == 1){
+	else if (option->playa1.on == 1 && user == 1){
 		printf("player1 is thinking");
 #ifndef SPEEDY_GONZALES
 		for (i = 0; i < 3; i++){
@@ -380,7 +380,19 @@ return 0 => normal
 return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
-#define REVERSE //aims to place piece on a largest number possible instead of smallest number possible. REVERSE with LVL1 is the highest difficulty.
+#define ENGINE_REVERSE //aims to place piece on a largest number possible instead of smallest number possible. REVERSE with LVL1 is the highest ranked difficulty.
+//#define ENGINE_OFFVSDEF //if turned on, defense limit will be same as controlled offense limit.
+
+/*
+list of engine speed/performance rank(AUTO LVL1 P1CPU LVL1):
+1st (about 29~46/100) => ENGINE_REVERSE on, ENGINE_OFFVSDEF off
+2nd (about 38~45/100) => ENGINE_REVERSE off, ENGINE_OFFVSDEF on
+3rd (about 40~54/100) => ENGINE_REVERSE on, ENGINE_OFFVSDEF on
+4th (about 68~96/100) => ENGINE_REVERSE off, ENGINE_OFFVSDEF off
+
+more than LVL1 will give much more varied results that defeats the purpose of ranking.
+*/
+
 
 _level *player1_option(int row, _option *option){
 
@@ -412,8 +424,8 @@ int game_engine(
 	else if (user == 2) engine_option = player2_option(row, option);
 
 	//declare here
-	int i, j, k, broken = 0, nostart = 0, startloc_x=0, startloc_y=0, worse, minor_y = -1, minor_x = -1;
-#ifdef REVERSE
+	int i, j, k, broken = 0, nostart = 0, startloc_x = 0, startloc_y = 0, worse, minor_y = -1, minor_x = -1;
+#ifdef ENGINE_REVERSE
 	int prev_brain = -3;/*minimum*/
 #else
 	int prev_brain = 3;/*maximum*/
@@ -531,7 +543,7 @@ int game_engine(
 	//input to brain first
 	for (i = 0; i < row; i++){
 		for (j = 0; j < col; j++){
-#ifdef REVERSE
+#ifdef ENGINE_REVERSE
 			if (brain[i][j]>prev_brain&&arr[i][j] == 0){
 #else
 			if (brain[i][j]<prev_brain&&arr[i][j] == 0){
@@ -541,9 +553,9 @@ int game_engine(
 				pass->val2 = j;
 			}
 
-		}
+			}
 
-	}
+		}
 
 	//controlled offense
 	//col
@@ -632,11 +644,15 @@ int game_engine(
 			else minor_x = j;
 		}
 		if (broken == 1);
+#ifdef ENGINE_OFFVSDEF
+		else if (worse >= engine_option->level){
+#else
 		else if (worse >= row - 1){
+#endif
 			pass->val1 = i;
 			pass->val2 = minor_x;
 		}
-	}
+		}
 	//row
 	for (i = 0; i < row; i++){
 		worse = 0;
@@ -650,11 +666,15 @@ int game_engine(
 			else minor_y = j;
 		}
 		if (broken == 1);
+#ifdef ENGINE_OFFVSDEF
+		else if (worse >= engine_option->level){
+#else
 		else if (worse >= row - 1){
+#endif
 			pass->val1 = minor_y;
 			pass->val2 = i;
 		}
-	}
+		}
 	//diagonal
 	worse = 0;
 	broken = 0;
@@ -667,7 +687,11 @@ int game_engine(
 		else minor_x = i;
 	}
 	if (broken == 1);
+#ifdef ENGINE_OFFVSDEF
+	else if (worse >= engine_option->level){
+#else
 	else if (worse >= row - 1){
+#endif
 		pass->val1 = minor_x;
 		pass->val2 = minor_x;
 	}
@@ -686,7 +710,11 @@ int game_engine(
 		}
 	}
 	if (broken == 1);
+#ifdef ENGINE_OFFVSDEF
+	else if (worse >= engine_option->level){
+#else
 	else if (worse >= row - 1){
+#endif
 		pass->val1 = minor_y;
 		pass->val2 = minor_x;
 	}
@@ -777,7 +805,7 @@ int game_engine(
 	//return -1 when nothings been touched.
 	if (pass->val1 == -1 || pass->val2 == -1) return -1;
 	else return 0;
-}
+	}
 
 void printstatus(
 	int inputstate,
