@@ -399,7 +399,7 @@ return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
 #define ENGINE_REVERSE //aims to place piece on a largest number possible instead of smallest number possible. REVERSE with LVL1 is the highest ranked difficulty.
-//#define ENGINE_OFFVSDEF //if turned on, defense limit will be same as controlled offense limit.
+#define ENGINE_OFFVSDEF //if turned on, defense limit will be same as controlled offense limit.
 
 /*
 list of engine speed/performance rank(AUTO LVL1 P1CPU LVL1):
