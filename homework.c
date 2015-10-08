@@ -201,7 +201,7 @@ int userinput_alt(int **arr, int row, int col,
 			Sleep(200); //0.2 seconds
 #else
 			fflush(stdout);
-			usleep(200*1000);
+			usleep(200 * 1000);
 #endif
 		}
 #endif
@@ -219,7 +219,7 @@ int userinput_alt(int **arr, int row, int col,
 			Sleep(200); //0.2 seconds
 #else
 			fflush(stdout);
-			usleep(200*1000);
+			usleep(200 * 1000);
 #endif
 		}
 #endif
@@ -399,7 +399,7 @@ return 1 => normal(won or lost)
 return -1 => abnormal(undecided, crashed)
 */
 #define ENGINE_REVERSE //aims to place piece on a largest number possible instead of smallest number possible. REVERSE with LVL1 is the highest ranked difficulty.
-#define ENGINE_OFFVSDEF //if turned on, defense limit will be same as controlled offense limit.
+//#define ENGINE_OFFVSDEF //if turned on, defense limit will be same as controlled offense limit. interestingly, it also adds a little variation to the score xDD
 
 /*
 list of engine speed/performance rank(AUTO LVL1 P1CPU LVL1):
@@ -1035,7 +1035,7 @@ int main(int argc, char **argv){
 				Sleep(200); //0.2 seconds
 #else
 				fflush(stdout);
-				usleep(200*1000);
+				usleep(200 * 1000);
 #endif
 				printf(". ");
 			}
