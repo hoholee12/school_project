@@ -13,8 +13,8 @@
 #include<unistd.h>
 
 /*#define DEBUG*/
-#define SPEEDY_GONZALES
-
+/*#define SPEEDY_GONZALES
+*/
 typedef struct scoredat{
 	int score;
 	int count;
@@ -47,6 +47,11 @@ str		==	-4
 *always sort with switch statement!!
 */
 
+#define printf(str, args...); \
+		fflush(stdout);		/*for dots*/\
+		printf(str, ##args);\
+		fflush(stdout);
+
 void printarr_alt(int **arr, int row, int col,
 	int user,
 	int err,
@@ -56,7 +61,7 @@ void printarr_alt(int **arr, int row, int col,
 	int player1_count = 0, player2_count = 0, i, j;
 	printf("\x1b[2J\x1b[0;0H");
 	printf("\t");
-	for (i = 1; i <= row; i++) printf("%d\t", i);
+	for (i = 1; i <= row; i++){ printf("%d\t", i);}
 
 
 
@@ -138,12 +143,12 @@ int advinput_alt(
 	input_alt *pass,
 	int row, int col
 	){
-	int i;
+	int i, buffer=0xff/*255*/;
 	char *input=NULL;
 	fflush(stdin);
 	input = (char *)calloc(dividenum(row) * 2 + 2, sizeof(char));
-	input = (char *)realloc(input, 0xFFF);
-	gets(input);
+	input = (char *)realloc(input, buffer);
+	fgets(input, buffer, stdin);
 	if (input[0] == 'q'){
 		pass->val1 = 'q';
 		return 0;
@@ -182,28 +187,28 @@ int userinput_alt(int **arr, int row, int col,
 		printf("player2 is thinking");
 #ifndef SPEEDY_GONZALES
 		for (i = 0; i < 3; i++){
-			fflush(stdout);
+			
 			printf(".");
 			usleep(200*1000);
 		}
 #endif
 		if (game_engine(arr, row, col, &pass, option, user) == -1){
 			fprintf(stderr, "game_engine() crashed!!");
-			abort();
+			exit(1);
 		}
 	}
 	else if (option->playa1.on == 1 && user == 1){
 		printf("player1 is thinking");
 #ifndef SPEEDY_GONZALES
 		for (i = 0; i < 3; i++){
-			fflush(stdout);
+			
 			printf(".");
 			usleep(200*1000);
 		}
 #endif
 		if (game_engine(arr, row, col, &pass, option, user) == -1){
 			fprintf(stderr, "game_engine() crashed!!");
-			abort();
+			exit(1);
 		}
 	}
 	else{
@@ -228,8 +233,6 @@ int userinput_alt(int **arr, int row, int col,
 	}
 	return 0;
 }
-
-
 
 
 
@@ -828,9 +831,9 @@ void printstatus(
 			 printf(", player1 score=%d", player1->score);
 			 printf(", player2 score=%d", player2->score);
 
-			 if (player1->score > player2->score) printf("\nplayer1 won by +%d points", player1->score - player2->score);
-			 else if (player1->score == player2->score) printf("\nits a tie.");
-			 else printf("\nplayer2 won by +%d points", player2->score - player1->score);
+			 if (player1->score > player2->score){printf("\nplayer1 won by +%d points", player1->score - player2->score);}
+			 else if (player1->score == player2->score){printf("\nits a tie.");}
+			 else{printf("\nplayer2 won by +%d points", player2->score - player1->score);}
 
 			 break;
 	default:;
@@ -1014,7 +1017,7 @@ int main(int argc, char **argv){
 				"\npress any key to start flipping!...");
 			getchar();
 			for (i = 0; i < 3; i++){
-				fflush(stdout);
+				
 				printf(".");
 				usleep(200*1000);
 			}
