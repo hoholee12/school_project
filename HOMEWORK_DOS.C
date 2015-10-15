@@ -234,7 +234,7 @@ int userinput_alt(int **arr, int row, int col,
 
 int **allocarr(int **arr, int row, int col){
 	int i;
-	arr = calloc(row, sizeof(int));
+	arr = calloc(row, sizeof(int*/*create a row of int pointers*/));
 	for (i = 0; i<row; i++) arr[i] = calloc(col, sizeof(int));
 
 	return arr;

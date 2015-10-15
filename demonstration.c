@@ -4,8 +4,7 @@
 
 int **allocarr(int **arr, int row, int col){
 	int i;
-	arr=(int **)calloc(row, sizeof(int));
-	malloc(row*sizeof(int)); //hack
+	arr=(int **)calloc(row, sizeof(int*/*create a row of int pointers*/));
 	for(i=0; i<row; i++){
 		arr[i]=(int *)calloc(col, sizeof(int));
 
@@ -40,6 +39,7 @@ void printarr(int **arr, int row, int col){
 int main(){
 	int **arr=NULL;
 	arr=allocarr(arr, 3, 3);
+	arr[0][0]=2;
 	arr[2][2]=8;
 	printarr(arr, 3, 3);
 	freearr(arr,3, 3);
