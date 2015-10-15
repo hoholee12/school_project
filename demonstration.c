@@ -4,7 +4,9 @@
 
 int **allocarr(int **arr, int row, int col){
 	int i;
-	arr=(int **)calloc(row, sizeof(int*/*create a row of int pointers*/));
+	/*arr = calloc(row, sizeof(int *)); /*create a row of pointers*/
+
+	arr = calloc(row, sizeof * arr); /*sizeof variable lets the compiler deduce the type*/
 	for(i=0; i<row; i++){
 		arr[i]=(int *)calloc(col, sizeof(int));
 
