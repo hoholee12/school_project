@@ -1,6 +1,13 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+int **allocarr();
+void freearr();
+void generate();
+void gen_start();
+void printarr();
+void checkinput();
+
 int **allocarr(int **arr, int row, int col) {
 	int i;
 	/*arr = calloc(row, sizeof(int *)); /*create a row of pointers*/
@@ -63,6 +70,8 @@ void generate(int **arr, int n, int row, int col) {
 
 }
 
+
+
 void gen_start(int **arr, int n, int *count) {
 	int i, j, k, l;
 	static int row_count = 0;
@@ -83,14 +92,31 @@ void gen_start(int **arr, int n, int *count) {
 	}
 	
 	/*after start*/
-
-	
-
-
+	for (i = 1; i < n; i++) {
+		for (j = 0; j < n; j++) {
+			if (!arr[i][j]) {
+				generate(arr, n, i, j);
+				break;
+			}
+		}
+	}
+	printarr(arr, n);
 
 
 }
 
+void printarr(int **arr, int n) {
+	int i, j, k, l;
+	for (i = 0; i < n; i++) {
+		printf("\n\n");
+		for (j = 0; j < n; j++) {
+			printf("\t%d", arr[i][j]);
+		}
+	}
+	getchar();
+
+
+}
 
 void checkinput(int argc, char **argv) {
 	/*check input*/
@@ -118,22 +144,11 @@ int main(int argc, char **argv) {
 
 	arr = allocarr(arr, n, n);
 
-	generate(arr, n, 2, 3);
 
 	gen_start(arr, n, &count);
 
-	/*test*/
-
-	for (i = 0; i < n; i++) {
-		printf("\n\n");
-		for (j = 0; j < n; j++) {
-			printf("\t%d", arr[i][j]);
-		}
-	}
-	getchar();
-
-	/*test*/
-
+	gen_start(arr, n, &count);
+	
 
 	freearr(arr, n, n);
 
