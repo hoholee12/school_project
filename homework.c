@@ -3,6 +3,13 @@
 *
 * May be freely distributed and modified as long as copyright
 * is retained.
+
+THIS CODE IS NOW OBSOLETE!! DO NOT USE THIS CODE ON ANY PLATFORM OTHER THAN WINDOWS!!
+
+https://github.com/hoholee12/school_project/blob/master/HOMEWORK_DOS.C //DOS VERSION
+https://github.com/hoholee12/school_project/blob/master/homework_unix.c //UNIX VERSION
+
+
 */
 
 
