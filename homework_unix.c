@@ -146,8 +146,8 @@ int advinput_alt(
 	int i, buffer=0xff/*255*/;
 	char *input=NULL;
 	fflush(stdin);
-	input = (char *)calloc(dividenum(row) * 2 + 2, sizeof(char));
-	input = (char *)realloc(input, buffer);
+	input = calloc(dividenum(row) * 2 + 2, sizeof(char));
+	input = realloc(input, buffer);
 	fgets(input, buffer, stdin);
 	if (input[0] == 'q'){
 		pass->val1 = 'q';
@@ -242,7 +242,7 @@ int **allocarr(int **arr, int row, int col){
 
 	arr = calloc(row, sizeof * arr); /*sizeof variable lets the compiler deduce the type*/
 	for (i = 0; i<row; i++){
-		arr[i] = (int *)calloc(col, sizeof(int));
+		arr[i] = calloc(col, sizeof(int));
 	}
 	return arr;
 }
@@ -977,11 +977,11 @@ int main(int argc, char **argv){
 	getopt_struct hparam = { 0 }; 
 	getopt_struct aparam = { 0 }; 
 	getopt_struct vparam = { 0 }; 
-	iparam.optstr = (char *)calloc(0xfe, sizeof(char));
-	rparam.optstr = (char *)calloc(0xfe, sizeof(char));
-	hparam.optstr = (char *)calloc(0xfe, sizeof(char));	
-	aparam.optstr = (char *)calloc(0xfe, sizeof(char)); 
-	vparam.optstr = (char *)calloc(0xfe, sizeof(char));
+	iparam.optstr = calloc(0xfe, sizeof(char));
+	rparam.optstr = calloc(0xfe, sizeof(char));
+	hparam.optstr = calloc(0xfe, sizeof(char));	
+	aparam.optstr = calloc(0xfe, sizeof(char)); 
+	vparam.optstr = calloc(0xfe, sizeof(char));
 	
 	seed();	
 	simplegetopt(argc, argv, &iparam, &rparam, &hparam, &aparam, &vparam);
