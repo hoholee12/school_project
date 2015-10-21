@@ -2,6 +2,8 @@ char* const means that you can't change the address the pointer is pointing to.
 const char * means that you can't change the elements that this pointer is pointing to.
 
 ABI=application binary interface
+Application Binary Interface (ABI) similar to API, but the function is not accessible to the caller at source code level.
+only a binary representation is accessible/available.
 
 making a function static encapsulates it. it cannot be seen by a linker, so that its not available for other objects.
 
