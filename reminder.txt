@@ -1,0 +1,2 @@
+char* const means that you can't change the address the pointer is pointing to.
+const char * means that you can't change the elements that this pointer is pointing to.
