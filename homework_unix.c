@@ -829,7 +829,7 @@ void printstatus(
 		default: printf("%dth round", totalplaytime); break;
 		}
 	}
-			 else printf("%dth round", totalplaytime);
+			 else{ printf("%dth round", totalplaytime);}
 			 printf(", player1 score=%d", player1->score);
 			 printf(", player2 score=%d", player2->score);
 
