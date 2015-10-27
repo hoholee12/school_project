@@ -163,7 +163,7 @@ int advinput_alt(
 	input = realloc(input, 0xFFF); //fail proof *** i dont need to initialize the rest of the appending memory
 	//you should use heap memory for that.
 	//dont use more than already assigned, free() will complain about corrupted heap memory!!
-	gets(input); //i want to include spaces too.
+	fgets(input, 0xff, stdin); //i want to include spaces too.
 	if (input[0] == 'q'){
 		pass->val1 = 'q';
 		return 0;
@@ -916,54 +916,10 @@ void seed(){
 
 }
 
-//user defined getopt_struct
-typedef struct getopt_struct{
-	int on;
-	char *optstr; //strcpy needs the address of it! not itself...
-} getopt_struct;
-
-void simplegetopt(
-	int argc, char **argv,
-	getopt_struct *iparam,
-	getopt_struct *rparam,
-	getopt_struct *hparam,
-	getopt_struct *aparam,
-	getopt_struct *vparam
-	){
-	int i;
-	for (i = 1; i<argc; i++){
-		if (!strcmp(argv[i], "-i")){ //better to use this than switch for strings. hash is a nightmare!
-			if (strlen(argv[i + 1])>0xFD){ fprintf(stderr, "buffer overflow!\n"); abort(); } //0xFE - "null terminator"
-			iparam->on++;
-			if (i + 1 < argc) strcpy(iparam->optstr, argv[++i]); //row x col size
-			else strcpy(iparam->optstr, "3x3"); //default
-		}
-		else if (!strcmp(argv[i], "-r")){
-			rparam->on++;
-		}
-		else if (!strcmp(argv[i], "-h")){
-			hparam->on++;
-		}
-		else if (!strcmp(argv[i], "-a")){
-			aparam->on++;
-			if (i + 1 < argc) strcpy(aparam->optstr, argv[++i]); //difficulty level
-			else strcpy(aparam->optstr, "1"); //default
-		}
-		else if (!strcmp(argv[i], "-v")){
-			vparam->on++;
-			if (i + 1 < argc) strcpy(vparam->optstr, argv[++i]); //difficulty level
-			else strcpy(vparam->optstr, "1"); //default
-		}
-	}
-
-}
+#include"mygetopt.h"
 
 void help(int argc, char **argv,
-	getopt_struct *iparam,
-	getopt_struct *rparam,
-	getopt_struct *hparam,
-	getopt_struct *aparam,
-	getopt_struct *vparam
+	_optarr *optarr
 	){
 	fprintf(stderr, "homework.c - a tic-tac-toe game!"
 		"\nCopyright(C) 2015  hoholee12@naver.com"
@@ -972,11 +928,7 @@ void help(int argc, char **argv,
 		"\n\t-r reverses [row][col] input ingame"
 		"\n\t-a is a computer opponent"
 		"\n\t-v player1 is a computer\n\n", argv[0]);
-	free(iparam->optstr);
-	free(rparam->optstr);
-	free(hparam->optstr);
-	free(aparam->optstr);
-	free(vparam->optstr);
+	for(i=0;optarr->arr[i];i++) free(optarr->arr[i]->optarg);
 	exit(0);
 };
 
@@ -996,12 +948,28 @@ int main(int argc, char **argv){
 	scoredat player2 = { 0 };
 	_option option = { 0 };
 	int row = 3, col = 3;
-	getopt_struct iparam = { 0 }; iparam.optstr = calloc(0xfe, sizeof(char)); //allocate struct in stack first, allocate string contents in the heap after.
-	getopt_struct rparam = { 0 }; rparam.optstr = calloc(0xfe, sizeof(char)); //option>>swap
-	getopt_struct hparam = { 0 }; hparam.optstr = calloc(0xfe, sizeof(char));
-	getopt_struct aparam = { 0 }; aparam.optstr = calloc(0xfe, sizeof(char)); //option>>playa2
-	getopt_struct vparam = { 0 }; vparam.optstr = calloc(0xfe, sizeof(char)); //option>>playa1
-	simplegetopt(argc, argv, &iparam, &rparam, &hparam, &aparam, &vparam);
+	_optstuff iparam = { 0, 'i' }; 
+	_optstuff rparam = { 0, 'r' }; 
+	_optstuff hparam = { 0, 'h' }; 
+	_optstuff aparam = { 0, 'a' }; 
+	_optstuff vparam = { 0, 'v' };
+	_optarr optarr={0};
+	optarr.arr=calloc(5, sizeof*optarr.arr);
+	optarr.arr[0]=&iparam;
+	optarr.arr[1]=&rparam;
+	optarr.arr[2]=&hparam;
+	optarr.arr[3]=&aparam;
+	optarr.arr[4]=&vparam;
+	
+	
+	iparam.optarg = calloc(0xfe, sizeof(char));
+	rparam.optarg = calloc(0xfe, sizeof(char));
+	hparam.optarg = calloc(0xfe, sizeof(char));	
+	aparam.optarg = calloc(0xfe, sizeof(char)); 
+	vparam.optarg = calloc(0xfe, sizeof(char));
+	mygetopt(argc, argv, "i:rha:v:", &optarr);
+	
+	
 	if (iparam.on > 0){
 		row = atoi(iparam.optstr);
 		col = atoi(xtarget(iparam.optstr));
@@ -1018,7 +986,7 @@ int main(int argc, char **argv){
 		if (!option.playa1.level) option.playa1.level = 1; //default
 	}
 	if (col != row) col = row; //needed for square det
-	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam, &aparam, &vparam);
+	if (hparam.on > 0) help(argc, argv, &optarr);
 	free(iparam.optstr);
 	free(rparam.optstr);
 	free(hparam.optstr);

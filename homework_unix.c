@@ -11,6 +11,7 @@
 #include<time.h>
 #include<string.h>
 #include<unistd.h>
+#include"mygetopt.h"
 
 /*#define DEBUG*/
 /*#define SPEEDY_GONZALES
@@ -892,54 +893,12 @@ void seed(){
 }
 
 
-typedef struct getopt_struct{
-	int on;
-	char *optstr; 
-} getopt_struct;
 
-void simplegetopt(
-	int argc, char **argv,
-	getopt_struct *iparam,
-	getopt_struct *rparam,
-	getopt_struct *hparam,
-	getopt_struct *aparam,
-	getopt_struct *vparam
-	){
-	int i;
-	for (i = 1; i<argc; i++){
-		if (!strcmp(argv[i], "-i")){ 
-			if (strlen(argv[i + 1])>0xFD){ fprintf(stderr, "buffer overflow!\n"); abort(); } 
-			iparam->on++;
-			if (i + 1 < argc) strcpy(iparam->optstr, argv[++i]); 
-			else strcpy(iparam->optstr, "3x3"); 
-		}
-		else if (!strcmp(argv[i], "-r")){
-			rparam->on++;
-		}
-		else if (!strcmp(argv[i], "-h")){
-			hparam->on++;
-		}
-		else if (!strcmp(argv[i], "-a")){
-			aparam->on++;
-			if (i + 1 < argc) strcpy(aparam->optstr, argv[++i]); 
-			else strcpy(aparam->optstr, "1"); 
-		}
-		else if (!strcmp(argv[i], "-v")){
-			vparam->on++;
-			if (i + 1 < argc) strcpy(vparam->optstr, argv[++i]); 
-			else strcpy(vparam->optstr, "1"); 
-		}
-	}
-
-}
 
 void help(int argc, char **argv,
-	getopt_struct *iparam,
-	getopt_struct *rparam,
-	getopt_struct *hparam,
-	getopt_struct *aparam,
-	getopt_struct *vparam
+	_optarr *optarr
 	){
+	int i;
 	fprintf(stderr, "homework.c - a tic-tac-toe game!"
 		"\nCopyright(C) 2015  hoholee12@naver.com"
 		"\nUsage: %s -i [row]x[col] -r -a [level: 1(most aggressive) ~ row-1(least aggressive)] -v [level: 1(most aggressive) ~ row-1(least aggressive)]"
@@ -947,13 +906,9 @@ void help(int argc, char **argv,
 		"\n\t-r reverses [row][col] input ingame"
 		"\n\t-a is a computer opponent"
 		"\n\t-v player1 is a computer\n\n", argv[0]);
-	free(iparam->optstr);
-	free(rparam->optstr);
-	free(hparam->optstr);
-	free(aparam->optstr);
-	free(vparam->optstr);
+	for(i=0; optarr->arr[i+1];i++) free(optarr->arr[i]->optarg); /*offset + 1*/
 	exit(0);
-};
+}
 
 
 char *xtarget(char *arg){ 
@@ -972,44 +927,63 @@ int main(int argc, char **argv){
 	int totalplaytime, switchuser = 0, i;
 	char next;
 	
-	getopt_struct iparam = { 0 }; 
-	getopt_struct rparam = { 0 }; 
-	getopt_struct hparam = { 0 }; 
-	getopt_struct aparam = { 0 }; 
-	getopt_struct vparam = { 0 }; 
-	iparam.optstr = calloc(0xfe, sizeof(char));
-	rparam.optstr = calloc(0xfe, sizeof(char));
-	hparam.optstr = calloc(0xfe, sizeof(char));	
-	aparam.optstr = calloc(0xfe, sizeof(char)); 
-	vparam.optstr = calloc(0xfe, sizeof(char));
+	_optstuff iparam = { 0, 'i' }; 
+	_optstuff rparam = { 0, 'r' }; 
+	_optstuff hparam = { 0, 'h' }; 
+	_optstuff aparam = { 0, 'a' }; 
+	_optstuff vparam = { 0, 'v' };
+	_optarr optarr={0};
+	optarr.arr=calloc(5, sizeof(_optstuff *));
 	
-	seed();	
-	simplegetopt(argc, argv, &iparam, &rparam, &hparam, &aparam, &vparam);
+	
+	optarr.arr[0]=&iparam;
+	optarr.arr[1]=&rparam;
+	optarr.arr[2]=&hparam;
+	optarr.arr[3]=&aparam;
+	optarr.arr[4]=&vparam;
+	
+	iparam.optarg = calloc(0xfe, sizeof(char));
+	rparam.optarg = calloc(0xfe, sizeof(char));
+	hparam.optarg = calloc(0xfe, sizeof(char));	
+	aparam.optarg = calloc(0xfe, sizeof(char)); 
+	vparam.optarg = calloc(0xfe, sizeof(char));
+
+	
+	mygetopt(argc, argv, "i:rha:v:", &optarr);
+	
+	
+	
 	if (iparam.on > 0){
-		row = atoi(iparam.optstr);
-		col = atoi(xtarget(iparam.optstr));
+		row = atoi(iparam.optarg);
+		col = atoi(xtarget(iparam.optarg));
 	}
 	if (rparam.on > 0) option.swap = 1;
 	if (aparam.on > 0){
 		option.playa2.on = 1;
-		option.playa2.level = atoi(aparam.optstr);
+		option.playa2.level = atoi(aparam.optarg);
 		if (!option.playa2.level) option.playa2.level = 1; 
 	}
 	if (vparam.on > 0){
 		option.playa1.on = 1;
-		option.playa1.level = atoi(vparam.optstr);
+		option.playa1.level = atoi(vparam.optarg);
 		if (!option.playa1.level) option.playa1.level = 1; 
 	}
 	if (col != row) col = row; 
-	if (hparam.on > 0) help(argc, argv, &iparam, &rparam, &hparam, &aparam, &vparam);
-	free(iparam.optstr);
-	free(rparam.optstr);
-	free(hparam.optstr);
-	free(aparam.optstr);
-	free(vparam.optstr);
+	if (hparam.on > 0) help(argc, argv, &optarr);
+	
+	
+	for(i=0; optarr.arr[i+1];i++) free(optarr.arr[i]->optarg); /*offset + 1*/
+	
+	
+	
 	if (col < 2){ fprintf(stderr, "determinant is too small!\n"); return 1; }
 
 
+	
+	
+	
+	/*main game*/
+	seed();
 	
 	for (totalplaytime = 1;; totalplaytime++){
 		if (totalplaytime == 1){ 
