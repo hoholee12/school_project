@@ -894,6 +894,7 @@ void seed(){
 
 
 
+#define OPTARR_SIZE 5 /******************************************/
 
 void help(int argc, char **argv,
 	_optarr *optarr
@@ -906,7 +907,7 @@ void help(int argc, char **argv,
 		"\n\t-r reverses [row][col] input ingame"
 		"\n\t-a is a computer opponent"
 		"\n\t-v player1 is a computer\n\n", argv[0]);
-	for(i=0; optarr->arr[i];i++) free(optarr->arr[i]->optarg); /*offset + 1*/
+	for(i=0; i<OPTARR_SIZE;i++) free(optarr->arr[i]->optarg); /*offset + 1*/
 	exit(0);
 }
 
@@ -928,13 +929,14 @@ int main(int argc, char **argv){
 	char next;
 	char delim[]="i:rha:v:";
 	
+	
 	_optstuff iparam = { 0, 'i' }; 
 	_optstuff rparam = { 0, 'r' }; 
 	_optstuff hparam = { 0, 'h' }; 
 	_optstuff aparam = { 0, 'a' }; 
 	_optstuff vparam = { 0, 'v' };
 	_optarr optarr={0};
-	optarr.arr=calloc(5, sizeof(_optstuff *));
+	optarr.arr=calloc(OPTARR_SIZE, sizeof(_optstuff *));
 	
 	
 	optarr.arr[0]=&iparam;
@@ -943,8 +945,9 @@ int main(int argc, char **argv){
 	optarr.arr[3]=&aparam;
 	optarr.arr[4]=&vparam;
 	
-	for(i=0;optarr.arr[i];i++) optarr.arr[i]->optarg=calloc(0x400, sizeof(char));
-
+	for(i=0;i<OPTARR_SIZE;i++){
+		optarr.arr[i]->optarg=calloc(0x400, sizeof(char)); /*alloc*/
+	}
 	
 	mygetopt(argc, argv, delim, &optarr);
 	
@@ -969,8 +972,9 @@ int main(int argc, char **argv){
 	if (hparam.on > 0) help(argc, argv, &optarr);
 	
 	
-	for(i=0; optarr.arr[i];i++) free(optarr.arr[i]->optarg); /*offset + 1*/
-	
+	for(i=0; i<OPTARR_SIZE;i++){
+		free(optarr.arr[i]->optarg); /*free*/
+	}
 	
 	
 	if (col < 2){ fprintf(stderr, "determinant is too small!\n"); return 1; }
