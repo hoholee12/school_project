@@ -906,7 +906,7 @@ void help(int argc, char **argv,
 		"\n\t-r reverses [row][col] input ingame"
 		"\n\t-a is a computer opponent"
 		"\n\t-v player1 is a computer\n\n", argv[0]);
-	for(i=0; optarr->arr[i+1];i++) free(optarr->arr[i]->optarg); /*offset + 1*/
+	for(i=0; optarr->arr[i];i++) free(optarr->arr[i]->optarg); /*offset + 1*/
 	exit(0);
 }
 
@@ -926,6 +926,7 @@ int main(int argc, char **argv){
 	int row = 3, col = 3;
 	int totalplaytime, switchuser = 0, i;
 	char next;
+	char delim[]="i:rha:v:";
 	
 	_optstuff iparam = { 0, 'i' }; 
 	_optstuff rparam = { 0, 'r' }; 
@@ -942,14 +943,10 @@ int main(int argc, char **argv){
 	optarr.arr[3]=&aparam;
 	optarr.arr[4]=&vparam;
 	
-	iparam.optarg = calloc(0xfe, sizeof(char));
-	rparam.optarg = calloc(0xfe, sizeof(char));
-	hparam.optarg = calloc(0xfe, sizeof(char));	
-	aparam.optarg = calloc(0xfe, sizeof(char)); 
-	vparam.optarg = calloc(0xfe, sizeof(char));
+	for(i=0;optarr.arr[i];i++) optarr.arr[i]->optarg=calloc(0x400, sizeof(char));
 
 	
-	mygetopt(argc, argv, "i:rha:v:", &optarr);
+	mygetopt(argc, argv, delim, &optarr);
 	
 	
 	
@@ -972,7 +969,7 @@ int main(int argc, char **argv){
 	if (hparam.on > 0) help(argc, argv, &optarr);
 	
 	
-	for(i=0; optarr.arr[i+1];i++) free(optarr.arr[i]->optarg); /*offset + 1*/
+	for(i=0; optarr.arr[i];i++) free(optarr.arr[i]->optarg); /*offset + 1*/
 	
 	
 	
