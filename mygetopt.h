@@ -4,6 +4,12 @@
 #include<stdio.h>
 #include<stdlib.h> /*exit*/
 
+#define swap(x, y) do{\
+	x = x + y;\
+	y = x - y;\
+	x = x - y;\
+ } while (0);
+
 typedef struct _optstuff {
 	int on;
 	char name;

@@ -14,8 +14,8 @@
 #include"mygetopt.h"
 
 /*#define DEBUG*/
-/*#define SPEEDY_GONZALES
-*/
+#define SPEEDY_GONZALES
+
 typedef struct scoredat{
 	int score;
 	int count;
