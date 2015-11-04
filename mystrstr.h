@@ -8,14 +8,14 @@
 void mystrstr(char *input, char *replacefrom, char *replacewith, char *result) {
 	int i, j, k, l;
 
+
 	/*sanitize*/
 	for (i = 0; input[i+1]; i++);
-	input[i] = 0;
+	if(input[i]=='\n') input[i] = 0;
 	for (i = 0; replacefrom[i+1]; i++);
-	replacefrom[i] = 0;
+	if (replacefrom[i] == '\n') replacefrom[i] = 0;
 	for (i = 0; replacewith[i+1]; i++);
-	replacewith[i] = 0;
-
+	if (replacewith[i] == '\n') replacewith[i] = 0;
 	
 	
 	for (i = 0; input[i]; i++) {
