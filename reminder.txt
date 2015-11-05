@@ -10,6 +10,9 @@ making a function static encapsulates it. it cannot be seen by a linker, so that
 gets : can cause buffer overflows.
 scanf : for strings it would be better to use fgets (followed by self parsing using sscanf or strchr).
 sprintf (instead use snprintf)
+there is no such thing as snscanf. just use the tostr(x) macro to limit it!
 strcat : avoid it when dealing with user input (instead use strncat, even if strncat has its pitfalls.)
 strcpy : avoid it when dealing with user input (instead use strncpy, even if strncopy has its pitfalls.)
 strtok : is not thread safe.
+
+for scanf, use %lg for getting the result in double. %g in float. if opposite, bad shit will happen.
