@@ -64,7 +64,7 @@ void mystrstr(char *input, char *replacefrom, char *replacewith, char *result) {
 	/*find match*/
 	for (i = 0; input[i]; i++) {
 		for (k = 0; replacefrom[k]; k++); /*strlen*/
-		for (j = 0; replacefrom[j]; j++) {
+		for (j = 0; j<k; j++) {
 			if (input[i + j] != replacefrom[j]) {
 				break;
 			}
