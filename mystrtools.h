@@ -5,6 +5,10 @@
 #include<string.h>
 #include<stdlib.h>
 
+/*use this to insert buffer to scanf*/
+#define tostr2(x) #x
+#define tostr(x) tostr2(x)
+
 typedef struct _strcount {
 	int score;
 	char *loc;
