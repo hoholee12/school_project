@@ -19,13 +19,14 @@ typedef struct _strcount {
 void strcount(char *input, _strcount *strcount, int buffer) {
 	int i, j, k, l;
 	_strcount *temp=NULL;
+	int temp2;
 	char **arr = calloc(buffer, sizeof*arr);
 	/*sanitize*/
 	for (i = 0; input[i + 1]; i++);
 	if (input[i] == '\n')input[i] = 0;
 
 	/*separate*/
-	j = 0;
+	j = 0; /*count arr*/
 	arr[0] = input;
 	for (i = 0; input[i]; i++) {
 		if (!isalpha(input[i])) {
@@ -36,7 +37,7 @@ void strcount(char *input, _strcount *strcount, int buffer) {
 	}
 
 	/*store*/
-	k = 0;
+	k = 0; /*if i am first*/
 	for (i = 0; arr[i]; i++) {
 		l = 0; /*condition check*/
 		for (j = 0; strcount[j].loc; j++) {
