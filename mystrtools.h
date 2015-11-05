@@ -117,6 +117,6 @@ void mystrstr(char *input, char *replacefrom, char *replacewith, char *result) {
 			else result[l] = input[l];
 		}
 	}
-	result[l + k] = 0; /*end with null*/
+	/*result[l + k] = 0; /*end with null*/
 	
 }
