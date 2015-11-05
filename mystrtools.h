@@ -12,8 +12,9 @@ typedef struct _strcount {
 
 } _strcount;
 
-void strcount(char *input, _strcount *_strcount, int buffer) {
+void strcount(char *input, _strcount *strcount, int buffer) {
 	int i, j, k, l;
+	_strcount *temp=NULL;
 	char **arr = calloc(buffer, sizeof*arr);
 	/*sanitize*/
 	for (i = 0; input[i + 1]; i++);
@@ -34,19 +35,32 @@ void strcount(char *input, _strcount *_strcount, int buffer) {
 	k = 0;
 	for (i = 0; arr[i]; i++) {
 		l = 0; /*condition check*/
-		for (j = 0; _strcount[j].loc; j++) {
-			if (!strcmp(_strcount[j].loc, arr[i])) { /*if i am not the first*/
-				_strcount[j].score++;
+		for (j = 0; strcount[j].loc; j++) {
+			if (!strcmp(strcount[j].loc, arr[i])) { /*if i am not the first*/
+				strcount[j].score++;
 				l++;
 				break;
 			}
 		}
 		if (!l) { /*if i am first*/
-			_strcount[k].score++;
-			_strcount[k++].loc = arr[i];
+			strcount[k].score++;
+			strcount[k++].loc = arr[i];
 		}
 	}
 
+	/*sort by alphabetical order*/
+	for (j = 0; strcount[j + 1].loc; j++) {
+		for (i = 0; strcount[i + 1].loc; i++) {
+			if (strcmp(strcount[i].loc, strcount[i + 1].loc) > 0) {
+				temp = strcount[i + 1].loc;
+				strcount[i + 1].loc = strcount[i].loc;
+				strcount[i].loc = temp;
+
+			}
+
+
+		}
+	}
 }
 
 void mystrstr(char *input, char *replacefrom, char *replacewith, char *result) {
