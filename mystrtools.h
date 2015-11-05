@@ -52,10 +52,14 @@ void strcount(char *input, _strcount *strcount, int buffer) {
 	for (j = 0; strcount[j + 1].loc; j++) {
 		for (i = 0; strcount[i + 1].loc; i++) {
 			if (strcmp(strcount[i].loc, strcount[i + 1].loc) > 0) {
+				/*align loc*/
 				temp = strcount[i + 1].loc;
 				strcount[i + 1].loc = strcount[i].loc;
 				strcount[i].loc = temp;
-
+				/*align score*/
+				temp2 = strcount[i + 1].score;
+				strcount[i + 1].score = strcount[i].score;
+				strcount[i].score = temp2;
 			}
 
 
