@@ -52,20 +52,20 @@ void mygetopt(int argc, char **argv, char *delim, _optarr *optarr) {
 					/********************************************************************************************************/
 					for(l=0; (delim[l]!=optarr->arr[j]->name)&&delim[l]; l++); /*if the option has optarg according to delim*/
 					
-						if (delim[l + 1] == ':') {
+					if (delim[l + 1] == ':') {
 							
-							if(argc>i+1){
-								if (argv[i + 1][0] != '-')optarr->arr[j]->optarg = argv[i + 1];
-								else error(argc, argv, argv[i], "option requires an argument");
-							}
+						if(argc>i+1){
+							if (argv[i + 1][0] != '-')optarr->arr[j]->optarg = argv[i + 1];
 							else error(argc, argv, argv[i], "option requires an argument");
 						}
-						else {
-							if(argc>i+1){
-								if (argv[i + 1][0] != '-') error(argc, argv, argv[i], "option does not require an argument");
-							}
-							
+						else error(argc, argv, argv[i], "option requires an argument");
+					}
+					else {
+						if(argc>i+1){
+							if (argv[i + 1][0] != '-') error(argc, argv, argv[i], "option does not require an argument");
 						}
+						
+					}
 					/********************************************************************************************************/
 
 					
