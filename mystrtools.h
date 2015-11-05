@@ -61,7 +61,7 @@ void mystrstr(char *input, char *replacefrom, char *replacewith, char *result) {
 	for (i = 0; replacewith[i+1]; i++);
 	if (replacewith[i] == '\n') replacewith[i] = 0;
 	
-	
+	/*find match*/
 	for (i = 0; input[i]; i++) {
 		for (k = 0; replacefrom[k]; k++); /*strlen*/
 		for (j = 0; replacefrom[j]; j++) {
@@ -80,6 +80,7 @@ void mystrstr(char *input, char *replacefrom, char *replacewith, char *result) {
 	}
 	k = 0;
 	
+	/*start writing*/
 	for (l = 0; input[l]; l++) {
 		if (i == l) {
 			for (k = 0; replacewith[k]; k++) {
