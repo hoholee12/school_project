@@ -48,10 +48,11 @@ str		==	-4
 *always sort with switch statement!!
 */
 
-#define printf(str, args...); \
-		fflush(stdout);		/*for dots*/\
-		printf(str, ##args);\
-		fflush(stdout);
+#define printf(str, args...); do{\
+	fflush(stdout);		/*for dots*/\
+	printf(str, ##args);\
+	fflush(stdout);\
+} while(0);	
 
 void printarr_alt(int **arr, int row, int col,
 	int user,
