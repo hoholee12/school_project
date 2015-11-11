@@ -19,3 +19,4 @@ for scanf, use %lg for getting the result in double. %g in float. if opposite, b
 
 preprocessor: gcc -E
 assembly: gcc -S (use -O0 to get the pure unoptimized output)
+object: gcc -c
