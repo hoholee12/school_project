@@ -16,3 +16,6 @@ strcpy : avoid it when dealing with user input (instead use strncpy, even if str
 strtok : is not thread safe.
 
 for scanf, use %lg for getting the result in double. %g in float. if opposite, bad shit will happen.(test87.c)
+
+preprocessor: gcc -E
+assembly: gcc -S (use -O0 to get the pure unoptimized output)
