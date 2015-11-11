@@ -19,4 +19,8 @@ for scanf, use %lg for getting the result in double. %g in float. if opposite, b
 
 preprocessor: gcc -E
 assembly: gcc -S (use -O0 to get the pure unoptimized output)
-object: gcc -c
+create object: gcc -c (everything is checked)
+link objects: gcc [objects] (thats it.)
+executable name: gcc -o [name]
+
+these are done to reduce compile time when working on a huge project.
