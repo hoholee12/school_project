@@ -1,7 +1,10 @@
 #include<stdio.h>
 #include<string.h>
 
-
+#define fgets(x, y, z) do{\
+		fgets(x, y, z);\
+		x[strlen(x)-1]=0;\
+} while(0)
 
 typedef struct books {
 	char title[50];
@@ -14,11 +17,11 @@ typedef struct books {
 int main() {
 	books mybook = { 0 };
 	printf("Book 1 title : ");
-	gets(mybook.title);
+	fgets(mybook.title, 50, stdin);
 	printf("Book 1 author : ");
-	gets(mybook.author);
+	fgets(mybook.author, 50, stdin);
 	printf("Book 1 subject : ");
-	gets(mybook.subject);
+	fgets(mybook.subject, 100, stdin);
 	printf("Book 1 id : ");
 	scanf("%d", &mybook.id);
 
