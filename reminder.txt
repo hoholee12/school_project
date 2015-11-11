@@ -24,3 +24,5 @@ link objects: gcc [objects] (thats it.)
 executable name: gcc -o [name]
 
 these are done to reduce compile time when working on a huge project.
+
+the most portable code(no GNU extensions such as asm, inline, typeof, unix and vax): gcc -pedantic -ansi
