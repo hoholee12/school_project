@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 
+/*string will never be empty on fgets: so "x[-1]=0" will never happen!*/
 #define fgets(x, y, z) do{\
 		fgets(x, y, z);\
 		x[strlen(x)-1]=0;\
