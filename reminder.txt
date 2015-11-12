@@ -38,3 +38,6 @@ the most portable code(no GNU extensions such as asm, inline, typeof, unix and v
 
 gcc -Werror: treat all warnings as errors.
 gcc -Wno-???: disable the specific '???' warning.
+
+how to test my program using profiler:
+http://web.archive.org/web/20141129061523/http://www.cs.utah.edu/dept/old/texinfo/as/gprof.html#SEC2
