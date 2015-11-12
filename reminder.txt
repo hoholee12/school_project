@@ -17,7 +17,16 @@ strtok : is not thread safe.
 
 for scanf, use %lg for getting the result in double. %g in float. if opposite, bad shit will happen.(test87.c)
 
-preprocessor: gcc -E
+fputs is better than fprintf if you want the EXACT data to be printed out.
+
+
+==========compiler stuff=================
+
+preprocessor output to stdout: gcc -E
+^where it looks: gcc -v (use this for readability: gcc -v 2>&1 | sed -e 's/ --/\n--/g')
+link directory: gcc -L [path]
+include directory: gcc -I [path]
+
 assembly: gcc -S (use -O0 to get the pure unoptimized output)
 create object: gcc -c (everything is checked)
 link objects: gcc [objects] (thats it.)
@@ -26,3 +35,5 @@ executable name: gcc -o [name]
 these are done to reduce compile time when working on a huge project.
 
 the most portable code(no GNU extensions such as asm, inline, typeof, unix and vax): gcc -pedantic -ansi
+
+gcc -Werror: treat all warnings as errors.
