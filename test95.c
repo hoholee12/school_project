@@ -1,73 +1,163 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<windows.h>
+#include<time.h>
+
 
 HWND hwnd;
 HDC hdc;
 
-typedef struct _test {
+typedef struct _shape {
 	size_t *x;
 	size_t *y;
-} _test;
+} _shape;
 
 void input_xy();
+void move_xy();
+void rotate_xy();
 void print_xy();
 void drawline();
 void free_xy();
+void copy_xy();
+void reset_xy();
+
+#define urand(x) (rand()%(2*x+1)-x)
+
+void seed() {
+	srand((unsigned)time(0));
+
+}
 
 
 int main() {
-	_test test[3] = { 0 };
-	
+	int i;
+	_shape shape[3] = { { 0 } };
+	_shape instance = { 0 };
 	hwnd = GetForegroundWindow();
 	hdc = GetWindowDC(hwnd);
 
-	input_xy(&test[0], 500, 500);
-	input_xy(&test[0], 1000, 1000);
-	input_xy(&test[0], 1500, 1000);
-	input_xy(&test[0], 1000, 500);
-	print_xy(&test[0], 0x00bfff, 1);
+	seed();
 
-	free_xy(&test[0]);
+	input_xy(&shape[0], 0, 0);
+	input_xy(&shape[0], 100, 100);
+	input_xy(&shape[0], 0, 100);
+
+	move_xy(&shape[0], 500, 500);
+	print_xy(&shape[0], 0x00bfff, 1);
+	reset_xy(&shape[0]);
+
+	copy_xy(&shape[1], &shape[0]);
+	copy_xy(&shape[2], &shape[1]);
+
+	/*exit(1);*/
+	move_xy(&shape[0], 500, 500);
+	move_xy(&shape[1], 1000, 500);
+	move_xy(&shape[2], 1500, 500);
+	for (i = 0; i < 10000; i++) {
+		print_xy(&shape[0], 0x00bfff, 1);
+		move_xy(&shape[0], urand(10), urand(10));
+		print_xy(&shape[1], 0xffbfff, 1);
+		move_xy(&shape[1], urand(10), urand(10));
+		print_xy(&shape[2], 0x00bf00, 1);
+		move_xy(&shape[2], urand(10), urand(10));
+
+	}
+
+
+	free_xy(&shape[0]);
+	free_xy(&shape[1]);
+	free_xy(&shape[2]);
 	return 0;
 }
 
 
-void free_xy(_test *test) {
-	free(test->x);
-	free(test->y);
+void free_xy(_shape *shape) {
+	free(shape->x);
+	free(shape->y);
 
 }
 
-void input_xy(_test *test, size_t x, size_t y) {
+/*memcpy is a shallow copy in this case*/
+void copy_xy(_shape *dest, _shape *source) {
 	int i;
-	if (!test->x || !test->y) {
-		test->x = malloc(2 * sizeof*test->x);
-		test->y = malloc(2 * sizeof*test->y);
-		test->x[0] = x;
-		test->y[0] = y;
-		test->x[1] = -1;
-		test->y[1] = -1;
+	if (!dest->x || !dest->y) {
+		dest->x = malloc(2 * sizeof*dest->x);
+		dest->y = malloc(2 * sizeof*dest->y);
+	}
+	for (i = 0; source->x[i] != -1; i++);
+	dest->x = realloc(dest->x, (i + 1)*sizeof*dest->x);
+	dest->y = realloc(dest->y, (i + 1)*sizeof*dest->y);
+	for (i = 0; source->x[i] != -1; i++) {
+		dest->x[i] = source->x[i];
+		dest->y[i] = source->y[i];
+	}
+	dest->x[i] = -1;
+	dest->y[i] = -1;
+
+}
+
+
+void reset_xy(_shape *shape) {
+	int smallest_x = shape->x[0], smallest_y = shape->y[0];
+	int i;
+	for (i = 1; shape->x[i] != -1; i++) {
+		if (shape->x[i] < smallest_x) smallest_x = shape->x[i];
+		if (shape->y[i] < smallest_y) smallest_y = shape->y[i];
+	
+	}
+	for (i = 0; shape->x[i] != -1; i++) {
+		shape->x[i] -= smallest_x;
+		shape->y[i] -= smallest_y;
+	}
+
+}
+
+void input_xy(_shape *shape, size_t x, size_t y) {
+	int i;
+	if (!shape->x || !shape->y) {
+		shape->x = malloc(2 * sizeof*shape->x);
+		shape->y = malloc(2 * sizeof*shape->y);
+		shape->x[0] = x;
+		shape->y[0] = y;
+		shape->x[1] = -1;
+		shape->y[1] = -1;
 		return;
 
 	}
-	for (i = 0; test->x[i] != -1; i++); /*x length = y length*/
-	test->x = realloc(test->x, (i + 2)*sizeof*test->x);
-	test->y = realloc(test->y, (i + 2)*sizeof*test->y);
-	test->x[i] = x;
-	test->y[i] = y;
-	test->x[++i] = -1;
-	test->y[i] = -1;
+	for (i = 0; shape->x[i] != -1; i++); /*x length = y length*/
+	shape->x = realloc(shape->x, (i + 2)*sizeof*shape->x);
+	shape->y = realloc(shape->y, (i + 2)*sizeof*shape->y);
+	shape->x[i] = x;
+	shape->y[i] = y;
+	shape->x[++i] = -1;
+	shape->y[i] = -1;
 
 
 }
 
-void print_xy(_test *test, size_t color, size_t fill) {
+void move_xy(_shape *shape, int x, int y) {
 	int i;
-	for (i = 0; test->x[i + 1] != -1; i++) {
-		drawline(test->x[i], test->y[i], test->x[i + 1], test->y[i + 1], color);
+	for (i = 0; shape->x[i] != -1; i++) {
+		shape->x[i] += x;
+		shape->y[i] += y;
+
+
 	}
-	drawline(test->x[i], test->y[i], test->x[0], test->y[0], color);
+
+}
+
+void rotate_xy() {
+
+
+
+}
+
+void print_xy(_shape *shape, size_t color, size_t fill) {
+	int i;
+	for (i = 0; shape->x[i + 1] != -1; i++) {
+		drawline(shape->x[i], shape->y[i], shape->x[i + 1], shape->y[i + 1], color);
+	}
+	drawline(shape->x[i], shape->y[i], shape->x[0], shape->y[0], color);
 	if (!fill) return;
 
 }
