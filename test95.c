@@ -39,27 +39,23 @@ int main() {
 	seed();
 
 	input_xy(&shape[0], 0, 0);
+	input_xy(&shape[0], 100, 0);
 	input_xy(&shape[0], 100, 100);
 	input_xy(&shape[0], 0, 100);
-
-	move_xy(&shape[0], 500, 500);
-	print_xy(&shape[0], 0x00bfff, 1);
-	reset_xy(&shape[0]);
 
 	copy_xy(&shape[1], &shape[0]);
 	copy_xy(&shape[2], &shape[1]);
 
-	/*exit(1);*/
-	move_xy(&shape[0], 500, 500);
-	move_xy(&shape[1], 1000, 500);
-	move_xy(&shape[2], 1500, 500);
+	move_xy(&shape[0], 700, 500);
+	move_xy(&shape[1], 700, 500);
+	move_xy(&shape[2], 700, 500);
 	for (i = 0; i < 10000; i++) {
 		print_xy(&shape[0], 0x00bfff, 1);
-		move_xy(&shape[0], urand(10), urand(10));
+		move_xy(&shape[0], urand(20), urand(20));
 		print_xy(&shape[1], 0xffbfff, 1);
-		move_xy(&shape[1], urand(10), urand(10));
+		move_xy(&shape[1], urand(20), urand(20));
 		print_xy(&shape[2], 0x00bf00, 1);
-		move_xy(&shape[2], urand(10), urand(10));
+		move_xy(&shape[2], urand(20), urand(20));
 
 	}
 
@@ -103,7 +99,7 @@ void reset_xy(_shape *shape) {
 	for (i = 1; shape->x[i] != -1; i++) {
 		if (shape->x[i] < smallest_x) smallest_x = shape->x[i];
 		if (shape->y[i] < smallest_y) smallest_y = shape->y[i];
-	
+
 	}
 	for (i = 0; shape->x[i] != -1; i++) {
 		shape->x[i] -= smallest_x;
