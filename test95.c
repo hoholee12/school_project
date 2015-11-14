@@ -53,9 +53,12 @@ int main() {
 	input_xy(&shape[0], 100, 0);
 	input_xy(&shape[0], 100, 100);
 	input_xy(&shape[0], 0, 100);
-
-	rotate_xy(&shape[0], 50);
-
+	move_xy(&shape[0], 500, 500);
+	rotate_xy(&shape[0], 0); /*test here*/
+	print_xy(&shape[0], 0xbbbbbb, 1);
+	for (i = 0; shape[0].x[i] != -1; i++) {
+		printf("%d %d\n", shape[0].x[i], shape[0].y[i]);
+	}
 	exit(0);
 
 	copy_xy(&shape[1], &shape[0]);
@@ -189,9 +192,6 @@ void rotate_xy(_shape *shape, double rad) {
 		input_temp(&temp, (double)shape->x[i], (double)shape->y[i]);
 	}
 
-
-
-
 	double x = 0, y = 0; /*center*/
 	for (i = 0; temp.x[i + 1] != -1.0; i++) {
 		x += temp.x[i];
@@ -205,14 +205,19 @@ void rotate_xy(_shape *shape, double rad) {
 	for (i = 0; temp.x[i] != -1.0; i++) {
 		temp.x[i] -= x;
 		temp.y[i] -= y;
-		printf("%g %g\n", temp.x[i], temp.y[i]);
 	}
 
 	/*rotate*/
 	for (i = 0; temp.x[i] != -1.0; i++) {
-
+		shape->x[i] = cos(rad)*temp.x[i] - sin(rad)*temp.y[i];
+		shape->y[i] = sin(rad)*temp.x[i] + cos(rad)*temp.y[i];
 	}
 
+	/*add back*/
+	for (i = 0; shape->x[i] != -1; i++) {
+		shape->x[i] += x;
+		shape->y[i] += y;
+	}
 }
 
 void print_xy(_shape *shape, size_t color, size_t fill) {
@@ -225,6 +230,7 @@ void print_xy(_shape *shape, size_t color, size_t fill) {
 
 }
 
+/*this needs to be fixed!!*/
 void drawline(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
 	int i;
 	int xlen = dest_x - x;
