@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<windows.h>
 #include<time.h>
-
+#include<math.h>
 
 HWND hwnd;
 HDC hdc;
@@ -11,6 +11,12 @@ typedef struct _shape {
 	size_t *x;
 	size_t *y;
 } _shape;
+
+
+typedef struct _temp {
+	double *x;
+	double *y;
+} _temp;
 
 void input_xy();
 void move_xy();
@@ -28,6 +34,11 @@ void seed() {
 
 }
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+#define rotate_xy(x, y) rotate_xy(x, (double)y * M_PI / 180.0)
 
 int main() {
 	int i;
@@ -42,6 +53,10 @@ int main() {
 	input_xy(&shape[0], 100, 0);
 	input_xy(&shape[0], 100, 100);
 	input_xy(&shape[0], 0, 100);
+
+	rotate_xy(&shape[0], 50);
+
+	exit(0);
 
 	copy_xy(&shape[1], &shape[0]);
 	copy_xy(&shape[2], &shape[1]);
@@ -65,7 +80,7 @@ int main() {
 	free_xy(&shape[2]);
 	return 0;
 }
-
+#undef rotate_xy(x, y)
 
 void free_xy(_shape *shape) {
 	free(shape->x);
@@ -97,8 +112,8 @@ void reset_xy(_shape *shape) {
 	int smallest_x = shape->x[0], smallest_y = shape->y[0];
 	int i;
 	for (i = 1; shape->x[i] != -1; i++) {
-		if (shape->x[i] < smallest_x) smallest_x = shape->x[i];
-		if (shape->y[i] < smallest_y) smallest_y = shape->y[i];
+		if (shape->x[i] < (size_t)smallest_x) smallest_x = shape->x[i];
+		if (shape->y[i] < (size_t)smallest_y) smallest_y = shape->y[i];
 
 	}
 	for (i = 0; shape->x[i] != -1; i++) {
@@ -131,6 +146,29 @@ void input_xy(_shape *shape, size_t x, size_t y) {
 
 }
 
+void input_temp(_temp *temp, double x, double y) {
+	int i;
+	if (!temp->x || !temp->y) {
+		temp->x = malloc(2 * sizeof*temp->x);
+		temp->y = malloc(2 * sizeof*temp->y);
+		temp->x[0] = x;
+		temp->y[0] = y;
+		temp->x[1] = -1.0;
+		temp->y[1] = -1.0;
+		return;
+
+	}
+	for (i = 0; temp->x[i] != -1.0; i++); /*x length = y length*/
+	temp->x = realloc(temp->x, (i + 2)*sizeof*temp->x);
+	temp->y = realloc(temp->y, (i + 2)*sizeof*temp->y);
+	temp->x[i] = x;
+	temp->y[i] = y;
+	temp->x[++i] = -1.0;
+	temp->y[i] = -1.0;
+
+
+}
+
 void move_xy(_shape *shape, int x, int y) {
 	int i;
 	for (i = 0; shape->x[i] != -1; i++) {
@@ -142,9 +180,38 @@ void move_xy(_shape *shape, int x, int y) {
 
 }
 
-void rotate_xy() {
 
 
+void rotate_xy(_shape *shape, double rad) {
+	int i;
+	_temp temp = {0};
+	for (i = 0; shape->x[i] != -1; i++) {
+		input_temp(&temp, (double)shape->x[i], (double)shape->y[i]);
+	}
+
+
+
+
+	double x = 0, y = 0; /*center*/
+	for (i = 0; temp.x[i + 1] != -1.0; i++) {
+		x += temp.x[i];
+		y += temp.y[i];
+	}
+	x += temp.x[i];
+	y += temp.y[i];
+	x /= (double)++i;
+	y /= (double)i;
+
+	for (i = 0; temp.x[i] != -1.0; i++) {
+		temp.x[i] -= x;
+		temp.y[i] -= y;
+		printf("%g %g\n", temp.x[i], temp.y[i]);
+	}
+
+	/*rotate*/
+	for (i = 0; temp.x[i] != -1.0; i++) {
+
+	}
 
 }
 
@@ -162,10 +229,10 @@ void drawline(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
 	int i;
 	int xlen = dest_x - x;
 	int ylen = dest_y - y;
-	float ixlen, iylen;
+	double ixlen, iylen;
 	int biglen;
-	float ibiglen;
-	float setx = 0, sety = 0;
+	double ibiglen;
+	double setx = 0, sety = 0;
 
 	if (xlen < 0) {
 		xlen *= -1;
