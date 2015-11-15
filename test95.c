@@ -11,7 +11,10 @@ typedef struct _shape {
 	double *y;
 } _shape;
 
-
+typedef struct _temp {
+	double x;
+	double y;
+} _temp;
 
 void input_xy();
 void move_xy();
@@ -22,6 +25,7 @@ void free_xy();
 void copy_xy();
 void reset_xy();
 void drawline_alt();
+void copy_temp();
 
 #define urand(x) (rand()%(2*(x)+1)-(x))
 
@@ -173,8 +177,26 @@ void input_temp(_shape *temp, double x, double y) {
 	temp->y[i] = y;
 	temp->x[++i] = -1.0;
 	temp->y[i] = -1.0;
+}
 
+void copy_temp(_temp **poly, _shape *shape) {
+	int i;
+	if (poly) {
+		for (i = 0; poly[i]->x != -1.0; i++) free(poly[i]);
+		free(poly);
+	}
+	for (i = 0; shape->x[i] != -1.0; i++);
+	poly = calloc(i+1, sizeof*poly);
+	for (i = 0; shape->x[i-1] != -1.0; i++) {
+		poly[i] = calloc(1, sizeof*poly);
+	
+	}
+	for (i = 0; shape->x[i-1] != -1.0; i++) {
 
+		poly[i]->x = shape->x[i];
+		poly[i]->y = shape->y[i];
+
+	}
 }
 
 void move_xy(_shape *shape, size_t tempx, size_t tempy) {
@@ -226,16 +248,19 @@ void rotate_xy(_shape *shape, double rad) {
 
 void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	int i;
+	static HBRUSH brush;
+	_temp **poly = NULL;
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
 		if (clear) clear -= 1;
 	}
-	if (fill) {
-		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
-	}
-	else;
-
-
+	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
+	if (!fill) return;
+	copy_temp(poly, shape);
+	if(!brush) brush = CreateSolidBrush(color);
+	SelectObject(hdc, brush);
+	Polygon(hdc, poly, 3);
+	
 
 
 }
