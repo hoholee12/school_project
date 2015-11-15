@@ -7,15 +7,11 @@
 
 
 typedef struct _shape {
-	size_t *x;
-	size_t *y;
+	double *x;
+	double *y;
 } _shape;
 
 
-typedef struct _temp {
-	double *x;
-	double *y;
-} _temp;
 
 void input_xy();
 void move_xy();
@@ -27,18 +23,22 @@ void copy_xy();
 void reset_xy();
 void drawline_alt();
 
-#define urand(x) (rand()%(2*x+1)-x)
+#define urand(x) (rand()%(2*(x)+1)-(x))
 
 void seed() {
 	srand((unsigned)time(0));
 
 }
 
+void clearscreen(HWND *hwnd, HDC *hdc) {
+	InvalidateRect(hwnd, NULL, FALSE);
+}
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-#define rotate_xy(x, y) rotate_xy(x, (double)y * M_PI / 180.0)
+#define rotate_xy(x, y) rotate_xy((x), (double)(y) * M_PI / 180.0)
 
 int main() {
 	int i;
@@ -49,18 +49,21 @@ int main() {
 	seed();
 
 	input_xy(&shape[0], 0, 0);
-	input_xy(&shape[0], 100, 0);
-	input_xy(&shape[0], 100, 100);
-	input_xy(&shape[0], 0, 100);
+	input_xy(&shape[0], 500, 0);
+	input_xy(&shape[0], 500, 500);
+	input_xy(&shape[0], 0, 500);
+
 	move_xy(&shape[0], 500, 500);
+	/*rotate_xy(&shape[0], 360);
+	print_xy(&shape[0], 0xffffff, 1);
+	exit(0);*/
 	for (;;) {
-		system("cls");
 		rotate_xy(&shape[0], 1); /*test here*/
-		print_xy(&shape[0], 0xffffff, 1);
-		for (i = 0; shape[0].x[i] != -1; i++) {
-			printf("%d %d\n", shape[0].x[i], shape[0].y[i]);
-		}
-		Sleep(1);
+		print_xy(&shape[0], 0xffffff, 1, 1);
+		/*for (i = 0; shape[0].x[i] != -1; i++) {
+			printf("%g %g\n", shape[0].x[i], shape[0].y[i]);
+		}*/
+		Sleep(16); /*60fps*/
 	}
 	exit(0);
 
@@ -71,13 +74,12 @@ int main() {
 	move_xy(&shape[1], 700, 500);
 	move_xy(&shape[2], 700, 500);
 	for (i = 0; i < 10000; i++) {
-		print_xy(&shape[0], 0x00bfff, 1);
+		print_xy(&shape[0], 0x00bfff, 1, 1);
 		move_xy(&shape[0], urand(20), urand(20));
-		print_xy(&shape[1], 0xffbfff, 1);
+		print_xy(&shape[1], 0xffbfff, 1, 1);
 		move_xy(&shape[1], urand(20), urand(20));
-		print_xy(&shape[2], 0x00bf00, 1);
+		print_xy(&shape[2], 0x00bf00, 1, 1);
 		move_xy(&shape[2], urand(20), urand(20));
-
 	}
 
 
@@ -101,10 +103,10 @@ void copy_xy(_shape *dest, _shape *source) {
 		dest->x = malloc(2 * sizeof*dest->x);
 		dest->y = malloc(2 * sizeof*dest->y);
 	}
-	for (i = 0; source->x[i] != -1; i++);
+	for (i = 0; source->x[i] != -1.0; i++);
 	dest->x = realloc(dest->x, (i + 1)*sizeof*dest->x);
 	dest->y = realloc(dest->y, (i + 1)*sizeof*dest->y);
-	for (i = 0; source->x[i] != -1; i++) {
+	for (i = 0; source->x[i] != -1.0; i++) {
 		dest->x[i] = source->x[i];
 		dest->y[i] = source->y[i];
 	}
@@ -115,14 +117,14 @@ void copy_xy(_shape *dest, _shape *source) {
 
 
 void reset_xy(_shape *shape) {
-	int smallest_x = shape->x[0], smallest_y = shape->y[0];
+	double smallest_x = shape->x[0], smallest_y = shape->y[0];
 	int i;
-	for (i = 1; shape->x[i] != -1; i++) {
-		if (shape->x[i] < (size_t)smallest_x) smallest_x = shape->x[i];
-		if (shape->y[i] < (size_t)smallest_y) smallest_y = shape->y[i];
+	for (i = 1; shape->x[i] != -1.0; i++) {
+		if (shape->x[i] < smallest_x) smallest_x = shape->x[i];
+		if (shape->y[i] < smallest_y) smallest_y = shape->y[i];
 
 	}
-	for (i = 0; shape->x[i] != -1; i++) {
+	for (i = 0; shape->x[i] != -1.0; i++) {
 		shape->x[i] -= smallest_x;
 		shape->y[i] -= smallest_y;
 	}
@@ -136,8 +138,8 @@ void input_xy(_shape *shape, size_t x, size_t y) {
 		shape->y = malloc(2 * sizeof*shape->y);
 		shape->x[0] = x;
 		shape->y[0] = y;
-		shape->x[1] = -1;
-		shape->y[1] = -1;
+		shape->x[1] = -1.0;
+		shape->y[1] = -1.0;
 		return;
 
 	}
@@ -146,13 +148,13 @@ void input_xy(_shape *shape, size_t x, size_t y) {
 	shape->y = realloc(shape->y, (i + 2)*sizeof*shape->y);
 	shape->x[i] = x;
 	shape->y[i] = y;
-	shape->x[++i] = -1;
-	shape->y[i] = -1;
+	shape->x[++i] = -1.0;
+	shape->y[i] = -1.0;
 
 
 }
 
-void input_temp(_temp *temp, double x, double y) {
+void input_temp(_shape *temp, double x, double y) {
 	int i;
 	if (!temp->x || !temp->y) {
 		temp->x = malloc(2 * sizeof*temp->x);
@@ -175,24 +177,23 @@ void input_temp(_temp *temp, double x, double y) {
 
 }
 
-void move_xy(_shape *shape, int x, int y) {
+void move_xy(_shape *shape, size_t tempx, size_t tempy) {
 	int i;
-	for (i = 0; shape->x[i] != -1; i++) {
+	double x = (double)tempx;
+	double y = (double)tempy;
+	for (i = 0; shape->x[i] != -1.0; i++) {
 		shape->x[i] += x;
 		shape->y[i] += y;
-
-
 	}
-
 }
 
 
 
 void rotate_xy(_shape *shape, double rad) {
 	int i;
-	_temp temp = {0};
+	_shape temp = {0};
 	for (i = 0; shape->x[i] != -1; i++) {
-		input_temp(&temp, (double)shape->x[i], (double)shape->y[i]);
+		input_temp(&temp, shape->x[i], shape->y[i]);
 	}
 
 	double x = 0, y = 0; /*center*/
@@ -223,12 +224,13 @@ void rotate_xy(_shape *shape, double rad) {
 	}
 }
 
-void print_xy(_shape *shape, size_t color, size_t fill) {
+void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	int i;
-	for (i = 0; shape->x[i + 1] != -1; i++) {
-		drawline_alt(shape->x[i], shape->y[i], shape->x[i + 1], shape->y[i + 1], color);
+	for (i = 0; shape->x[i + 1] != -1.0; i++) {
+		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
+		if (clear) clear -= 1;
 	}
-	drawline_alt(shape->x[i], shape->y[i], shape->x[0], shape->y[0], color);
+	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
 	if (!fill) return;
 
 }
@@ -271,7 +273,7 @@ void drawline(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
 	}
 }
 
-void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
+void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color, size_t clear) {
 	HWND hwnd;
 	HDC hdc;
 	PAINTSTRUCT ps;
@@ -279,6 +281,7 @@ void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color
 	HPEN oldpen;
 	hwnd = GetForegroundWindow();
 	hdc = GetWindowDC(hwnd);
+	if (clear) clearscreen(&hwnd, &hdc);
 	pen = CreatePen(PS_SOLID, 1, color);
 	oldpen = SelectObject(hdc, pen);
 	MoveToEx(hdc, x, y, 0);
