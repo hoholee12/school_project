@@ -297,5 +297,5 @@ void clearscreen(HDC hdc) {
 	static HBRUSH brush;
 	if (!brush) brush = CreateSolidBrush(0x000000);
 	SelectObject(hdc, brush);
-	Rectangle(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+	Rectangle(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN)*2, GetSystemMetrics(SM_CYSCREEN)*2);
 }
