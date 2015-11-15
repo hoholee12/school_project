@@ -31,7 +31,8 @@ void seed() {
 
 }
 
-
+HWND hwnd;
+HDC hdc;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -56,13 +57,14 @@ int main() {
 	/*rotate_xy(&shape[0], 360);
 	print_xy(&shape[0], 0xffffff, 1);
 	exit(0);*/
+	double fps = 1000;
 	for (;;) {
-		rotate_xy(&shape[0], 1); /*test here*/
+		rotate_xy(&shape[0], 2); /*test here*/
 		print_xy(&shape[0], 0xffffff, 1, 1);
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
 			printf("%g %g\n", shape[0].x[i], shape[0].y[i]);
 		}*/
-		Sleep(16); /*60fps*/
+		Sleep(fps/60); /*60fps*/
 	}
 	exit(0);
 
@@ -234,47 +236,8 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 
 }
 
-/*this needs to be fixed!!*/
-void drawline(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
-	HWND hwnd;
-	HDC hdc;
-
-	int i;
-	int xlen = dest_x - x;
-	int ylen = dest_y - y;
-	double ixlen, iylen;
-	int biglen;
-	double ibiglen;
-	double setx = 0, sety = 0;
-	hwnd = GetForegroundWindow();
-	hdc = GetWindowDC(hwnd);
-
-	if (xlen < 0) {
-		xlen *= -1;
-		setx = dest_x;
-	}
-	else setx = x;
-	if (ylen < 0) {
-		ylen *= -1;
-		sety = dest_y;
-	}
-	else sety = y;
-	biglen = xlen;
-	if (ylen > xlen) biglen = ylen;
-	ibiglen = biglen;
-	ixlen = xlen;
-	iylen = ylen;
-	for (i = 0; i < biglen; i++) {
-		setx += ixlen / ibiglen;
-		sety += iylen / ibiglen;
-		SetPixel(hdc, (int)setx, (int)sety, color);
-
-	}
-}
 
 void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color, size_t clear) {
-	static HWND hwnd;
-	static HDC hdc;
 	static PAINTSTRUCT ps;
 	static HPEN pen;
 	static HPEN oldpen;
