@@ -4,8 +4,7 @@
 #include<time.h>
 #include<math.h>
 
-HWND hwnd;
-HDC hdc;
+
 
 typedef struct _shape {
 	size_t *x;
@@ -26,6 +25,7 @@ void drawline();
 void free_xy();
 void copy_xy();
 void reset_xy();
+void drawline_alt();
 
 #define urand(x) (rand()%(2*x+1)-x)
 
@@ -44,8 +44,7 @@ int main() {
 	int i;
 	_shape shape[3] = { { 0 } };
 	_shape instance = { 0 };
-	hwnd = GetForegroundWindow();
-	hdc = GetWindowDC(hwnd);
+	
 
 	seed();
 
@@ -54,10 +53,14 @@ int main() {
 	input_xy(&shape[0], 100, 100);
 	input_xy(&shape[0], 0, 100);
 	move_xy(&shape[0], 500, 500);
-	rotate_xy(&shape[0], 0); /*test here*/
-	print_xy(&shape[0], 0xbbbbbb, 1);
-	for (i = 0; shape[0].x[i] != -1; i++) {
-		printf("%d %d\n", shape[0].x[i], shape[0].y[i]);
+	for (;;) {
+		system("cls");
+		rotate_xy(&shape[0], 1); /*test here*/
+		print_xy(&shape[0], 0xffffff, 1);
+		for (i = 0; shape[0].x[i] != -1; i++) {
+			printf("%d %d\n", shape[0].x[i], shape[0].y[i]);
+		}
+		Sleep(1);
 	}
 	exit(0);
 
@@ -223,15 +226,18 @@ void rotate_xy(_shape *shape, double rad) {
 void print_xy(_shape *shape, size_t color, size_t fill) {
 	int i;
 	for (i = 0; shape->x[i + 1] != -1; i++) {
-		drawline(shape->x[i], shape->y[i], shape->x[i + 1], shape->y[i + 1], color);
+		drawline_alt(shape->x[i], shape->y[i], shape->x[i + 1], shape->y[i + 1], color);
 	}
-	drawline(shape->x[i], shape->y[i], shape->x[0], shape->y[0], color);
+	drawline_alt(shape->x[i], shape->y[i], shape->x[0], shape->y[0], color);
 	if (!fill) return;
 
 }
 
 /*this needs to be fixed!!*/
 void drawline(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
+	HWND hwnd;
+	HDC hdc;
+
 	int i;
 	int xlen = dest_x - x;
 	int ylen = dest_y - y;
@@ -239,6 +245,8 @@ void drawline(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
 	int biglen;
 	double ibiglen;
 	double setx = 0, sety = 0;
+	hwnd = GetForegroundWindow();
+	hdc = GetWindowDC(hwnd);
 
 	if (xlen < 0) {
 		xlen *= -1;
@@ -259,5 +267,23 @@ void drawline(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
 		setx += ixlen / ibiglen;
 		sety += iylen / ibiglen;
 		SetPixel(hdc, (int)setx, (int)sety, color);
+
 	}
+}
+
+void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
+	HWND hwnd;
+	HDC hdc;
+	PAINTSTRUCT ps;
+	HPEN pen;
+	HPEN oldpen;
+	hwnd = GetForegroundWindow();
+	hdc = GetWindowDC(hwnd);
+	pen = CreatePen(PS_SOLID, 1, color);
+	oldpen = SelectObject(hdc, pen);
+	MoveToEx(hdc, x, y, 0);
+	LineTo(hdc, dest_x, dest_y);
+	SelectObject(hdc, oldpen);
+	DeleteObject(pen);
+	EndPaint(hwnd, &ps);
 }
