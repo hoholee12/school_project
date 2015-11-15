@@ -22,6 +22,7 @@ void free_xy();
 void copy_xy();
 void reset_xy();
 void drawline_alt();
+void clearscreen();
 
 #define urand(x) (rand()%(2*(x)+1)-(x))
 
@@ -30,9 +31,7 @@ void seed() {
 
 }
 
-void clearscreen(HWND *hwnd, HDC *hdc) {
-	InvalidateRect(hwnd, NULL, FALSE);
-}
+
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -274,14 +273,17 @@ void drawline(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color) {
 }
 
 void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color, size_t clear) {
-	HWND hwnd;
-	HDC hdc;
-	PAINTSTRUCT ps;
-	HPEN pen;
-	HPEN oldpen;
+	static HWND hwnd;
+	static HDC hdc;
+	static PAINTSTRUCT ps;
+	static HPEN pen;
+	static HPEN oldpen;
+	if(!hwnd)
 	hwnd = GetForegroundWindow();
+	if(!hdc)
 	hdc = GetWindowDC(hwnd);
-	if (clear) clearscreen(&hwnd, &hdc);
+
+	if (clear) clearscreen(hdc);
 	pen = CreatePen(PS_SOLID, 1, color);
 	oldpen = SelectObject(hdc, pen);
 	MoveToEx(hdc, x, y, 0);
@@ -289,4 +291,11 @@ void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color
 	SelectObject(hdc, oldpen);
 	DeleteObject(pen);
 	EndPaint(hwnd, &ps);
+}
+
+void clearscreen(HDC hdc) {
+	static HBRUSH brush;
+	if (!brush) brush = CreateSolidBrush(0x000000);
+	SelectObject(hdc, brush);
+	Rectangle(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 }
