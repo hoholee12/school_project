@@ -26,6 +26,7 @@ void copy_xy();
 void reset_xy();
 void drawline_alt();
 void copy_temp();
+void shiftpoly();
 
 #define urand(x) (rand()%(2*(x)+1)-(x))
 
@@ -63,11 +64,11 @@ int main() {
 	double fps = 1000;
 	for (;;) {
 		rotate_xy(&shape[0], 1); /*test here*/
-		print_xy(&shape[0], 0xffffff, 1, 1);
+		print_xy(&shape[0], 0xbbbbbb, 1, 1);
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
 			printf("%g %g\n", shape[0].x[i], shape[0].y[i]);
 		}*/
-		Sleep(fps/60); /*60fps*/
+		Sleep((DWORD)fps/60); /*60fps*/
 	}
 	exit(0);
 
@@ -179,24 +180,20 @@ void input_temp(_shape *temp, double x, double y) {
 	temp->y[i] = -1.0;
 }
 
-void copy_temp(_temp **poly, _shape *shape) {
+void copy_temp(POINT *poly, _shape *shape) {
 	int i;
-	if (poly) {
-		for (i = 0; poly[i]->x != -1.0; i++) free(poly[i]);
-		free(poly);
+	for (i = 0; shape->x[i] != -1.0; i++) {
+
+		poly[i].x = (LONG)shape->x[i];
+		poly[i].y = (LONG)shape->y[i];
+
 	}
-	for (i = 0; shape->x[i] != -1.0; i++);
-	poly = calloc(i+1, sizeof*poly);
-	for (i = 0; shape->x[i-1] != -1.0; i++) {
-		poly[i] = calloc(1, sizeof*poly);
+}
+
+void shiftpoly(POINT *poly) {
+	int i;
 	
-	}
-	for (i = 0; shape->x[i-1] != -1.0; i++) {
 
-		poly[i]->x = shape->x[i];
-		poly[i]->y = shape->y[i];
-
-	}
 }
 
 void move_xy(_shape *shape, size_t tempx, size_t tempy) {
@@ -249,7 +246,7 @@ void rotate_xy(_shape *shape, double rad) {
 void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	int i;
 	static HBRUSH brush;
-	_temp **poly = NULL;
+	POINT poly[4] = {0};
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
 		if (clear) clear -= 1;
@@ -257,10 +254,15 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
 	if (!fill) return;
 	copy_temp(poly, shape);
+	/*for (i = 0; poly[i].x != -1; i++) {
+	
+	
+	}*/
 	if(!brush) brush = CreateSolidBrush(color);
 	SelectObject(hdc, brush);
 	Polygon(hdc, poly, 3);
-	
+	/*shiftpoly(poly)*/
+	Polygon(hdc, poly, 3);
 
 
 }
