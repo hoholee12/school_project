@@ -22,7 +22,6 @@ void free_xy();
 void copy_xy();
 void reset_xy();
 void drawline_alt();
-void clearscreen();
 
 #define urand(x) (rand()%(2*(x)+1)-(x))
 
@@ -59,7 +58,7 @@ int main() {
 	exit(0);*/
 	double fps = 1000;
 	for (;;) {
-		rotate_xy(&shape[0], 2); /*test here*/
+		rotate_xy(&shape[0], 1); /*test here*/
 		print_xy(&shape[0], 0xffffff, 1, 1);
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
 			printf("%g %g\n", shape[0].x[i], shape[0].y[i]);
@@ -231,34 +230,37 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
 		if (clear) clear -= 1;
 	}
-	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
-	if (!fill) return;
+	if (fill) {
+		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
+	}
+	else;
+
+
+
 
 }
 
 
 void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color, size_t clear) {
-	static PAINTSTRUCT ps;
 	static HPEN pen;
 	static HPEN oldpen;
+	static HBRUSH brush;
+	static size_t bcolor;
+	if (!bcolor) bcolor = color;
 	if(!hwnd)
 	hwnd = GetForegroundWindow();
 	if(!hdc)
 	hdc = GetWindowDC(hwnd);
 
-	if (clear) clearscreen(hdc);
-	pen = CreatePen(PS_SOLID, 1, color);
+	if (clear) {
+		if (!brush) brush = CreateSolidBrush(0x000000);
+		SelectObject(hdc, brush);
+		Rectangle(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN) * 2, GetSystemMetrics(SM_CYSCREEN) * 2);
+	}
+	if (bcolor != color) DeleteObject(pen);
+	if (!pen) pen = CreatePen(PS_SOLID, 1, color);
 	oldpen = SelectObject(hdc, pen);
 	MoveToEx(hdc, x, y, 0);
 	LineTo(hdc, dest_x, dest_y);
 	SelectObject(hdc, oldpen);
-	DeleteObject(pen);
-	EndPaint(hwnd, &ps);
-}
-
-void clearscreen(HDC hdc) {
-	static HBRUSH brush;
-	if (!brush) brush = CreateSolidBrush(0x000000);
-	SelectObject(hdc, brush);
-	Rectangle(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN)*2, GetSystemMetrics(SM_CYSCREEN)*2);
 }
