@@ -12,16 +12,15 @@ typedef struct _shape {
 } _shape;
 
 
-void input_xy();
-void move_xy();
-void rotate_xy();
-void print_xy();
-void drawline();
-void free_xy();
-void copy_xy();
-void reset_xy();
-void drawline_alt();
-void copy_temp();
+void input_xy(); /*도형 만들기*/
+void move_xy(); /*도형 움직이기*/
+void rotate_xy(); /*도형 회전하기*/
+void print_xy(); /*도형 프린트하기*/
+void free_xy(); /*프로그램 끝나면 이거 꼭 써야함*/
+void copy_xy(); /*도형 복사하기*/
+void reset_xy(); /*도형을 원래 자리로*/
+void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
+void copy_temp(); /*print_xy()에서 삼각형 채울때 쓰는거*/
 
 
 #define urand(x) (rand()%(2*(x)+1)-(x))
@@ -48,24 +47,23 @@ int main() {
 
 	seed();
 
+	/*테스트 하는 곳*/
 	input_xy(&shape[0], 0, 0);
 	input_xy(&shape[0], 200, 0);
 	input_xy(&shape[0], 400, 200);
 	input_xy(&shape[0], 0, 200);
 
 	move_xy(&shape[0], 500, 500);
-	/*rotate_xy(&shape[0], 360);
-	print_xy(&shape[0], 0xffffff, 1);
-	exit(0);*/
+
 	double fps = 1000;
 	for (;;) {
-		//system("cls");
-		rotate_xy(&shape[0], 1); /*test here*/
+		system("cls");
+		rotate_xy(&shape[0], 45);
 		print_xy(&shape[0], 0xbbbbbb, 1, 1);
-		/*for (i = 0; shape[0].x[i] != -1; i++) {
+		for (i = 0; shape[0].x[i] != -1; i++) {
 		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
-		}*/
-		Sleep((DWORD)fps / 60); /*60fps*/
+		}
+		Sleep((DWORD)fps / 1); /*1fps*/
 	}
 	exit(0);
 
@@ -84,7 +82,7 @@ int main() {
 		move_xy(&shape[2], urand(20), urand(20));
 	}
 
-
+	/*건들지 마*/
 	free_xy(&shape[0]);
 	free_xy(&shape[1]);
 	free_xy(&shape[2]);
