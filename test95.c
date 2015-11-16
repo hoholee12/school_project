@@ -44,7 +44,7 @@ int main() {
 	int i;
 	_shape shape[3] = { { 0 } };
 	_shape instance = { 0 };
-	
+
 
 	seed();
 
@@ -63,9 +63,9 @@ int main() {
 		rotate_xy(&shape[0], 1); /*test here*/
 		print_xy(&shape[0], 0xbbbbbb, 1, 1);
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
-			printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
+		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
 		}*/
-		Sleep((DWORD)fps/60); /*60fps*/
+		Sleep((DWORD)fps / 60); /*60fps*/
 	}
 	exit(0);
 
@@ -178,8 +178,8 @@ void input_temp(_shape *temp, double x, double y) {
 }
 
 void copy_temp(POINT *poly, _shape *shape, int *offset) {
-	int i, j=0;
-	for (i = 0+*offset; shape->x[i] != -1.0; i++, j++) {
+	int i, j = 0;
+	for (i = 0 + *offset; shape->x[i] != -1.0; i++, j++) {
 		if (j > 2) {
 			*offset = --i;
 			return;
@@ -207,7 +207,7 @@ void move_xy(_shape *shape, size_t tempx, size_t tempy) {
 
 void rotate_xy(_shape *shape, double rad) {
 	int i;
-	_shape temp = {0};
+	_shape temp = { 0 };
 	for (i = 0; shape->x[i] != -1; i++) {
 		input_temp(&temp, shape->x[i], shape->y[i]);
 	}
@@ -251,7 +251,7 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	}
 	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
 	if (!fill) return;
-	if(!brush) brush = CreateSolidBrush(color);
+	if (!brush) brush = CreateSolidBrush(color);
 	SelectObject(hdc, brush);
 	do {
 		copy_temp(poly, shape, &offset);
@@ -268,10 +268,10 @@ void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color
 	static HBRUSH brush;
 	static size_t bcolor;
 	if (!bcolor) bcolor = color;
-	if(!hwnd)
-	hwnd = GetForegroundWindow();
-	if(!hdc)
-	hdc = GetWindowDC(hwnd);
+	if (!hwnd)
+		hwnd = GetForegroundWindow();
+	if (!hdc)
+		hdc = GetWindowDC(hwnd);
 
 	if (clear) {
 		if (!brush) brush = CreateSolidBrush(0x000000);
