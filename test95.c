@@ -11,10 +11,6 @@ typedef struct _shape {
 	double *y;
 } _shape;
 
-typedef struct _temp {
-	double x;
-	double y;
-} _temp;
 
 void input_xy();
 void move_xy();
@@ -26,7 +22,7 @@ void copy_xy();
 void reset_xy();
 void drawline_alt();
 void copy_temp();
-void shiftpoly();
+
 
 #define urand(x) (rand()%(2*(x)+1)-(x))
 
@@ -53,9 +49,9 @@ int main() {
 	seed();
 
 	input_xy(&shape[0], 0, 0);
-	input_xy(&shape[0], 500, 0);
-	input_xy(&shape[0], 500, 500);
-	input_xy(&shape[0], 0, 500);
+	input_xy(&shape[0], 200, 0);
+	input_xy(&shape[0], 400, 200);
+	input_xy(&shape[0], 0, 200);
 
 	move_xy(&shape[0], 500, 500);
 	/*rotate_xy(&shape[0], 360);
@@ -63,10 +59,11 @@ int main() {
 	exit(0);*/
 	double fps = 1000;
 	for (;;) {
+		//system("cls");
 		rotate_xy(&shape[0], 1); /*test here*/
 		print_xy(&shape[0], 0xbbbbbb, 1, 1);
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
-			printf("%g %g\n", shape[0].x[i], shape[0].y[i]);
+			printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
 		}*/
 		Sleep((DWORD)fps/60); /*60fps*/
 	}
@@ -180,21 +177,21 @@ void input_temp(_shape *temp, double x, double y) {
 	temp->y[i] = -1.0;
 }
 
-void copy_temp(POINT *poly, _shape *shape) {
-	int i;
-	for (i = 0; shape->x[i] != -1.0; i++) {
-
-		poly[i].x = (LONG)shape->x[i];
-		poly[i].y = (LONG)shape->y[i];
-
+void copy_temp(POINT *poly, _shape *shape, int *offset) {
+	int i, j=0;
+	for (i = 0+*offset; shape->x[i] != -1.0; i++, j++) {
+		if (j > 2) {
+			*offset = --i;
+			return;
+		}
+		poly[j].x = (LONG)shape->x[i];
+		poly[j].y = (LONG)shape->y[i];
 	}
+	poly[j].x = (LONG)shape->x[0];
+	poly[j].y = (LONG)shape->y[0];
+	*offset = 0;
 }
 
-void shiftpoly(POINT *poly) {
-	int i;
-	
-
-}
 
 void move_xy(_shape *shape, size_t tempx, size_t tempy) {
 	int i;
@@ -245,25 +242,22 @@ void rotate_xy(_shape *shape, double rad) {
 
 void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	int i;
+	int offset = 0;
 	static HBRUSH brush;
-	POINT poly[4] = {0};
+	POINT poly[3] = { 0 };
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
 		if (clear) clear -= 1;
 	}
 	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
 	if (!fill) return;
-	copy_temp(poly, shape);
-	/*for (i = 0; poly[i].x != -1; i++) {
-	
-	
-	}*/
 	if(!brush) brush = CreateSolidBrush(color);
 	SelectObject(hdc, brush);
-	Polygon(hdc, poly, 3);
-	/*shiftpoly(poly)*/
-	Polygon(hdc, poly, 3);
-
+	do {
+		copy_temp(poly, shape, &offset);
+		Polygon(hdc, poly, 3);
+		drawline_alt((size_t)shape->x[0], (size_t)shape->y[0], (size_t)shape->x[2], (size_t)shape->y[2], color, clear); /*hax*/
+	} while (offset);
 
 }
 
