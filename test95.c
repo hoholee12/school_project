@@ -15,7 +15,7 @@ typedef struct _shape {
 void input_xy(); /*도형 만들기*/
 void move_xy(); /*도형 움직이기*/
 void rotate_xy(); /*도형 회전하기*/
-void print_xy(); /*도형 프린트하기*/
+void print_xy(); /*도형 출력하기*/
 void free_xy(); /*프로그램 끝나면 이거 꼭 써야함*/
 void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
@@ -42,47 +42,54 @@ HDC hdc;
 int main() {
 	int i;
 	_shape shape[3] = { { 0 } };
-	_shape instance = { 0 };
+	_shape instance[3] = { { 0 } }; /*나중에 쓸거임*/
 
 
 	seed();
 
-	/*테스트 하는 곳*/
+	/*도형 만들기*/
 	input_xy(&shape[0], 0, 0);
 	input_xy(&shape[0], 200, 0);
 	input_xy(&shape[0], 400, 200);
 	input_xy(&shape[0], 0, 200);
 
+	/*도형 복사하기: 복사 당할곳, 복사 할곳*/
+	copy_xy(&shape[1], &shape[0]);
+	copy_xy(&shape[2], &shape[1]);
+	
+	/*도형 위치 움직이기*/
 	move_xy(&shape[0], 500, 500);
+	move_xy(&shape[1], 1000, 500);
+	move_xy(&shape[2], 1500, 500);
+
 
 	double fps = 1000;
 	for (;;) {
-		system("cls");
-		rotate_xy(&shape[0], 45);
-		print_xy(&shape[0], 0xbbbbbb, 1, 1);
-		for (i = 0; shape[0].x[i] != -1; i++) {
+		/*system("cls");*/
+
+
+
+
+		rotate_xy(&shape[0], -2); /*도형 돌리기: 돌릴 도형, 각도*/
+		print_xy(&shape[0], 0xbbbbbb, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+		rotate_xy(&shape[1], 1);
+		print_xy(&shape[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
+		rotate_xy(&shape[2], urand(360)); /*urand(): -359~360 사이 임의의 각도*/
+		print_xy(&shape[2], 0x00ff00, 1, 0); 
+
+
+
+
+
+		/*for (i = 0; shape[0].x[i] != -1; i++) {
 		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
-		}
-		Sleep((DWORD)fps / 1); /*1fps*/
-	}
-	exit(0);
+		}*/
 
-	copy_xy(&shape[1], &shape[0]);
-	copy_xy(&shape[2], &shape[1]);
 
-	move_xy(&shape[0], 700, 500);
-	move_xy(&shape[1], 700, 500);
-	move_xy(&shape[2], 700, 500);
-	for (i = 0; i < 10000; i++) {
-		print_xy(&shape[0], 0x00bfff, 1, 1);
-		move_xy(&shape[0], urand(20), urand(20));
-		print_xy(&shape[1], 0xffbfff, 1, 1);
-		move_xy(&shape[1], urand(20), urand(20));
-		print_xy(&shape[2], 0x00bf00, 1, 1);
-		move_xy(&shape[2], urand(20), urand(20));
+		Sleep((DWORD)fps / 60); /*1fps*/
 	}
 
-	/*건들지 마*/
+	/*건들지 마시오*/
 	free_xy(&shape[0]);
 	free_xy(&shape[1]);
 	free_xy(&shape[2]);
