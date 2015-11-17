@@ -53,6 +53,7 @@ int main() {
 	input_xy(&shape[0], 400, 200);
 	input_xy(&shape[0], 0, 200);
 
+
 	/*도형 복사하기: 복사 당할곳, 복사 할곳*/
 	copy_xy(&shape[1], &shape[0]);
 	copy_xy(&shape[2], &shape[1]);
@@ -192,8 +193,10 @@ void copy_temp(POINT *poly, _shape *shape, int *offset) {
 		poly[j].x = (LONG)shape->x[i];
 		poly[j].y = (LONG)shape->y[i];
 	}
-	poly[j].x = (LONG)shape->x[0];
-	poly[j].y = (LONG)shape->y[0];
+	if (j < 3) {
+		poly[j].x = (LONG)shape->x[0];
+		poly[j].y = (LONG)shape->y[0];
+	}
 	*offset = 0;
 }
 
