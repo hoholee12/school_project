@@ -71,11 +71,11 @@ int main() {
 
 
 		rotate_xy(&shape[0], -2); /*도형 돌리기: 돌릴 도형, 각도*/
-		print_xy(&shape[0], 0xbbbbbb, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+		print_xy(&shape[0], 0xff0000, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
 		rotate_xy(&shape[1], 1);
 		print_xy(&shape[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
 		rotate_xy(&shape[2], urand(360)); /*urand(): -359~360 사이 임의의 각도*/
-		print_xy(&shape[2], 0x00ff00, 1, 0); 
+		print_xy(&shape[2], 0x0000ff, 1, 0); 
 
 
 
@@ -258,7 +258,7 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	}
 	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, 0);
 	if (!fill) return;
-	if (!brush) brush = CreateSolidBrush(color);
+	brush = CreateSolidBrush(color);
 	SelectObject(hdc, brush);
 	do {
 		copy_temp(poly, shape, &offset);
@@ -284,7 +284,7 @@ void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color
 		Rectangle(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN) * 2, GetSystemMetrics(SM_CYSCREEN) * 2);
 	}
 	if (bcolor != color) DeleteObject(pen);
-	if (!pen) pen = CreatePen(PS_SOLID, 1, color);
+	pen = CreatePen(PS_SOLID, 1, color);
 	SelectObject(hdc, pen);
 	MoveToEx(hdc, x, y, 0);
 	LineTo(hdc, dest_x, dest_y);
