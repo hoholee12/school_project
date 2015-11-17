@@ -86,7 +86,7 @@ int main() {
 		}*/
 
 
-		Sleep((DWORD)fps / 60); /*1fps*/
+		Sleep((DWORD)fps / 10); /*1fps*/
 	}
 
 	/*건들지 마시오*/
@@ -252,16 +252,17 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	POINT poly[3] = { 0 };
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
+		if(shape->x[i+2]!= -1.0)
+		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 2], (size_t)shape->y[i + 2], color, 0); /*hax*/
 		if (clear) clear -= 1;
 	}
-	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, clear);
+	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, 0);
 	if (!fill) return;
 	if (!brush) brush = CreateSolidBrush(color);
 	SelectObject(hdc, brush);
 	do {
 		copy_temp(poly, shape, &offset);
 		Polygon(hdc, poly, 3);
-		drawline_alt((size_t)shape->x[0], (size_t)shape->y[0], (size_t)shape->x[2], (size_t)shape->y[2], color, clear); /*hax*/
 	} while (offset);
 
 }
@@ -269,7 +270,6 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 
 void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color, size_t clear) {
 	static HPEN pen;
-	static HPEN oldpen;
 	static HBRUSH brush;
 	static size_t bcolor;
 	if (!bcolor) bcolor = color;
@@ -285,8 +285,7 @@ void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color
 	}
 	if (bcolor != color) DeleteObject(pen);
 	if (!pen) pen = CreatePen(PS_SOLID, 1, color);
-	oldpen = SelectObject(hdc, pen);
+	SelectObject(hdc, pen);
 	MoveToEx(hdc, x, y, 0);
 	LineTo(hdc, dest_x, dest_y);
-	SelectObject(hdc, oldpen);
 }
