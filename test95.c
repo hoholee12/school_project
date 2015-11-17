@@ -71,9 +71,9 @@ int main() {
 
 		/*컬러링: 0xB;G;R*/
 
-		rotate_xy(&shape[0], -2); /*도형 돌리기: 돌릴 도형, 각도*/
-		print_xy(&shape[0], 0x0000ff, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
-		rotate_xy(&shape[1], 1);
+		rotate_xy(&shape[0], 1); /*도형 돌리기: 돌릴 도형, 각도*/
+		print_xy(&shape[0], 0x0000ff, 1, 0); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+		rotate_xy(&shape[1], -1);
 		print_xy(&shape[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
 		rotate_xy(&shape[2], urand(360)); /*urand(): -359~360 사이 임의의 각도*/
 		print_xy(&shape[2], 0xff0000, 1, 0); 
@@ -87,7 +87,7 @@ int main() {
 		}*/
 
 
-		Sleep((DWORD)fps / 10); /*1fps*/
+		Sleep((DWORD)fps / 1000); /*1fps*/
 	}
 
 	/*건들지 마시오*/
@@ -252,7 +252,9 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	int i;
 	int offset = 0;
 	static HBRUSH brush;
+	static size_t bcolor;
 	POINT poly[3] = { 0 };
+	if (!bcolor) bcolor = color;
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
 		if(shape->x[i+2]!= -1.0)
@@ -261,6 +263,7 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	}
 	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, 0);
 	if (!fill) return;
+	if (bcolor != color) DeleteObject(brush);
 	brush = CreateSolidBrush(color);
 	SelectObject(hdc, brush);
 	do {
