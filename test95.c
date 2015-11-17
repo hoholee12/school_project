@@ -68,14 +68,14 @@ int main() {
 		/*system("cls");*/
 
 
-
+		/*컬러링: 0xB;G;R*/
 
 		rotate_xy(&shape[0], -2); /*도형 돌리기: 돌릴 도형, 각도*/
-		print_xy(&shape[0], 0xff0000, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+		print_xy(&shape[0], 0x0000ff, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
 		rotate_xy(&shape[1], 1);
 		print_xy(&shape[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
 		rotate_xy(&shape[2], urand(360)); /*urand(): -359~360 사이 임의의 각도*/
-		print_xy(&shape[2], 0x0000ff, 1, 0); 
+		print_xy(&shape[2], 0xff0000, 1, 0); 
 
 
 
