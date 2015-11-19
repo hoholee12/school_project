@@ -226,11 +226,12 @@ void move_xy(_shape *shape, size_t tempx, size_t tempy) {
 void rotate_xy(_shape *shape, double rad) {
 	int i;
 	_shape temp = { 0 };
+	double x = 0, y = 0; /*center*/
+
 	for (i = 0; shape->x[i] != -1.0; i++) {
 		input_temp(&temp, shape->x[i], shape->y[i]);
 	}
 
-	double x = 0, y = 0; /*center*/
 	for (i = 0; temp.x[i + 1] != -1.0; i++) {
 		x += temp.x[i];
 		y += temp.y[i];
@@ -260,8 +261,8 @@ void rotate_xy(_shape *shape, double rad) {
 
 void size_xy(_shape *shape, double multi) {
 	int i;
-
 	double x = 0, y = 0; /*center*/
+	
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		x += shape->x[i];
 		y += shape->y[i];
