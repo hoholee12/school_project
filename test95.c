@@ -11,16 +11,20 @@ typedef struct _shape {
 	double *y;
 } _shape;
 
-
+/*사용할 것들*/
 void input_xy(); /*도형 만들기*/
 void move_xy(); /*도형 움직이기*/
 void rotate_xy(); /*도형 회전하기*/
+void size_xy(); /*도형 사이즈 변경하기*/
 void print_xy(); /*도형 출력하기*/
 void free_xy(); /*프로그램 끝나면 이거 꼭 써야함*/
 void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
+
+/*쓰면 안되는 것들*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
 void copy_temp(); /*print_xy()에서 삼각형 채울때 쓰는거*/
+void input_temp(); /*rotate_xy()에서 도형 만들때 쓰는거*/
 
 
 #define urand(x) (rand()%(2*(x)+1)-(x))
@@ -41,6 +45,7 @@ HDC hdc;
 
 int main() {
 	int i;
+	double j;
 	_shape shape[3] = { { 0 } };
 	_shape instance[3] = { { 0 } }; /*나중에 쓸거임*/
 
@@ -65,29 +70,34 @@ int main() {
 
 
 	double fps = 1000;
-	for (;;) {
+	for (i=0, j= 0.96;;i++) {
 		/*system("cls");*/
 
 
 		/*컬러링: 0xB;G;R*/
 
 		rotate_xy(&shape[0], 1); /*도형 돌리기: 돌릴 도형, 각도*/
-		print_xy(&shape[0], 0x0000ff, 1, 0); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+		print_xy(&shape[0], 0x0000ff, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
 		rotate_xy(&shape[1], -1);
 		print_xy(&shape[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
 		rotate_xy(&shape[2], urand(360)); /*urand(): -359~360 사이 임의의 각도*/
 		print_xy(&shape[2], 0xff0000, 1, 0); 
 
+		if (i > 60) {
+			if (j == 1.05) j = 0.96;
+			else j = 1.05;
+			i = 0;
+		}
 
-
-
-
+		size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
+		size_xy(&shape[1], j);
+		size_xy(&shape[2], j);
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
 		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
 		}*/
 
 
-		Sleep((DWORD)fps / 1000); /*1fps*/
+		Sleep((DWORD)fps / 60); /*60fps*/
 	}
 
 	/*건들지 마시오*/
@@ -144,8 +154,8 @@ void input_xy(_shape *shape, size_t x, size_t y) {
 	if (!shape->x || !shape->y) {
 		shape->x = malloc(2 * sizeof*shape->x);
 		shape->y = malloc(2 * sizeof*shape->y);
-		shape->x[0] = x;
-		shape->y[0] = y;
+		shape->x[0] = (double)x;
+		shape->y[0] = (double)y;
 		shape->x[1] = -1.0;
 		shape->y[1] = -1.0;
 		return;
@@ -154,8 +164,8 @@ void input_xy(_shape *shape, size_t x, size_t y) {
 	for (i = 0; shape->x[i] != -1; i++); /*x length = y length*/
 	shape->x = realloc(shape->x, (i + 2)*sizeof*shape->x);
 	shape->y = realloc(shape->y, (i + 2)*sizeof*shape->y);
-	shape->x[i] = x;
-	shape->y[i] = y;
+	shape->x[i] = (double)x;
+	shape->y[i] = (double)y;
 	shape->x[++i] = -1.0;
 	shape->y[i] = -1.0;
 
@@ -216,7 +226,7 @@ void move_xy(_shape *shape, size_t tempx, size_t tempy) {
 void rotate_xy(_shape *shape, double rad) {
 	int i;
 	_shape temp = { 0 };
-	for (i = 0; shape->x[i] != -1; i++) {
+	for (i = 0; shape->x[i] != -1.0; i++) {
 		input_temp(&temp, shape->x[i], shape->y[i]);
 	}
 
@@ -242,7 +252,38 @@ void rotate_xy(_shape *shape, double rad) {
 	}
 
 	/*add back*/
-	for (i = 0; shape->x[i] != -1; i++) {
+	for (i = 0; shape->x[i] != -1.0; i++) {
+		shape->x[i] += x;
+		shape->y[i] += y;
+	}
+}
+
+void size_xy(_shape *shape, double multi) {
+	int i;
+
+	double x = 0, y = 0; /*center*/
+	for (i = 0; shape->x[i + 1] != -1.0; i++) {
+		x += shape->x[i];
+		y += shape->y[i];
+	}
+	x += shape->x[i];
+	y += shape->y[i];
+	x /= (double)++i;
+	y /= (double)i;
+
+	for (i = 0; shape->x[i] != -1.0; i++) {
+		shape->x[i] -= x;
+		shape->y[i] -= y;
+	}
+
+	/*multiply*/
+	for (i = 0; shape->x[i] != -1.0; i++) {
+		shape->x[i] = shape->x[i] * multi;
+		shape->y[i] = shape->y[i] * multi;
+	}
+
+	/*add back*/
+	for (i = 0; shape->x[i] != -1.0; i++) {
 		shape->x[i] += x;
 		shape->y[i] += y;
 	}
