@@ -22,6 +22,9 @@ fputs is better than fprintf if you want the EXACT data to be printed out.
 arrays and structures are different!!!
 	array: int **arr => arr[][]
 	structure: struct *arr => arr[].stuff (no **arr)
+	
+text mode: fputc(character, IO), fputs(string, buffercount, IO), fprintf(IO, string, param), fgetc, fgets, fscanf
+binary mode: fread, fwrite
 
 
 ==========compiler stuff=================
