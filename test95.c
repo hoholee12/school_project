@@ -20,8 +20,9 @@ void print_xy(); /*도형 출력하기*/
 void free_xy(); /*프로그램 끝나면 이거 꼭 써야함*/
 void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
+void camera_xy(_shape *shape, double userx, double usery, double zoom); /*bug in the vc++ compiler*/
 
-/*쓰면 안되는 것들*/
+				 /*쓰면 안되는 것들*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
 void copy_temp(); /*print_xy()에서 삼각형 채울때 쓰는거*/
 void input_temp(); /*rotate_xy()에서 도형 만들때 쓰는거*/
@@ -46,7 +47,7 @@ HDC hdc;
 int main() {
 	int i;
 	double j;
-	_shape shape[3] = { { 0 } };
+	_shape shape[4] = { { 0 } };
 	_shape instance[3] = { { 0 } }; /*나중에 쓸거임*/
 
 
@@ -62,15 +63,19 @@ int main() {
 	/*도형 복사하기: 복사 당할곳, 복사 할곳*/
 	copy_xy(&shape[1], &shape[0]);
 	copy_xy(&shape[2], &shape[1]);
-	
+
+	copy_xy(&shape[3], &shape[2]);
+	shape[3].x[0] = -1.0;
+
 	/*도형 위치 움직이기*/
 	move_xy(&shape[0], 500, 500);
 	move_xy(&shape[1], 1000, 500);
 	move_xy(&shape[2], 1500, 500);
 
+	
 
 	double fps = 1000;
-	for (i=0, j= 0.96;;i++) {
+	for (i = 0, j = 1.005;; i++) {
 		/*system("cls");*/
 
 
@@ -80,18 +85,20 @@ int main() {
 		print_xy(&shape[0], 0x0000ff, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
 		rotate_xy(&shape[1], -1);
 		print_xy(&shape[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
-		rotate_xy(&shape[2], urand(360)); /*urand(): -359~360 사이 임의의 각도*/
-		print_xy(&shape[2], 0xff0000, 1, 0); 
+		rotate_xy(&shape[2], 1); /*urand(): -359~360 사이 임의의 각도*/
+		print_xy(&shape[2], 0xff0000, 1, 0);
 
 		if (i > 60) {
-			if (j == 1.05) j = 0.96;
-			else j = 1.05;
+			if (j == 1.005) j = 0.995;
+			else j = 1.005;
 			i = 0;
 		}
 
-		size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
-		size_xy(&shape[1], j);
-		size_xy(&shape[2], j);
+		//size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
+		//size_xy(&shape[1], j);
+		//size_xy(&shape[2], j);
+
+		camera_xy(shape, urand(50), urand(50), j);
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
 		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
 		}*/
@@ -211,7 +218,7 @@ void copy_temp(POINT *poly, _shape *shape, int *offset) {
 }
 
 
-void move_xy(_shape *shape, size_t tempx, size_t tempy) {
+void move_xy(_shape *shape, int tempx, int tempy) {
 	int i;
 	double x = (double)tempx;
 	double y = (double)tempy;
@@ -262,7 +269,7 @@ void rotate_xy(_shape *shape, double rad) {
 void size_xy(_shape *shape, double multi) {
 	int i;
 	double x = 0, y = 0; /*center*/
-	
+
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		x += shape->x[i];
 		y += shape->y[i];
@@ -279,8 +286,8 @@ void size_xy(_shape *shape, double multi) {
 
 	/*multiply*/
 	for (i = 0; shape->x[i] != -1.0; i++) {
-		shape->x[i] = shape->x[i] * multi;
-		shape->y[i] = shape->y[i] * multi;
+		shape->x[i] *= multi;
+		shape->y[i] *= multi;
 	}
 
 	/*add back*/
@@ -289,6 +296,43 @@ void size_xy(_shape *shape, double multi) {
 		shape->y[i] += y;
 	}
 }
+
+void camera_xy(_shape *shape, double userx, double usery, double zoom) {
+	int i, j, k;
+	double x = 0, y = 0; /*center*/
+	k = 0;
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++, k++) {
+			x += shape[i].x[j];
+			y += shape[i].y[j];
+		}
+	}
+	x /= (double)k;
+	y /= (double)k;
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			shape[i].x[j] -= x - userx;
+			shape[i].y[j] -= y - usery;
+		}
+	}
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			shape[i].x[j] *= zoom;
+			shape[i].y[j] *= zoom;
+		}
+	}
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			shape[i].x[j] += x;
+			shape[i].y[j] += y;
+		}
+	}
+
+}
+
 
 void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	int i;
@@ -299,8 +343,8 @@ void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
 	if (!bcolor) bcolor = color;
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
-		if(shape->x[i+2]!= -1.0)
-		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 2], (size_t)shape->y[i + 2], color, 0); /*hax*/
+		if (shape->x[i + 2] != -1.0)
+			drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 2], (size_t)shape->y[i + 2], color, 0); /*hax*/
 		if (clear) clear -= 1;
 	}
 	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, 0);
@@ -327,7 +371,7 @@ void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color
 		hdc = GetWindowDC(hwnd);
 
 	if (clear) {
-		if (!brush) brush = CreateSolidBrush(0x000000);
+		if (!brush) brush = CreateSolidBrush(0xffffff);
 		SelectObject(hdc, brush);
 		Rectangle(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN) * 2, GetSystemMetrics(SM_CYSCREEN) * 2);
 	}
