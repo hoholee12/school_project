@@ -27,8 +27,8 @@ void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
 void copy_temp(); /*print_xy()에서 삼각형 채울때 쓰는거*/
 void input_temp(); /*rotate_xy()에서 도형 만들때 쓰는거*/
 
+#define urand(x) (2*x*(double)rand()/RAND_MAX-x)
 
-#define urand(x) (rand()%(2*(x)+1)-(x))
 
 void seed() {
 	srand((unsigned)time(0));
@@ -75,7 +75,7 @@ int main() {
 	
 
 	double fps = 1000;
-	for (i = 0, j = 1.005;; i++) {
+	for (i = 0, j = 1.01;; i++) {
 		/*system("cls");*/
 
 
@@ -89,22 +89,22 @@ int main() {
 		print_xy(&shape[2], 0xff0000, 1, 0);
 
 		if (i > 60) {
-			if (j == 1.005) j = 0.995;
-			else j = 1.005;
+			if (j == 1.01) j = 0.99;
+			else j = 1.01;
 			i = 0;
 		}
 
 		//size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
 		//size_xy(&shape[1], j);
 		//size_xy(&shape[2], j);
-
-		camera_xy(shape, urand(50), urand(50), j, 0.1);
+		
+		camera_xy(shape, urand(50), urand(50), j, urand(0.1));
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
 		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
 		}*/
 
 
-		Sleep((DWORD)fps / 30); /*60fps*/
+		Sleep((DWORD)fps / 60); /*60fps*/
 	}
 
 	/*건들지 마시오*/
