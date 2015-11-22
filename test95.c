@@ -20,9 +20,14 @@ void print_xy(); /*도형 출력하기*/
 void free_xy(); /*프로그램 끝나면 이거 꼭 써야함*/
 void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
-void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*bug in the vc++ compiler*/
 
-				 /*쓰면 안되는 것들*/
+/*도형 집합체*/
+/*카메라 효과: 스크린에 있는 도형 전체를 움직이기*/
+void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*found a bug in the vc++ compiler*/
+void endinput_xy(); /*도형 집합체 만들고 배열 한개 더 만들어서 이거 꼭 써야함!!*/
+void free_arr(); /*도형 집합체 없애기*/
+
+/*쓰면 안되는 것들*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
 void copy_temp(); /*print_xy()에서 삼각형 채울때 쓰는거*/
 void input_temp(); /*rotate_xy()에서 도형 만들때 쓰는거*/
@@ -65,7 +70,7 @@ int main() {
 	copy_xy(&shape[2], &shape[1]);
 
 	copy_xy(&shape[3], &shape[2]);
-	shape[3].x[0] = -1.0;
+	endinput_xy(&shape[3]);
 
 	/*도형 위치 움직이기*/
 	move_xy(&shape[0], 500, 500);
@@ -94,11 +99,11 @@ int main() {
 			i = 0;
 		}
 
-		//size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
-		//size_xy(&shape[1], j);
-		//size_xy(&shape[2], j);
+		/*size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
+		/*size_xy(&shape[1], j);
+		size_xy(&shape[2], j);*/
 		
-		camera_xy(shape, urand(50), urand(50), j, urand(0.1));
+		camera_xy(shape, urand(50), urand(50), j, urand(0.1)); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
 		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
 		}*/
@@ -108,9 +113,7 @@ int main() {
 	}
 
 	/*건들지 마시오*/
-	free_xy(&shape[0]);
-	free_xy(&shape[1]);
-	free_xy(&shape[2]);
+	free_arr(shape);
 	return 0;
 }
 #undef rotate_xy(x, y)
@@ -121,6 +124,16 @@ void free_xy(_shape *shape) {
 
 }
 
+void free_arr(_shape *temp) {
+	int i;
+	for (i = 0; temp[i].x[0] != -1.0; i++) {
+		free_xy(&temp[i]);
+	}
+	free_xy(&temp[i]); /*remove -1.0 end indicator*/
+	free(temp);
+}
+
+/*create +1 array and put -1.0 at the last x[0] or y[0]*/
 void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad) {
 	int i, j, k;
 	_shape *temp = NULL;
@@ -136,7 +149,7 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 	x /= (double)k;
 	y /= (double)k;
 
-	temp = calloc(i, sizeof*temp);
+	temp = calloc(i + 1, sizeof*temp); /*0~3 == 4 blocks*/
 
 	for (i = 0; shape[i].x[0] != -1.0; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
@@ -173,8 +186,8 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 		}
 	}
 
-	for (i = 0; shape[i].x[0] != -1.0; i++) free_xy(&temp[i]);
-	free(temp);
+	endinput_xy(&temp[i]);
+	free_arr(temp);
 }
 
 /*memcpy is a shallow copy in this case*/
@@ -233,6 +246,20 @@ void input_xy(_shape *shape, size_t x, size_t y) {
 	shape->y[i] = -1.0;
 
 
+}
+
+void endinput_xy(_shape *temp) {
+	if (temp->x || temp->y) {
+		temp->x = realloc(temp->x, 1 * sizeof*temp->x);
+		temp->y = realloc(temp->y, 1 * sizeof*temp->y);
+		temp->x[0] = -1.0;
+		temp->y[0] = -1.0;
+		return;
+	}
+	temp->x = malloc(1 * sizeof*temp->x);
+	temp->y = malloc(1 * sizeof*temp->y);
+	temp->x[0] = -1.0;
+	temp->y[0] = -1.0;
 }
 
 void input_temp(_shape *temp, double x, double y) {
