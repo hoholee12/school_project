@@ -53,7 +53,7 @@ HDC hdc;
 #endif
 
 #define rotate_xy(x, y) rotate_xy((x), (double)(y) * M_PI / 180.0)
-
+#define camera_xy(a, b, c, x, y) camera_xy((a), (b), (c), (x), (double)(y) * M_PI / 180.0)
 
 
 int main() {
@@ -144,6 +144,7 @@ int main() {
 	return 0;
 }
 #undef rotate_xy(x, y)
+#undef camera_xy(a, b, c, x, y)
 
 void free_xy(_shape *shape) {
 	free(shape->x);
