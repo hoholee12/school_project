@@ -30,7 +30,7 @@ void reset_xy(); /*도형을 원래 자리로*/
 void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*found a bug in the vc++ compiler*/
 #define endmark_def 1 /*use teh most practical number*/
 void free_arr(); /*도형 집합체 없애기*/
-void copy_arr(); /*도형 집합체 복사(endinput_xy 필요x)*/
+void copy_arr(); /*도형 집합체 복사*/
 
 /*쓰면 안되는 것들*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
@@ -101,11 +101,16 @@ int main() {
 			/*컬러링: 0xB;G;R*/
 
 			rotate_xy(&instance[0], 2); /*도형 돌리기: 돌릴 도형, 각도*/
-			print_xy(&instance[0], -1, 1, 0); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+			print_xy(&instance[0], -1, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
 			rotate_xy(&instance[1], -2);
 			print_xy(&instance[1], -1, 1, 0); /*여기서 스크린 지우면 안됨*/
 			rotate_xy(&instance[2], 2); /*urand(): -359~360 사이 임의의 각도*/
 			print_xy(&instance[2], -1, 1, 0);
+
+			rotate_xy(&shape[0], 2);
+			rotate_xy(&shape[1], -2);
+			rotate_xy(&shape[2], 2);
+
 
 			if (i > 60) {
 				if (j == 1.01) j = 0.99;
