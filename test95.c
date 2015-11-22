@@ -26,6 +26,7 @@ void reset_xy(); /*도형을 원래 자리로*/
 void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*found a bug in the vc++ compiler*/
 void endinput_xy(); /*도형 집합체 만들고 배열 한개 더 만들어서 이거 꼭 써야함!!*/
 void free_arr(); /*도형 집합체 없애기*/
+void copy_arr(); /*도형 집합체 복사(endinput_xy 필요x)*/
 
 /*쓰면 안되는 것들*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
@@ -77,42 +78,54 @@ int main() {
 	move_xy(&shape[1], 1000, 500);
 	move_xy(&shape[2], 1500, 500);
 
+	/*인스턴스로 복사*/
+	copy_arr(instance, shape);
 	
 
 	double fps = 1000;
-	for (i = 0, j = 1.01;; i++) {
-		/*system("cls");*/
+	for (;;) {
+		print_xy(&instance[0], 0x0000ff, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+		for (i = 0, j = 1.01; i < 40; i++) {
+			/*system("cls");*/
 
 
-		/*컬러링: 0xB;G;R*/
+			/*컬러링: 0xB;G;R*/
 
-		rotate_xy(&shape[0], 1); /*도형 돌리기: 돌릴 도형, 각도*/
-		print_xy(&shape[0], 0x0000ff, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
-		rotate_xy(&shape[1], -1);
-		print_xy(&shape[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
-		rotate_xy(&shape[2], 1); /*urand(): -359~360 사이 임의의 각도*/
-		print_xy(&shape[2], 0xff0000, 1, 0);
+			rotate_xy(&instance[0], 2); /*도형 돌리기: 돌릴 도형, 각도*/
+			print_xy(&instance[0], 0x0000ff, 1, 0); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+			rotate_xy(&instance[1], -2);
+			print_xy(&instance[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
+			rotate_xy(&instance[2], 2); /*urand(): -359~360 사이 임의의 각도*/
+			print_xy(&instance[2], 0xff0000, 1, 0);
 
-		if (i > 60) {
-			if (j == 1.01) j = 0.99;
-			else j = 1.01;
-			i = 0;
+			if (i > 60) {
+				if (j == 1.01) j = 0.99;
+				else j = 1.01;
+				i = 0;
+			}
+
+			/*size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
+			/*size_xy(&shape[1], j);
+			size_xy(&shape[2], j);*/
+
+			camera_xy(instance, urand(50), urand(50), j, urand(0.1)); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
+
+
+
+			/*for (i = 0; shape[0].x[i] != -1; i++) {
+			printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
+			}*/
+
+
+			Sleep((DWORD)fps / 60); /*60fps*/
 		}
+		/*도형 집함체를 리셋 할때*/
+		copy_arr(instance, shape);
 
-		/*size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
-		/*size_xy(&shape[1], j);
-		size_xy(&shape[2], j);*/
-		
-		camera_xy(shape, urand(50), urand(50), j, urand(0.1)); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
-		/*for (i = 0; shape[0].x[i] != -1; i++) {
-		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
-		}*/
-
-
-		Sleep((DWORD)fps / 60); /*60fps*/
 	}
 
 	/*건들지 마시오*/
+	free_arr(instance);
 	free_arr(shape);
 	return 0;
 }
@@ -131,6 +144,14 @@ void free_arr(_shape *temp) {
 	}
 	free_xy(&temp[i]); /*remove -1.0 end indicator*/
 	free(temp);
+}
+
+void copy_arr(_shape *dest, _shape *source) {
+	int i;
+	for (i = 0; source[i].x[0] != -1.0; i++) {
+		copy_xy(&dest[i], &source[i]);
+	}
+	endinput_xy(&dest[i]);
 }
 
 /*create +1 array and put -1.0 at the last x[0] or y[0]*/
