@@ -20,7 +20,7 @@ void print_xy(); /*도형 출력하기*/
 void free_xy(); /*프로그램 끝나면 이거 꼭 써야함*/
 void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
-void camera_xy(_shape *shape, double userx, double usery, double zoom); /*bug in the vc++ compiler*/
+void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*bug in the vc++ compiler*/
 
 				 /*쓰면 안되는 것들*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
@@ -47,8 +47,8 @@ HDC hdc;
 int main() {
 	int i;
 	double j;
-	_shape shape[4] = { { 0 } };
-	_shape instance[3] = { { 0 } }; /*나중에 쓸거임*/
+	_shape shape[4] = { { 0 } }; /*건드리지 않기, 리셋할때 씀*/
+	_shape instance[4] = { { 0 } }; /*디스플레이 - 대신 이거 맘대로 건드리기*/
 
 
 	seed();
@@ -98,13 +98,13 @@ int main() {
 		//size_xy(&shape[1], j);
 		//size_xy(&shape[2], j);
 
-		camera_xy(shape, urand(50), urand(50), j);
+		camera_xy(shape, urand(50), urand(50), j, 0.1);
 		/*for (i = 0; shape[0].x[i] != -1; i++) {
 		printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
 		}*/
 
 
-		Sleep((DWORD)fps / 60); /*60fps*/
+		Sleep((DWORD)fps / 30); /*60fps*/
 	}
 
 	/*건들지 마시오*/
@@ -119,6 +119,62 @@ void free_xy(_shape *shape) {
 	free(shape->x);
 	free(shape->y);
 
+}
+
+void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad) {
+	int i, j, k;
+	_shape *temp = NULL;
+	double x = 0, y = 0; /*center*/
+
+	k = 0;
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++, k++) {
+			x += shape[i].x[j];
+			y += shape[i].y[j];
+		}
+	}
+	x /= (double)k;
+	y /= (double)k;
+
+	temp = calloc(i, sizeof*temp);
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			input_temp(&temp[i], shape[i].x[j], shape[i].y[j]);
+		}
+	}
+
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			temp[i].x[j] -= x - userx;
+			temp[i].y[j] -= y - usery;
+		}
+	}
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			shape[i].x[j] = cos(rad)*temp[i].x[j] - sin(rad)*temp[i].y[j];
+			shape[i].y[j] = sin(rad)*temp[i].x[j] + cos(rad)*temp[i].y[j];
+		}
+	}
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			shape[i].x[j] *= zoom;
+			shape[i].y[j] *= zoom;
+		}
+	}
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			shape[i].x[j] += x;
+			shape[i].y[j] += y;
+		}
+	}
+
+	for (i = 0; shape[i].x[0] != -1.0; i++) free_xy(&temp[i]);
+	free(temp);
 }
 
 /*memcpy is a shallow copy in this case*/
@@ -264,6 +320,7 @@ void rotate_xy(_shape *shape, double rad) {
 		shape->x[i] += x;
 		shape->y[i] += y;
 	}
+	free_xy(&temp);
 }
 
 void size_xy(_shape *shape, double multi) {
@@ -295,42 +352,6 @@ void size_xy(_shape *shape, double multi) {
 		shape->x[i] += x;
 		shape->y[i] += y;
 	}
-}
-
-void camera_xy(_shape *shape, double userx, double usery, double zoom) {
-	int i, j, k;
-	double x = 0, y = 0; /*center*/
-	k = 0;
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
-		for (j = 0; shape[i].x[j] != -1.0; j++, k++) {
-			x += shape[i].x[j];
-			y += shape[i].y[j];
-		}
-	}
-	x /= (double)k;
-	y /= (double)k;
-
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
-		for (j = 0; shape[i].x[j] != -1.0; j++) {
-			shape[i].x[j] -= x - userx;
-			shape[i].y[j] -= y - usery;
-		}
-	}
-
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
-		for (j = 0; shape[i].x[j] != -1.0; j++) {
-			shape[i].x[j] *= zoom;
-			shape[i].y[j] *= zoom;
-		}
-	}
-
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
-		for (j = 0; shape[i].x[j] != -1.0; j++) {
-			shape[i].x[j] += x;
-			shape[i].y[j] += y;
-		}
-	}
-
 }
 
 
