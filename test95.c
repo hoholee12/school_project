@@ -9,7 +9,11 @@
 typedef struct _shape {
 	double *x;
 	double *y;
+	size_t color;
+	size_t index;
 } _shape;
+
+
 
 /*사용할 것들*/
 void input_xy(); /*도형 만들기*/
@@ -78,13 +82,19 @@ int main() {
 	move_xy(&shape[1], 1000, 500);
 	move_xy(&shape[2], 1500, 500);
 
+	
+	/*기본값 색깔 지정: print_xy()에서 int color부분을 -1으로 지정하면 이 색깔을 씀*/
+	shape[0].color = 0x0000ff;
+	shape[1].color = 0x00ff00;
+	shape[2].color = 0xff0000;
+
+
 	/*인스턴스로 복사*/
 	copy_arr(instance, shape);
-	
 
 	double fps = 1000;
 	for (;;) {
-		print_xy(&instance[0], 0x0000ff, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+		print_xy(&instance[0], -1, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
 		for (i = 0, j = 1.01; i < 40; i++) {
 			/*system("cls");*/
 
@@ -92,11 +102,11 @@ int main() {
 			/*컬러링: 0xB;G;R*/
 
 			rotate_xy(&instance[0], 2); /*도형 돌리기: 돌릴 도형, 각도*/
-			print_xy(&instance[0], 0x0000ff, 1, 0); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+			print_xy(&instance[0], -1, 1, 0); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
 			rotate_xy(&instance[1], -2);
-			print_xy(&instance[1], 0x00ff00, 1, 0); /*여기서 스크린 지우면 안됨*/
+			print_xy(&instance[1], -1, 1, 0); /*여기서 스크린 지우면 안됨*/
 			rotate_xy(&instance[2], 2); /*urand(): -359~360 사이 임의의 각도*/
-			print_xy(&instance[2], 0xff0000, 1, 0);
+			print_xy(&instance[2], -1, 1, 0);
 
 			if (i > 60) {
 				if (j == 1.01) j = 0.99;
@@ -214,6 +224,9 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 /*memcpy is a shallow copy in this case*/
 void copy_xy(_shape *dest, _shape *source) {
 	int i;
+	dest->color = source->color;
+	dest->index = source->index;
+
 	if (!dest->x || !dest->y) {
 		dest->x = malloc(2 * sizeof*dest->x);
 		dest->y = malloc(2 * sizeof*dest->y);
@@ -403,12 +416,14 @@ void size_xy(_shape *shape, double multi) {
 }
 
 
-void print_xy(_shape *shape, size_t color, size_t fill, size_t clear) {
+void print_xy(_shape *shape, int color, size_t fill, size_t clear) {
 	int i;
 	int offset = 0;
 	static HBRUSH brush;
 	static size_t bcolor;
 	POINT poly[3] = { 0 };
+	if (color == -1) color = shape->color;
+
 	if (!bcolor) bcolor = color;
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
