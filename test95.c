@@ -93,23 +93,23 @@ int main() {
 
 	double fps = 1000;
 	for (;;) {
-		print_xy(&instance[0], -1, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
-		for (i = 0, j = 1.01; i < 40; i++) {
+		/*print_xy(&instance[0], -1, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
+		for (i = 0, j = 1.01;; i++) {
 			/*system("cls");*/
 
 
 			/*컬러링: 0xB;G;R*/
 
-			rotate_xy(&instance[0], 2); /*도형 돌리기: 돌릴 도형, 각도*/
+			rotate_xy(&instance[0], 1); /*도형 돌리기: 돌릴 도형, 각도*/
 			print_xy(&instance[0], -1, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
-			rotate_xy(&instance[1], -2);
+			rotate_xy(&instance[1], -1);
 			print_xy(&instance[1], -1, 1, 0); /*여기서 스크린 지우면 안됨*/
-			rotate_xy(&instance[2], 2); /*urand(): -359~360 사이 임의의 각도*/
+			rotate_xy(&instance[2], 1); /*urand(): -359~360 사이 임의의 각도*/
 			print_xy(&instance[2], -1, 1, 0);
 
-			rotate_xy(&shape[0], 2);
-			rotate_xy(&shape[1], -2);
-			rotate_xy(&shape[2], 2);
+			rotate_xy(&shape[0], 1);
+			rotate_xy(&shape[1], -1);
+			rotate_xy(&shape[2], 1);
 
 
 			if (i > 60) {
@@ -122,7 +122,7 @@ int main() {
 			/*size_xy(&shape[1], j);
 			size_xy(&shape[2], j);*/
 
-			camera_xy(instance, urand(50), urand(50), j, urand(0.1)); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
+			camera_xy(instance, 0, 0, j, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
 
 
 
@@ -134,7 +134,7 @@ int main() {
 			Sleep((DWORD)fps / 60); /*60fps*/
 		}
 		/*도형 집함체를 리셋 할때*/
-		copy_arr(instance, shape);
+		//copy_arr(instance, shape);
 
 	}
 
@@ -178,7 +178,7 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 	x /= (double)k;
 	y /= (double)k;
 
-	temp = calloc(i + 1, sizeof*temp); /*0~3 == 4 blocks*/
+	temp = calloc(i, sizeof*temp); /*0~2 == 3 blocks*/
 
 	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
@@ -340,13 +340,11 @@ void rotate_xy(_shape *shape, double rad) {
 		input_temp(&temp, shape->x[i], shape->y[i]);
 	}
 
-	for (i = 0; temp.x[i + 1] != -1.0; i++) {
+	for (i = 0; temp.x[i] != -1.0; i++) {
 		x += temp.x[i];
 		y += temp.y[i];
 	}
-	x += temp.x[i];
-	y += temp.y[i];
-	x /= (double)++i;
+	x /= (double)i;
 	y /= (double)i;
 
 	for (i = 0; temp.x[i] != -1.0; i++) {
@@ -372,13 +370,11 @@ void size_xy(_shape *shape, double multi) {
 	int i;
 	double x = 0, y = 0; /*center*/
 
-	for (i = 0; shape->x[i + 1] != -1.0; i++) {
+	for (i = 0; shape->x[i] != -1.0; i++) {
 		x += shape->x[i];
 		y += shape->y[i];
 	}
-	x += shape->x[i];
-	y += shape->y[i];
-	x /= (double)++i;
+	x /= (double)i;
 	y /= (double)i;
 
 	for (i = 0; shape->x[i] != -1.0; i++) {
