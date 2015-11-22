@@ -10,7 +10,7 @@ typedef struct _shape {
 	double *x;
 	double *y;
 	size_t color;
-	size_t index;
+	size_t endmark;
 } _shape;
 
 
@@ -28,7 +28,7 @@ void reset_xy(); /*도형을 원래 자리로*/
 /*도형 집합체*/
 /*카메라 효과: 스크린에 있는 도형 전체를 움직이기*/
 void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*found a bug in the vc++ compiler*/
-void endinput_xy(); /*도형 집합체 만들고 배열 한개 더 만들어서 이거 꼭 써야함!!*/
+#define endmark_def 1 /*use teh most practical number*/
 void free_arr(); /*도형 집합체 없애기*/
 void copy_arr(); /*도형 집합체 복사(endinput_xy 필요x)*/
 
@@ -54,11 +54,13 @@ HDC hdc;
 
 #define rotate_xy(x, y) rotate_xy((x), (double)(y) * M_PI / 180.0)
 
+
+
 int main() {
 	int i;
 	double j;
-	_shape shape[4] = { { 0 } }; /*건드리지 않기, 리셋할때 씀*/
-	_shape instance[4] = { { 0 } }; /*디스플레이 - 대신 이거 맘대로 건드리기*/
+	_shape shape[3] = { { 0 } }; /*건드리지 않기, 리셋할때 씀*/
+	_shape instance[3] = { { 0 } }; /*디스플레이 - 대신 이거 맘대로 건드리기*/
 
 
 	seed();
@@ -73,9 +75,6 @@ int main() {
 	/*도형 복사하기: 복사 당할곳, 복사 할곳*/
 	copy_xy(&shape[1], &shape[0]);
 	copy_xy(&shape[2], &shape[1]);
-
-	copy_xy(&shape[3], &shape[2]);
-	endinput_xy(&shape[3]);
 
 	/*도형 위치 움직이기*/
 	move_xy(&shape[0], 500, 500);
@@ -149,19 +148,13 @@ void free_xy(_shape *shape) {
 
 void free_arr(_shape *temp) {
 	int i;
-	for (i = 0; temp[i].x[0] != -1.0; i++) {
-		free_xy(&temp[i]);
-	}
-	free_xy(&temp[i]); /*remove -1.0 end indicator*/
+	for (i = 0; temp[i].endmark == endmark_def; i++) free_xy(&temp[i]);
 	free(temp);
 }
 
 void copy_arr(_shape *dest, _shape *source) {
 	int i;
-	for (i = 0; source[i].x[0] != -1.0; i++) {
-		copy_xy(&dest[i], &source[i]);
-	}
-	endinput_xy(&dest[i]);
+	for (i = 0; source[i].endmark == endmark_def; i++) copy_xy(&dest[i], &source[i]);
 }
 
 /*create +1 array and put -1.0 at the last x[0] or y[0]*/
@@ -171,7 +164,7 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 	double x = 0, y = 0; /*center*/
 
 	k = 0;
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
+	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++, k++) {
 			x += shape[i].x[j];
 			y += shape[i].y[j];
@@ -182,42 +175,40 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 
 	temp = calloc(i + 1, sizeof*temp); /*0~3 == 4 blocks*/
 
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
+	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
 			input_temp(&temp[i], shape[i].x[j], shape[i].y[j]);
 		}
 	}
 
 
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
+	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
 			temp[i].x[j] -= x - userx;
 			temp[i].y[j] -= y - usery;
 		}
 	}
 
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
+	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
 			shape[i].x[j] = cos(rad)*temp[i].x[j] - sin(rad)*temp[i].y[j];
 			shape[i].y[j] = sin(rad)*temp[i].x[j] + cos(rad)*temp[i].y[j];
 		}
 	}
 
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
+	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
 			shape[i].x[j] *= zoom;
 			shape[i].y[j] *= zoom;
 		}
 	}
 
-	for (i = 0; shape[i].x[0] != -1.0; i++) {
+	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
 			shape[i].x[j] += x;
 			shape[i].y[j] += y;
 		}
 	}
-
-	endinput_xy(&temp[i]);
 	free_arr(temp);
 }
 
@@ -225,7 +216,7 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 void copy_xy(_shape *dest, _shape *source) {
 	int i;
 	dest->color = source->color;
-	dest->index = source->index;
+	dest->endmark = source->endmark;
 
 	if (!dest->x || !dest->y) {
 		dest->x = malloc(2 * sizeof*dest->x);
@@ -261,6 +252,7 @@ void reset_xy(_shape *shape) {
 
 void input_xy(_shape *shape, size_t x, size_t y) {
 	int i;
+	shape->endmark = endmark_def;
 	if (!shape->x || !shape->y) {
 		shape->x = malloc(2 * sizeof*shape->x);
 		shape->y = malloc(2 * sizeof*shape->y);
@@ -282,19 +274,6 @@ void input_xy(_shape *shape, size_t x, size_t y) {
 
 }
 
-void endinput_xy(_shape *temp) {
-	if (temp->x || temp->y) {
-		temp->x = realloc(temp->x, 1 * sizeof*temp->x);
-		temp->y = realloc(temp->y, 1 * sizeof*temp->y);
-		temp->x[0] = -1.0;
-		temp->y[0] = -1.0;
-		return;
-	}
-	temp->x = malloc(1 * sizeof*temp->x);
-	temp->y = malloc(1 * sizeof*temp->y);
-	temp->x[0] = -1.0;
-	temp->y[0] = -1.0;
-}
 
 void input_temp(_shape *temp, double x, double y) {
 	int i;
