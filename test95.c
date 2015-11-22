@@ -134,7 +134,7 @@ int main() {
 			Sleep((DWORD)fps / 60); /*60fps*/
 		}
 		/*도형 집함체를 리셋 할때*/
-		//copy_arr(instance, shape);
+		/*copy_arr(instance, shape);*/
 
 	}
 
@@ -163,7 +163,6 @@ void copy_arr(_shape *dest, _shape *source) {
 	for (i = 0; source[i].endmark == endmark_def; i++) copy_xy(&dest[i], &source[i]);
 }
 
-/*create +1 array and put -1.0 at the last x[0] or y[0]*/
 void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad) {
 	int i, j, k;
 	_shape *temp = NULL;
