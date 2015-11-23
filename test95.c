@@ -3,7 +3,6 @@
 #include<windows.h>
 #include<time.h>
 #include<math.h>
-#include<vld.h>
 
 
 typedef struct _shape {
@@ -122,13 +121,13 @@ int main() {
 			/*size_xy(&shape[1], j);
 			size_xy(&shape[2], j);*/
 
-			camera_xy(instance, 0, 0, j, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
+			camera_xy(instance, urand(50), urand(50), j, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
 
 
 
-											   /*for (i = 0; shape[0].x[i] != -1; i++) {
-											   printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
-											   }*/
+			/*for (i = 0; shape[0].x[i] != -1; i++) {
+				printf("%lf %lf\n", shape[0].x[i], shape[0].y[i])
+			}*/
 
 
 			Sleep((DWORD)fps / 60); /*60fps*/
