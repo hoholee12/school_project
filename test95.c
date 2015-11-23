@@ -32,8 +32,8 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 void free_arr(); /*도형 집합체 없애기*/
 void copy_arr(); /*도형 집합체 복사*/
 
-/*쓰면 안되는 것들*/
-void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거*/
+/*low level*/
+void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거; print_xy()에 이니셜 코드가 있으니, 그전에 쓰면 안된다!!*/
 void copy_temp(); /*print_xy()에서 삼각형 채울때 쓰는거*/
 void input_temp(); /*rotate_xy()에서 도형 만들때 쓰는거*/
 
@@ -81,7 +81,7 @@ int main() {
 	move_xy(&shape[1], 1000, 500);
 	move_xy(&shape[2], 1500, 500);
 
-	
+
 	/*기본값 색깔 지정: print_xy()에서 int color부분을 -1으로 지정하면 이 색깔을 씀*/
 	shape[0].color = 0x0000ff;
 	shape[1].color = 0x00ff00;
@@ -126,9 +126,9 @@ int main() {
 
 
 
-			/*for (i = 0; shape[0].x[i] != -1; i++) {
-			printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
-			}*/
+											   /*for (i = 0; shape[0].x[i] != -1; i++) {
+											   printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
+											   }*/
 
 
 			Sleep((DWORD)fps / 60); /*60fps*/
@@ -399,12 +399,13 @@ void size_xy(_shape *shape, double multi) {
 void print_xy(_shape *shape, int color, size_t fill, size_t clear) {
 	int i;
 	int offset = 0;
-	static HBRUSH brush;
-	static size_t bcolor;
+	HBRUSH brush;
 	POINT poly[3] = { 0 };
+	if (!hwnd)
+		hwnd = GetForegroundWindow();
+	if (!hdc)
+		hdc = GetWindowDC(hwnd);
 	if (color == -1) color = shape->color;
-
-	if (!bcolor) bcolor = color;
 	for (i = 0; shape->x[i + 1] != -1.0; i++) {
 		drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[i + 1], (size_t)shape->y[i + 1], color, clear);
 		if (shape->x[i + 2] != -1.0)
@@ -413,35 +414,28 @@ void print_xy(_shape *shape, int color, size_t fill, size_t clear) {
 	}
 	drawline_alt((size_t)shape->x[i], (size_t)shape->y[i], (size_t)shape->x[0], (size_t)shape->y[0], color, 0);
 	if (!fill) return;
-	if (bcolor != color) DeleteObject(brush);
 	brush = CreateSolidBrush(color);
 	SelectObject(hdc, brush);
 	do {
 		copy_temp(poly, shape, &offset);
 		Polygon(hdc, poly, 3);
 	} while (offset);
-
+	DeleteObject(brush);
 }
 
 
 void drawline_alt(size_t x, size_t y, size_t dest_x, size_t dest_y, size_t color, size_t clear) {
-	static HPEN pen;
-	static HBRUSH brush;
-	static size_t bcolor;
-	if (!bcolor) bcolor = color;
-	if (!hwnd)
-		hwnd = GetForegroundWindow();
-	if (!hdc)
-		hdc = GetWindowDC(hwnd);
-
+	HPEN pen;
+	HBRUSH brush;
 	if (clear) {
-		if (!brush) brush = CreateSolidBrush(0xffffff);
+		brush = CreateSolidBrush(0xffffff);
 		SelectObject(hdc, brush);
 		Rectangle(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN) * 2, GetSystemMetrics(SM_CYSCREEN) * 2);
+		DeleteObject(brush);
 	}
-	if (bcolor != color) DeleteObject(pen);
 	pen = CreatePen(PS_SOLID, 1, color);
 	SelectObject(hdc, pen);
 	MoveToEx(hdc, x, y, 0);
 	LineTo(hdc, dest_x, dest_y);
+	DeleteObject(pen);
 }
