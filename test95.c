@@ -3,7 +3,8 @@
 #include<windows.h>
 #include<time.h>
 #include<math.h>
-
+#include<stdarg.h>
+#define va_copy(dest, src) ((dest) = (src))
 
 typedef struct _shape {
 	double *x;
