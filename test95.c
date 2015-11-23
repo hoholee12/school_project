@@ -3,7 +3,7 @@
 #include<windows.h>
 #include<time.h>
 #include<math.h>
-
+#include<vld.h>
 
 
 typedef struct _shape {
@@ -143,8 +143,8 @@ int main() {
 	free_arr(shape);
 	return 0;
 }
-#undef rotate_xy(x, y)
-#undef camera_xy(a, b, c, x, y)
+#undef rotate_xy
+#undef camera_xy
 
 void free_xy(_shape *shape) {
 	free(shape->x);
