@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<windows.h>
 #include<time.h>
 #include<math.h>
 
@@ -8,6 +7,8 @@
 #ifndef va_copy
 #define va_copy(dest, src) ((dest) = (src))
 #endif
+
+#include<windows.h> /*gdi*/
 
 typedef struct _shape {
 	double *x;
@@ -144,7 +145,7 @@ int main() {
 			}*/
 
 
-			Sleep((DWORD)fps / 60); /*60fps*/
+			Sleep((DWORD)fps / 1000); /*60fps*/
 		}
 		/*도형 집함체를 리셋 할때*/
 		/*copy_arr(instance, shape);*/
@@ -159,6 +160,8 @@ int main() {
 #undef rotate_xy
 #undef camera_xy
 #undef select_arr
+
+
 
 void free_xy(_shape *shape) {
 	free(shape->x);
