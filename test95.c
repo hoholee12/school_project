@@ -125,8 +125,8 @@ int main() {
 			/*size_xy(&shape[1], j);
 			size_xy(&shape[2], j);*/
 
-			select_arr(urand(50), urand(50), j, 1.0, 2, &shape[0], &shape[1]);
-			//camera_xy(instance, urand(50), urand(50), j, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
+			select_arr(urand(50), urand(50), j, 1.0, 2, &shape[0], &shape[1]); /*확대/축소중심 x축, y축, 배율, 돌리기, 도형갯수, 도형1, 도형2, 도형3, ...*/
+			/*camera_xy(instance, urand(50), urand(50), j, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
 
 
 
@@ -241,8 +241,7 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 	}
 	x /= (double)k;
 	y /= (double)k;
-	va_end(va[0]);
-	
+
 	temp = calloc(i, sizeof*temp);
 
 	for (i = 0; i < count; i++) {
@@ -251,7 +250,6 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 			input_temp(&temp[i], vatemp->x[j], vatemp->y[j]);
 		}
 	}
-	va_end(va[1]);
 
 	for (i = 0; i < count; i++) {
 		vatemp = va_arg(va[2], _shape *);
@@ -260,7 +258,6 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 			temp[i].y[j] -= y - usery;
 		}
 	}
-	va_end(va[2]);
 
 	for (i = 0; i < count; i++) {
 		vatemp = va_arg(va[3], _shape *);
@@ -269,7 +266,6 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 			vatemp->y[j] = sin(rad)*temp[i].x[j] + cos(rad)*temp[i].y[j];
 		}
 	}
-	va_end(va[3]);
 
 	for (i = 0; i < count; i++) {
 		vatemp = va_arg(va[4], _shape *);
@@ -278,7 +274,6 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 			vatemp->y[j] *= zoom;
 		}
 	}
-	va_end(va[4]);
 
 	for (i = 0; i < count; i++) {
 		vatemp = va_arg(va[5], _shape *);
@@ -287,7 +282,8 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 			vatemp->y[j] += y;
 		}
 	}
-	va_end(va[5]);
+
+	for (i = 0; i < 6;i++) va_end(va[i]);
 	free_arr(temp);
 }
 
@@ -356,6 +352,7 @@ void input_xy(_shape *shape, size_t x, size_t y) {
 
 void input_temp(_shape *temp, double x, double y) {
 	int i;
+	temp->endmark = endmark_def;
 	if (!temp->x || !temp->y) {
 		temp->x = malloc(2 * sizeof*temp->x);
 		temp->y = malloc(2 * sizeof*temp->y);
