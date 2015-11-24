@@ -3,8 +3,11 @@
 #include<windows.h>
 #include<time.h>
 #include<math.h>
+
 #include<stdarg.h>
+#ifndef va_copy
 #define va_copy(dest, src) ((dest) = (src))
+#endif
 
 typedef struct _shape {
 	double *x;
@@ -66,7 +69,7 @@ int main() {
 	double j;
 	_shape shape[3] = { { 0 } }; /*건드리지 않기, 리셋할때 씀*/
 	_shape instance[3] = { { 0 } }; /*디스플레이 - 대신 이거 맘대로 건드리기*/
-	_shape instance2[3] = { {0} };
+	_shape instance2[3] = { { 0 } };
 
 	seed();
 
@@ -92,13 +95,14 @@ int main() {
 	shape[1].color = 0x00ff00;
 	shape[2].color = 0xff0000;
 
-	invert_xy(&shape[1], 1); /*뒤집기; 1:x축으로, 2:y축으로, 3:x,y축으로*/
+	invert_xy(&shape[1], 1); /*뒤집기; 1:x축 중심으로, 2:y축 중심으로, 3:x,y축 중심으로*/
 	
 	/*인스턴스로 복사*/
 	copy_arr(instance, shape);
 	copy_arr(instance2, instance);
 	
 	invert_xy(&instance2[1], 3);
+	move_xy(&instance[1], 100, 0);
 
 	double fps = 1000;
 	for (;;) {
@@ -111,7 +115,7 @@ int main() {
 
 			rotate_xy(&instance2[0], 0); /*도형 돌리기: 돌릴 도형, 각도*/
 			print_xy(&instance2[0], -1, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
-			rotate_xy(&instance2[1], -1);
+			
 			print_xy(&instance2[1], -1, 1, 0); /*여기서 스크린 지우면 안됨*/
 			rotate_xy(&instance2[2], 0); /*urand(): -359~360 사이 임의의 각도*/
 			print_xy(&instance2[2], -1, 1, 0);
@@ -133,7 +137,7 @@ int main() {
 			select_arr(0, 0, 1.0, -1.0, 2, &instance[0], &instance[2]); /*확대/축소중심 x축, y축, 배율, 돌리기, 도형갯수, 도형1, 도형2, 도형3, ...*/
 			camera_xy(instance2, 0, 0, 1.0, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
 
-
+			rotate_xy(&instance2[1], -1);
 
 			/*for (i = 0; shape[0].x[i] != -1; i++) {
 				printf("%lf %lf\n", shape[0].x[i], shape[0].y[i])
