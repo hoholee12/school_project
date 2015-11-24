@@ -24,6 +24,8 @@ void print_xy(); /*도형 출력하기*/
 void free_xy(); /*프로그램 끝나면 이거 꼭 써야함*/
 void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
+void invert_xy(); /*도형 뒤집기*/
+void warp_xy();
 
 /*도형 집합체*/
 #define endmark_def 1 /*use teh most practical number*/
@@ -90,10 +92,13 @@ int main() {
 	shape[1].color = 0x00ff00;
 	shape[2].color = 0xff0000;
 
-
+	invert_xy(&shape[1], 1); /*뒤집기; 1:x축으로, 2:y축으로, 3:x,y축으로*/
+	
 	/*인스턴스로 복사*/
 	copy_arr(instance, shape);
 	copy_arr(instance2, instance);
+	
+	invert_xy(&instance2[1], 3);
 
 	double fps = 1000;
 	for (;;) {
@@ -287,6 +292,8 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 	free_arr(temp);
 }
 
+
+
 /*memcpy is a shallow copy in this case*/
 void copy_xy(_shape *dest, _shape *source) {
 	int i;
@@ -445,6 +452,57 @@ void size_xy(_shape *shape, double multi) {
 		shape->x[i] += x;
 		shape->y[i] += y;
 	}
+}
+
+void invert_xy(_shape *shape, int side) {
+	int i;
+	double x = 0, y = 0;
+	for (i = 0; shape->x[i] != -1.0; i++) {
+		x += shape->x[i];
+		y += shape->y[i];
+	}
+	x /= (double)i;
+	y /= (double)i;
+
+	for (i = 0; shape->x[i] != -1.0; i++) {
+		shape->x[i] -= x;
+		shape->y[i] -= y;
+	}
+
+	switch (side) {
+	case 0: break;
+	case 1:
+		for (i = 0; shape->x[i] != -1.0; i++) {
+			shape->y[i] *= -1;
+		}
+		break;
+	case 2: 
+		for (i = 0; shape->x[i] != -1.0; i++) {
+			shape->x[i] *= -1;
+		}
+		break;
+	case 3: 
+		for (i = 0; shape->x[i] != -1.0; i++) {
+			shape->y[i] *= -1;
+		}
+		for (i = 0; shape->x[i] != -1.0; i++) {
+			shape->x[i] *= -1;
+		}
+		break;
+	default: break;
+	}
+
+	for (i = 0; shape->x[i] != -1.0; i++) {
+		shape->x[i] += x;
+		shape->y[i] += y;
+	}
+
+}
+
+void warp_xy() {
+
+
+
 }
 
 
