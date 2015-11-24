@@ -26,11 +26,12 @@ void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
 
 /*도형 집합체*/
+#define endmark_def 1 /*use teh most practical number*/
 /*카메라 효과: 스크린에 있는 도형 전체를 움직이기*/
 void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*found a bug in the vc++ compiler*/
-#define endmark_def 1 /*use teh most practical number*/
 void free_arr(); /*도형 집합체 없애기*/
 void copy_arr(); /*도형 집합체 복사*/
+void select_arr(int count, ...); /*원하는 도형을 직접 고르기*/
 
 /*low level*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거; print_xy()에 이니셜 코드가 있으니, 그전에 쓰면 안된다!!*/
@@ -45,6 +46,7 @@ void seed() {
 
 }
 
+/*나중에 버리고 opengl로 갈아탈 계획중*/
 HWND hwnd;
 HDC hdc;
 
@@ -55,7 +57,7 @@ HDC hdc;
 #define rotate_xy(x, y) rotate_xy((x), (double)(y) * M_PI / 180.0)
 #define camera_xy(a, b, c, x, y) camera_xy((a), (b), (c), (x), (double)(y) * M_PI / 180.0)
 
-
+/*main() 놀이터*/
 int main() {
 	int i;
 	double j;
@@ -217,6 +219,16 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 	free_arr(temp);
 }
 
+void select_arr(const int count, ...) {
+	va_list va[6] = { {0} };
+	va_start(va[0], count);
+	int i, j, k, l;
+	_shape *temp = NULL;
+	for (i = 0; i < 5; i++) va_copy(va[i+1], va[i]);
+
+
+}
+
 /*memcpy is a shallow copy in this case*/
 void copy_xy(_shape *dest, _shape *source) {
 	int i;
@@ -301,23 +313,6 @@ void input_temp(_shape *temp, double x, double y) {
 	temp->y[i] = -1.0;
 }
 
-void copy_temp(POINT *poly, _shape *shape, int *offset) {
-	int i, j = 0;
-	for (i = 0 + *offset; shape->x[i] != -1.0; i++, j++) {
-		if (j > 2) {
-			*offset = --i;
-			return;
-		}
-		poly[j].x = (LONG)shape->x[i];
-		poly[j].y = (LONG)shape->y[i];
-	}
-	if (j < 3) {
-		poly[j].x = (LONG)shape->x[0];
-		poly[j].y = (LONG)shape->y[0];
-	}
-	*offset = 0;
-}
-
 
 void move_xy(_shape *shape, int tempx, int tempy) {
 	int i;
@@ -328,8 +323,6 @@ void move_xy(_shape *shape, int tempx, int tempy) {
 		shape->y[i] += y;
 	}
 }
-
-
 
 void rotate_xy(_shape *shape, double rad) {
 	int i;
@@ -395,6 +388,24 @@ void size_xy(_shape *shape, double multi) {
 	}
 }
 
+
+/*나중에 버리고 opengl로 갈아탈 계획중*/
+void copy_temp(POINT *poly, _shape *shape, int *offset) {
+	int i, j = 0;
+	for (i = 0 + *offset; shape->x[i] != -1.0; i++, j++) {
+		if (j > 2) {
+			*offset = --i;
+			return;
+		}
+		poly[j].x = (LONG)shape->x[i];
+		poly[j].y = (LONG)shape->y[i];
+	}
+	if (j < 3) {
+		poly[j].x = (LONG)shape->x[0];
+		poly[j].y = (LONG)shape->y[0];
+	}
+	*offset = 0;
+}
 
 void print_xy(_shape *shape, int color, size_t fill, size_t clear) {
 	int i;
