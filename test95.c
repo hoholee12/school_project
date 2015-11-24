@@ -242,6 +242,8 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 	x /= (double)k;
 	y /= (double)k;
 	va_end(va[0]);
+	
+	temp = calloc(i, sizeof*temp);
 
 	for (i = 0; i < count; i++) {
 		vatemp = va_arg(va[1], _shape *);
