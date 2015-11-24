@@ -31,7 +31,7 @@ void reset_xy(); /*도형을 원래 자리로*/
 void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*found a bug in the vc++ compiler*/
 void free_arr(); /*도형 집합체 없애기*/
 void copy_arr(); /*도형 집합체 복사*/
-void select_arr(int count, ...); /*원하는 도형을 직접 고르기*/
+void select_arr(double userx, double usery, double zoom, double rad, const int count, ...); /*원하는 도형을 직접 고르기*/
 
 /*low level*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거; print_xy()에 이니셜 코드가 있으니, 그전에 쓰면 안된다!!*/
@@ -56,6 +56,7 @@ HDC hdc;
 
 #define rotate_xy(x, y) rotate_xy((x), (double)(y) * M_PI / 180.0)
 #define camera_xy(a, b, c, x, y) camera_xy((a), (b), (c), (x), (double)(y) * M_PI / 180.0)
+#define select_arr(b, c, x, y, count, ...) select_arr((b), (c), (x), (double)(y) * M_PI / 180.0, (count), __VA_ARGS__)
 
 /*main() 놀이터*/
 int main() {
@@ -124,7 +125,8 @@ int main() {
 			/*size_xy(&shape[1], j);
 			size_xy(&shape[2], j);*/
 
-			camera_xy(instance, urand(50), urand(50), j, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
+			select_arr(urand(50), urand(50), j, 1.0, 2, &shape[0], &shape[1]);
+			//camera_xy(instance, urand(50), urand(50), j, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
 
 
 
@@ -147,6 +149,7 @@ int main() {
 }
 #undef rotate_xy
 #undef camera_xy
+#undef select_arr
 
 void free_xy(_shape *shape) {
 	free(shape->x);
@@ -219,14 +222,71 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 	free_arr(temp);
 }
 
-void select_arr(const int count, ...) {
+void select_arr(double userx, double usery, double zoom, double rad, const int count, ...) {
 	va_list va[6] = { {0} };
-	va_start(va[0], count);
-	int i, j, k, l;
+	int i, j, k;
+	double x = 0, y = 0;
 	_shape *temp = NULL;
+	_shape *vatemp = NULL;
+	va_start(va[0], count);
 	for (i = 0; i < 5; i++) va_copy(va[i+1], va[i]);
 
+	k = 0;
+	for (i = 0; i < count; i++) {
+		vatemp = va_arg(va[0], _shape *);
+		for (j = 0; vatemp->x[j] != -1.0; j++, k++) {
+			x += vatemp->x[j];
+			y += vatemp->y[j];
+		}
+	}
+	x /= (double)k;
+	y /= (double)k;
+	va_end(va[0]);
 
+	for (i = 0; i < count; i++) {
+		vatemp = va_arg(va[1], _shape *);
+		for (j = 0; vatemp->x[j] != -1.0; j++) {
+			input_temp(&temp[i], vatemp->x[j], vatemp->y[j]);
+		}
+	}
+	va_end(va[1]);
+
+	for (i = 0; i < count; i++) {
+		vatemp = va_arg(va[2], _shape *);
+		for (j = 0; vatemp->x[j] != -1.0; j++) {
+			temp[i].x[j] -= x - userx;
+			temp[i].y[j] -= y - usery;
+		}
+	}
+	va_end(va[2]);
+
+	for (i = 0; i < count; i++) {
+		vatemp = va_arg(va[3], _shape *);
+		for (j = 0; vatemp->x[j] != -1.0; j++) {
+			vatemp->x[j] = cos(rad)*temp[i].x[j] - sin(rad)*temp[i].y[j];
+			vatemp->y[j] = sin(rad)*temp[i].x[j] + cos(rad)*temp[i].y[j];
+		}
+	}
+	va_end(va[3]);
+
+	for (i = 0; i < count; i++) {
+		vatemp = va_arg(va[4], _shape *);
+		for (j = 0; vatemp->x[j] != -1.0; j++) {
+			vatemp->x[j] *= zoom;
+			vatemp->y[j] *= zoom;
+		}
+	}
+	va_end(va[4]);
+
+	for (i = 0; i < count; i++) {
+		vatemp = va_arg(va[5], _shape *);
+		for (j = 0; vatemp->x[j] != -1.0; j++) {
+			vatemp->x[j] += x;
+			vatemp->y[j] += y;
+		}
+	}
+	va_end(va[5]);
+	free_arr(temp);
 }
 
 /*memcpy is a shallow copy in this case*/
