@@ -79,6 +79,7 @@ int main() {
 	_shape instance2[3] = { { 0 } };
 	_shape hexagon[6] = { {0} };
 
+	/*
 	equilateral(&hexagon[0], 200);
 	move_xy(&hexagon[0], 500, 500);
 	for (i = 0; hexagon[0].x[i] != -1; i++) {
@@ -93,7 +94,7 @@ int main() {
 	invert_xy(&hexagon[0], 1);
 	print_xy(&hexagon[0], 0xffffff, 1, 0);
 	exit(0);
-
+	*/
 	seed();
 
 	/*도형 만들기*/
@@ -163,7 +164,7 @@ int main() {
 			rotate_xy(&instance2[1], -1);
 
 			/*for (i = 0; shape[0].x[i] != -1; i++) {
-				printf("%lf %lf\n", shape[0].x[i], shape[0].y[i])
+				printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
 			}*/
 
 
@@ -544,10 +545,8 @@ void equilateral(_shape *shape, int radius) {
 	input_temp(shape, cos(30.0 * M_PI / 180.0) * radius * -1, sin(30.0 * M_PI / 180.0) * radius);
 }
 
-void equilateral_alt(_shape *shape, double x, double y) {
-
-
-
+void equilateral_alt(_shape *shape, double *x, double *y) {
+	/*TODO: get two dots, and calculate the position of the other dot*/
 }
 
 
