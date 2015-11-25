@@ -35,10 +35,10 @@ void equilateral_alt();
 /*도형 집합체*/
 #define endmark_def 1 /*use teh most practical number*/
 /*카메라 효과: 스크린에 있는 도형 전체를 움직이기*/
-void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad); /*found a bug in the vc++ compiler*/
+void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad, int side); /*found a bug in the vc++ compiler*/
 void free_arr(); /*도형 집합체 없애기*/
 void copy_arr(); /*도형 집합체 복사*/
-void select_arr(double userx, double usery, double zoom, double rad, const int count, ...); /*원하는 도형을 직접 고르기*/
+void select_arr(double userx, double usery, double zoom, double rad, int side, const int count, ...); /*원하는 도형을 직접 고르기*/
 
 /*low level*/
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거; print_xy()에 이니셜 코드가 있으니, 그전에 쓰면 안된다!!*/
@@ -63,8 +63,8 @@ HDC hdc;
 #endif
 
 #define rotate_xy(x, y) rotate_xy((x), (double)(y) * M_PI / 180.0)
-#define camera_xy(a, b, c, x, y) camera_xy((a), (b), (c), (x), (double)(y) * M_PI / 180.0)
-#define select_arr(b, c, x, y, count, ...) select_arr((b), (c), (x), (double)(y) * M_PI / 180.0, (count), __VA_ARGS__)
+#define camera_xy(shape, userx, usery, zoom, rad, side) camera_xy((shape), (userx), (usery), (zoom), (double)(rad) * M_PI / 180.0, (side))
+#define select_arr(userx, usery, zoom, rad, side, count, ...) select_arr((userx), (usery), (zoom), (double)(rad) * M_PI / 180.0, (side), (count), __VA_ARGS__)
 
 #define pow(x) (x)*(x)
 #define length(x, y, side) sqrt(pow(x[side] - x[side + 1]) + pow(y[side] - y[side]))
@@ -75,8 +75,8 @@ int main() {
 	int i;
 	double j;
 	_shape shape[3] = { { 0 } }; /*건드리지 않기, 리셋할때 씀*/
-	_shape instance[3] = { { 0 } }; /*디스플레이 - 대신 이거 맘대로 건드리기*/
-	_shape instance2[3] = { { 0 } };
+	/*_shape instance[3] = { { 0 } }; /*디스플레이 - 대신 이거 맘대로 건드리기*/
+	/*_shape instance2[3] = { { 0 } };
 	_shape hexagon[6] = { {0} };
 
 	/*
@@ -95,89 +95,98 @@ int main() {
 	print_xy(&hexagon[0], 0xffffff, 1, 0);
 	exit(0);
 	*/
+	_shape myshape[3] = { { 0} };
+
+
+
 	seed();
-
-	/*도형 만들기*/
-	input_xy(&shape[0], 0, 0);
-	input_xy(&shape[0], 200, 0);
-	input_xy(&shape[0], 400, 200);
-	input_xy(&shape[0], 0, 200);
-
-
-	/*도형 복사하기: 복사 당할곳, 복사 할곳*/
-	copy_xy(&shape[1], &shape[0]);
-	copy_xy(&shape[2], &shape[1]);
-
-	/*도형 위치 움직이기*/
-	move_xy(&shape[0], 500, 500);
-	move_xy(&shape[1], 1000, 500);
-	move_xy(&shape[2], 1500, 500);
 
 
 	/*기본값 색깔 지정: print_xy()에서 int color부분을 -1으로 지정하면 이 색깔을 씀*/
-	shape[0].color = 0x0000ff;
-	shape[1].color = 0x00ff00;
+	shape[0].color = 0xff0000;
+	shape[1].color = 0xff0000;
 	shape[2].color = 0xff0000;
 
-	invert_xy(&shape[1], 1); /*뒤집기; 1:x축 중심으로, 2:y축 중심으로, 3:x,y축 중심으로*/
-	
-	/*인스턴스로 복사*/
-	copy_arr(instance, shape);
-	copy_arr(instance2, instance);
-	
-	invert_xy(&instance2[1], 3);
-	move_xy(&instance[1], 100, 0);
+	/*도형 만들기*/
+	/*rectangle*/
+	input_xy(&shape[0], 0, 0);
+	input_xy(&shape[0], 100, 0);
+	input_xy(&shape[0], 100, 100);
+	input_xy(&shape[0], 0, 100);
+	/*triangle*/
+	input_xy(&shape[1], 0, 0);
+	input_xy(&shape[1], 100, 100);
+	input_xy(&shape[1], 0, 100);
 
+	invert_xy(&shape[1], 2);
+	copy_xy(&myshape[0], &shape[1]);
+	move_temp(&shape[0], 66.666666, 0);
+	copy_xy(&myshape[1], &shape[0]);
+	move_temp(&shape[1], 166.666666, -33.333333);
+	invert_xy(&shape[1], 3);
+	copy_xy(&myshape[2], &shape[1]);
+	camera_xy(myshape, 500, 500, 1.0, 0, 0);
+	print_xy(&myshape[0], -1, 1, 1);
+	print_xy(&myshape[1], -1, 1, 0);
+	print_xy(&myshape[2], -1, 1, 0);
+
+
+	
+	/*45도회전*/
 	double fps = 1000;
-	for (;;) {
-		/*print_xy(&instance[0], -1, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
-		for (i = 0, j = 1.01;; i++) {
-			/*system("cls");*/
-
-
-			/*컬러링: 0xB;G;R*/
-
-			rotate_xy(&instance2[0], 0); /*도형 돌리기: 돌릴 도형, 각도*/
-			print_xy(&instance2[0], -1, 1, 1); /*도형 출력하기: 출력할 도형, 색깔, 도형 채우기, 스크린 지우기*/
-			
-			print_xy(&instance2[1], -1, 1, 0); /*여기서 스크린 지우면 안됨*/
-			rotate_xy(&instance2[2], 0); /*urand(): -359~360 사이 임의의 각도*/
-			print_xy(&instance2[2], -1, 1, 0);
-			print_xy(&instance[0], -1, 1, 0);
-			print_xy(&instance[1], -1, 1, 0);
-			print_xy(&instance[2], -1, 1, 0);
-
-
-			if (i > 60) {
-				if (j == 1.01) j = 0.99;
-				else j = 1.01;
-				i = 0;
-			}
-
-			/*size_xy(&shape[0], j); /*여기서 j는 꼭 실수형이어야 한다*/
-			/*size_xy(&shape[1], j);
-			size_xy(&shape[2], j);*/
-
-			select_arr(0, 0, 1.0, -1.0, 2, &instance[0], &instance[2]); /*확대/축소중심 x축, y축, 배율, 돌리기, 도형갯수, 도형1, 도형2, 도형3, ...*/
-			camera_xy(instance2, 0, 0, 1.0, 1.0); /*도형 집합체, 확대/축소중심 x축, y축, 배율, 돌리기*/
-
-			rotate_xy(&instance2[1], -1);
-
-			/*for (i = 0; shape[0].x[i] != -1; i++) {
-				printf("%lf %lf\n", shape[0].x[i], shape[0].y[i]);
-			}*/
-
-
-			Sleep((DWORD)fps / 1000); /*60fps*/
-		}
-		/*도형 집함체를 리셋 할때*/
-		/*copy_arr(instance, shape);*/
-
+	for (i=0;i<5;i++) {
+		camera_xy(myshape, 0, 0, 1.0, 45, 0);
+		print_xy(&myshape[0], -1, 1, 1);
+		print_xy(&myshape[1], -1, 1, 0);
+		print_xy(&myshape[2], -1, 1, 0);
+		printf("45도회전\r");
+		Sleep((DWORD)fps / 1); /*1fps*/
 	}
 
+	/*y축 반사*/
+	
+	for (i = 0; i < 5; i++) {
+		camera_xy(myshape, 0, 0, 1.0, 0, 2);
+		print_xy(&myshape[0], -1, 1, 1);
+		print_xy(&myshape[1], -1, 1, 0);
+		print_xy(&myshape[2], -1, 1, 0);
+		printf("y축 반사\r");
+		Sleep((DWORD)fps / 1); /*1fps*/
+	}
+
+	/*x축 반사*/
+
+	for (i = 0; i < 5; i++) {
+		camera_xy(myshape, 0, 0, 1.0, 0, 1);
+		print_xy(&myshape[0], -1, 1, 1);
+		print_xy(&myshape[1], -1, 1, 0);
+		print_xy(&myshape[2], -1, 1, 0);
+		printf("x축 반사\r");
+		Sleep((DWORD)fps / 1); /*1fps*/
+	}
+
+	/*크기변환*/
+
+	for (i = 0; i < 5; i++) {
+		camera_xy(myshape, 0, 0, 2.0, 0, 0);
+		print_xy(&myshape[0], -1, 1, 1);
+		print_xy(&myshape[1], -1, 1, 0);
+		print_xy(&myshape[2], -1, 1, 0);
+		printf("크기 변환\r");
+		Sleep((DWORD)fps / 1); /*1fps*/
+	}
+	for (i = 0; i < 5; i++) {
+		camera_xy(myshape, 0, 0, 0.5, 0, 0);
+		print_xy(&myshape[0], -1, 1, 1);
+		print_xy(&myshape[1], -1, 1, 0);
+		print_xy(&myshape[2], -1, 1, 0);
+		printf("크기 변환\r");
+		Sleep((DWORD)fps / 1); /*1fps*/
+	}
 	/*건들지 마시오*/
-	free_arr(instance);
+	
 	free_arr(shape);
+	free_arr(myshape);
 	return 0;
 }
 #undef rotate_xy
@@ -195,7 +204,6 @@ void free_xy(_shape *shape) {
 void free_arr(_shape *temp) {
 	int i;
 	for (i = 0; temp[i].endmark == endmark_def; i++) free_xy(&temp[i]);
-	free(temp);
 }
 
 void copy_arr(_shape *dest, _shape *source) {
@@ -203,7 +211,7 @@ void copy_arr(_shape *dest, _shape *source) {
 	for (i = 0; source[i].endmark == endmark_def; i++) copy_xy(&dest[i], &source[i]);
 }
 
-void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad) {
+void camera_xy(_shape *shape, double userx, double usery, double zoom, double rad, int side) {
 	int i, j, k;
 	_shape *temp = NULL;
 	double x = 0, y = 0; /*center*/
@@ -229,8 +237,8 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 
 	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
-			temp[i].x[j] -= x - userx;
-			temp[i].y[j] -= y - usery;
+			temp[i].x[j] -= x;
+			temp[i].y[j] -= y;
 		}
 	}
 
@@ -250,14 +258,31 @@ void camera_xy(_shape *shape, double userx, double usery, double zoom, double ra
 
 	for (i = 0; shape[i].endmark == endmark_def; i++) {
 		for (j = 0; shape[i].x[j] != -1.0; j++) {
-			shape[i].x[j] += x;
-			shape[i].y[j] += y;
+			switch (side) {
+			case 0: break;
+			case 1:
+				shape[i].y[j] *= -1; break;
+			case 2:
+				shape[i].x[j] *= -1; break;
+			case 3:
+				shape[i].y[j] *= -1;
+				shape[i].x[j] *= -1;
+				break;
+			default: break;
+			}
+		}
+	}
+
+	for (i = 0; shape[i].endmark == endmark_def; i++) {
+		for (j = 0; shape[i].x[j] != -1.0; j++) {
+			shape[i].x[j] += x + userx;
+			shape[i].y[j] += y + usery;
 		}
 	}
 	free_arr(temp);
 }
 
-void select_arr(double userx, double usery, double zoom, double rad, const int count, ...) {
+void select_arr(double userx, double usery, double zoom, double rad, int side, const int count, ...) {
 	va_list va[6] = { {0} };
 	int i, j, k;
 	double x = 0, y = 0;
@@ -289,8 +314,8 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 	for (i = 0; i < count; i++) {
 		vatemp = va_arg(va[2], _shape *);
 		for (j = 0; vatemp->x[j] != -1.0; j++) {
-			temp[i].x[j] -= x - userx;
-			temp[i].y[j] -= y - usery;
+			temp[i].x[j] -= x;
+			temp[i].y[j] -= y;
 		}
 	}
 
@@ -311,10 +336,29 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 	}
 
 	for (i = 0; i < count; i++) {
+		vatemp = va_arg(va[4], _shape *);
+		for (j = 0; vatemp->x[j] != -1.0; j++) {
+			switch (side) {
+			case 0: break;
+			case 1:
+				vatemp->y[j] *= -1; break;
+			case 2:
+				vatemp->x[j] *= -1; break;
+			case 3:
+				vatemp->y[j] *= -1;
+				vatemp->x[j] *= -1;
+					break;
+			default: break;
+			}
+		}
+	}
+	
+
+	for (i = 0; i < count; i++) {
 		vatemp = va_arg(va[5], _shape *);
 		for (j = 0; vatemp->x[j] != -1.0; j++) {
-			vatemp->x[j] += x;
-			vatemp->y[j] += y;
+			vatemp->x[j] += x + userx;
+			vatemp->y[j] += y + usery;
 		}
 	}
 
