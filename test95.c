@@ -30,6 +30,7 @@ void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
 void invert_xy(); /*도형 뒤집기*/
 void equilateral();
+void equilateral_alt();
 
 /*도형 집합체*/
 #define endmark_def 1 /*use teh most practical number*/
@@ -43,6 +44,7 @@ void select_arr(double userx, double usery, double zoom, double rad, const int c
 void drawline_alt(); /*print_xy()에서 선 그릴때 쓰는거; print_xy()에 이니셜 코드가 있으니, 그전에 쓰면 안된다!!*/
 void copy_temp(); /*print_xy()에서 삼각형 채울때 쓰는거*/
 void input_temp(); /*rotate_xy()에서 도형 만들때 쓰는거*/
+void move_temp(); /*double형 move_xy()*/
 
 #define urand(x) (2*x*(double)rand()/RAND_MAX-x)
 
@@ -64,6 +66,10 @@ HDC hdc;
 #define camera_xy(a, b, c, x, y) camera_xy((a), (b), (c), (x), (double)(y) * M_PI / 180.0)
 #define select_arr(b, c, x, y, count, ...) select_arr((b), (c), (x), (double)(y) * M_PI / 180.0, (count), __VA_ARGS__)
 
+#define pow(x) (x)*(x)
+#define length(x, y, side) sqrt(pow(x[side] - x[side + 1]) + pow(y[side] - y[side]))
+
+
 /*main() 놀이터*/
 int main() {
 	int i;
@@ -74,8 +80,17 @@ int main() {
 	_shape hexagon[6] = { {0} };
 
 	equilateral(&hexagon[0], 200);
-	print_xy(&hexagon[0], 0xffffff, 1, 0);
 	move_xy(&hexagon[0], 500, 500);
+	for (i = 0; hexagon[0].x[i] != -1; i++) {
+		printf("%lf %lf\n", hexagon[0].x[i], hexagon[0].y[i]);
+	}
+	print_xy(&hexagon[0], 0xffffff, 1, 0);
+	printf("%lf\n", length(hexagon[0].x, hexagon[0].y, 0));
+	move_temp(&hexagon[0], length(hexagon[0].x, hexagon[0].y, 0), -1* length(hexagon[0].x, hexagon[0].y, 0));
+	for (i = 0; hexagon[0].x[i] != -1; i++) {
+		printf("%lf %lf\n", hexagon[0].x[i], hexagon[0].y[i]);
+	}
+	invert_xy(&hexagon[0], 1);
 	print_xy(&hexagon[0], 0xffffff, 1, 0);
 	exit(0);
 
@@ -404,6 +419,16 @@ void move_xy(_shape *shape, int tempx, int tempy) {
 	}
 }
 
+void move_temp(_shape *shape, double tempx, double tempy) {
+	int i;
+	double x = tempx;
+	double y = tempy;
+	for (i = 0; shape->x[i] != -1.0; i++) {
+		shape->x[i] += x;
+		shape->y[i] += y;
+	}
+}
+
 void rotate_xy(_shape *shape, double rad) {
 	int i;
 	_shape temp = { 0 };
@@ -518,6 +543,13 @@ void equilateral(_shape *shape, int radius) {
 	input_temp(shape, cos(30.0 * M_PI / 180.0) * radius, sin(30.0 * M_PI / 180.0) * radius);
 	input_temp(shape, cos(30.0 * M_PI / 180.0) * radius * -1, sin(30.0 * M_PI / 180.0) * radius);
 }
+
+void equilateral_alt(_shape *shape, double x, double y) {
+
+
+
+}
+
 
 
 /*나중에 버리고 opengl로 갈아탈 계획중*/
