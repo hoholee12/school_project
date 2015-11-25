@@ -29,7 +29,7 @@ void free_xy(); /*프로그램 끝나면 이거 꼭 써야함*/
 void copy_xy(); /*도형 복사하기*/
 void reset_xy(); /*도형을 원래 자리로*/
 void invert_xy(); /*도형 뒤집기*/
-void warp_xy();
+void equilateral();
 
 /*도형 집합체*/
 #define endmark_def 1 /*use teh most practical number*/
@@ -71,6 +71,13 @@ int main() {
 	_shape shape[3] = { { 0 } }; /*건드리지 않기, 리셋할때 씀*/
 	_shape instance[3] = { { 0 } }; /*디스플레이 - 대신 이거 맘대로 건드리기*/
 	_shape instance2[3] = { { 0 } };
+	_shape hexagon[6] = { {0} };
+
+	equilateral(&hexagon[0], 200);
+	print_xy(&hexagon[0], 0xffffff, 1, 0);
+	move_xy(&hexagon[0], 500, 500);
+	print_xy(&hexagon[0], 0xffffff, 1, 0);
+	exit(0);
 
 	seed();
 
@@ -506,10 +513,10 @@ void invert_xy(_shape *shape, int side) {
 
 }
 
-void warp_xy() {
-
-
-
+void equilateral(_shape *shape, int radius) {
+	input_temp(shape, 0, radius * -1);
+	input_temp(shape, cos(30.0 * M_PI / 180.0) * radius, sin(30.0 * M_PI / 180.0) * radius);
+	input_temp(shape, cos(30.0 * M_PI / 180.0) * radius * -1, sin(30.0 * M_PI / 180.0) * radius);
 }
 
 
