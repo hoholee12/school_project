@@ -7,9 +7,9 @@
 #include<ctype.h>
 
 #define global_buffer 1024
-//#define DEBUG
+#define DEBUG
 
-typedef struct _test{
+typedef struct _test {
 	char **vartype;
 	char **varname;
 	/*count stuff*/
@@ -35,7 +35,7 @@ void error(char *err, int errcode) {
 void varname_input(_test *option, char *str) {
 	int i;
 	if (!option->varname) {
-		option->varname = malloc(2*sizeof*option);
+		option->varname = malloc(2 * sizeof*option);
 		option->varname[0] = calloc(63, sizeof*option);
 		option->varname[1] = -1;
 		strncpy(option->varname[0], str, 63);
@@ -163,18 +163,13 @@ void details(FILE *myfiles, _test *options, char *lines, int *eofmark) {
 			if ((pstr = strstr(str, options->vartype[i]))) {
 				if (strstr(pstr, "(")) break;
 				strtok(pstr, " ");
-				pstr = strtok(NULL, " =");
+				pstr = strtok(NULL, "=");
 				if (pstr) {
-					for (l = 0, j = 0; pstr[l]; l++, j++) { /*check if its a garbage*/
-						if (pstr[l] != '_'&&!isalnum(pstr[l])) {
-							break;
-						}
-
-					}
-					if (l == j) {
+					pstr = strtok(pstr, ", ");
+					do {
 						varname_input(options, pstr);
 						options->variables++;
-					}
+					} while ((pstr = strtok(NULL, ", "))); /*if it finds comma, it means im scanning a parameter*/
 				}
 				break;
 			}
@@ -202,7 +197,7 @@ void parser(FILE *myfiles, _test *options, char **lines, int *eofmark, int *j, i
 			}
 		}
 
-		
+
 		*k += strlen(str);
 		*lines = realloc(*lines, (*k + 1)*sizeof*lines);
 		/*remove alphabet and underscore*/
@@ -223,8 +218,8 @@ void parser(FILE *myfiles, _test *options, char **lines, int *eofmark, int *j, i
 				continue;
 			}
 
-			/*truncate logic*/
-			if (str[i] != '_' && !isalnum(str[i]) && str[i]!='#' && str[i]!='<' && str[i] != '>' && str[i] != '/' && str[i] != '*'&& !check2 && !check3 && !check4) /*remove header, left side, right side*/
+			/*truncate logic & final output*/
+			if (str[i] != '.' && str[i] != '=' && str[i] != '_' && !isalnum(str[i]) && str[i] != '#' && str[i] != '<' && str[i] != '>' && str[i] != '/' && str[i] != '*'&& !check2 && !check3 && !check4) /*remove what you want to remove here to gain more detection rate*/
 				(*lines)[l++] = str[i];
 
 
@@ -246,12 +241,12 @@ void parser(FILE *myfiles, _test *options, char **lines, int *eofmark, int *j, i
 			}
 		}
 
-		
+
 
 		(*lines)[l] = 0;
 		bc = l;
 	}
-	
+
 
 }
 
@@ -266,9 +261,10 @@ int main() {
 	char c;
 	int eofmark;
 	int clearindex;
+	int flag;
 	i = 0;
 	buffer = calloc(global_buffer, sizeof*buffer);
-	do{
+	do {
 		if (!myfiles) {
 			printf("main file to compare: ");
 			buffer[0] = calloc(global_buffer, sizeof*buffer);
@@ -306,6 +302,11 @@ int main() {
 	}
 
 	/*test*/
+#ifdef DEBUG
+	printf("main file logic: %s\n"
+		"=========================================================\n"
+		, lines[0]);
+#endif
 	for (i = 1; i < clearindex; i++) {
 		printf(
 			"filename: %s\n"
@@ -330,43 +331,49 @@ int main() {
 				strcpy(diffcheck[l++], options[i].varname[j]);
 				m = 1;
 			}
-		
-		
+
+
 		}
 
-		if (!strcmp(lines[0], lines[i])|| m) {
+		flag = 0;
+		if (!strcmp(lines[0], lines[i])) {
 			if (
-				options[0].comments == options[i].comments&&
-				options[0].structs == options[i].structs&&
-				options[0].variables == options[i].variables
-				)
-				printf("%s and %s are identical!\n", buffer[0], buffer[i]);
-			else {
-				if(options[i].comments<options[0].comments)
+				options[0].comments != options[i].comments||
+				options[0].structs != options[i].structs||
+				options[0].variables != options[i].variables
+				){
+				if (options[i].comments < options[0].comments)
 					printf("%d less comments, ", options[0].comments - options[i].comments);
 				else printf("%d more comments, ", options[i].comments - options[0].comments);
 
-				if (options[i].structs<options[0].structs)
+				if (options[i].structs < options[0].structs)
 					printf("%d less structs, ", options[0].structs - options[i].structs);
 				else printf("%d more structs, ", options[i].structs - options[0].structs);
 
-				if (options[i].variables<options[0].variables)
+				if (options[i].variables < options[0].variables)
 					printf("%d less variables found\n", options[0].variables - options[i].variables);
 				else printf("%d more variables found\n", options[i].variables - options[0].variables);
-
+			}
+			else flag = 1;
 				if (m) {
 					printf("variable differences found!:\n");
 					for (l = 0; diffcheck[l] != -1; l++) {
 						printf("%d: %s\n", l + 1, diffcheck[l]);
 					}
-				
+
 				}
-				printf(
-					"=========================================================\n"
-					"%s and %s are *logically* identical.\n"
-					"PLAGIARISM CONFIRMED!!!1!!!11\n"
-					, buffer[0], buffer[i]);
-			}
+				if (flag)
+					printf(
+						"=========================================================\n"
+						"%s and %s are LITERALLY identical.\n"
+						"PLAGIARISM CONFIRMED!!!1!!!11\n"
+						, buffer[0], buffer[i]);
+				else
+					printf(
+						"=========================================================\n"
+						"%s and %s are *logically* identical.\n"
+						"PLAGIARISM CONFIRMED!!!1!!!11\n"
+						, buffer[0], buffer[i]);
 		}
 		else printf("no plagiarism detected.\n");
 
