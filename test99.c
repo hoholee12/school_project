@@ -1,5 +1,5 @@
 /*written by 이정호 in nov.2015*/
-/*semi-finished product after all the fucking headaches ive been thru and all the hours ive wasted:3*/
+/*semi-finished product after all the f**king headaches ive been thru and all the hours ive wasted:3*/
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -7,6 +7,7 @@
 #include<ctype.h>
 
 #define global_buffer 1024
+//#define DEBUG
 
 typedef struct _test{
 	char **vartype;
@@ -183,11 +184,11 @@ void details(FILE *myfiles, _test *options, char *lines, int *eofmark) {
 
 
 void parser(FILE *myfiles, _test *options, char **lines, int *eofmark, int *j, int *k) {
-	int i, check, l, bc, check2;
+	int i, check, l, bc, check2, check3, check4;
 	char *pstr = NULL;
 	char str[global_buffer] = { 0 }, str2[global_buffer] = { 0 };
 	*lines = malloc(sizeof*lines);
-	bc = 0; check2 = 0;
+	bc = 0; check2 = 0, check3 = 0, check4 = 0;
 	while (fgets(str2, global_buffer, myfiles)) {
 		/*remove trailing newline & tabs*/
 		memset(str, 0, global_buffer*sizeof*str);
@@ -206,8 +207,27 @@ void parser(FILE *myfiles, _test *options, char **lines, int *eofmark, int *j, i
 		*lines = realloc(*lines, (*k + 1)*sizeof*lines);
 		/*remove alphabet and underscore*/
 		for (i = 0, l = bc; i < strlen(str); i++) {
-			if (str[i] != '_' && !isalnum(str[i]) && str[i]!='#' && str[i]!='<' && str[i] != '>' && str[i] != '/' && str[i] != '*'&& !check2) /*remove header, left side, right side*/
+			if (str[i] == '"') { /*found a string*/
+				if (!check3)
+					check3 = 1;
+				else
+					check3 = 0;
+				continue;
+			}
+
+			if (str[i] == '\'') { /*found a character*/
+				if (!check4)
+					check4 = 1;
+				else
+					check4 = 0;
+				continue;
+			}
+
+			/*truncate logic*/
+			if (str[i] != '_' && !isalnum(str[i]) && str[i]!='#' && str[i]!='<' && str[i] != '>' && str[i] != '/' && str[i] != '*'&& !check2 && !check3 && !check4) /*remove header, left side, right side*/
 				(*lines)[l++] = str[i];
+
+
 			if (strstr(str, "/*")) { /*found a comment*/
 				if (!strstr(str, "*/")) {
 					check2 = 1;
@@ -220,11 +240,14 @@ void parser(FILE *myfiles, _test *options, char **lines, int *eofmark, int *j, i
 				check2 = 0;
 				options->comments++;
 			}
-			else if (strstr(str, "//")) { /*found a line comment*/
+			if (strstr(str, "//")) { /*found a line comment*/
 				options->comments++;
 				break;
 			}
 		}
+
+		
+
 		(*lines)[l] = 0;
 		bc = l;
 	}
@@ -238,7 +261,8 @@ int main() {
 	char **buffer = NULL;
 	char **lines = NULL;
 	_test *options = NULL;
-	int i, j, k;
+	char **diffcheck = NULL;
+	int i, j, k, l, m;
 	char c;
 	int eofmark;
 	int clearindex;
@@ -259,7 +283,7 @@ int main() {
 			if (!myfiles[0]) error("not a valid file\n", 1);
 			continue;
 		}
-		printf("filename no.%d: ", i);
+		printf("filename no.%d:(hit return key again to start comparing) ", i);
 		buffer[i] = calloc(global_buffer, sizeof*buffer);
 		fgets(buffer[i], global_buffer, stdin);
 		if (buffer[i][0] == '\n') break;
@@ -282,12 +306,71 @@ int main() {
 	}
 
 	/*test*/
-	for (i = 0; i < clearindex; i++) {
-		printf("%s\n%dcomments, %dstructs, and %dvariables\n", lines[i], options->comments, options->structs, options->variables);
-		for (j = 0; options->vartype[j] != -1; j++) {
-			printf("%s\n", options->vartype[j]);
+	for (i = 1; i < clearindex; i++) {
+		printf(
+			"filename: %s\n"
+#ifdef DEBUG
+			"logic: %s\n"
+#endif
+			"=========================================================\n"
+			, buffer[i]
+#ifdef DEBUG
+			, lines[i]
+#endif
+			);
+
+		l = 0;
+		m = 0; /*check whether variable naming is different*/
+		diffcheck = malloc(sizeof*diffcheck);
+		for (j = 0; options[0].varname[j] != -1 && options[i].varname[j] != -1; j++) {
+			if (strcmp(options[0].varname[j], options[i].varname[j])) {
+				diffcheck = realloc(diffcheck, (l + 2)*sizeof*diffcheck);
+				diffcheck[l] = calloc(63, sizeof*diffcheck);
+				diffcheck[l + 1] = -1;
+				strcpy(diffcheck[l++], options[i].varname[j]);
+				m = 1;
+			}
+		
 		
 		}
+
+		if (!strcmp(lines[0], lines[i])|| m) {
+			if (
+				options[0].comments == options[i].comments&&
+				options[0].structs == options[i].structs&&
+				options[0].variables == options[i].variables
+				)
+				printf("%s and %s are identical!\n", buffer[0], buffer[i]);
+			else {
+				if(options[i].comments<options[0].comments)
+					printf("%d less comments, ", options[0].comments - options[i].comments);
+				else printf("%d more comments, ", options[i].comments - options[0].comments);
+
+				if (options[i].structs<options[0].structs)
+					printf("%d less structs, ", options[0].structs - options[i].structs);
+				else printf("%d more structs, ", options[i].structs - options[0].structs);
+
+				if (options[i].variables<options[0].variables)
+					printf("%d less variables found\n", options[0].variables - options[i].variables);
+				else printf("%d more variables found\n", options[i].variables - options[0].variables);
+
+				if (m) {
+					printf("variable differences found!:\n");
+					for (l = 0; diffcheck[l] != -1; l++) {
+						printf("%d: %s\n", l + 1, diffcheck[l]);
+					}
+				
+				}
+				printf(
+					"=========================================================\n"
+					"%s and %s are *logically* identical.\n"
+					"PLAGIARISM CONFIRMED!!!1!!!11\n"
+					, buffer[0], buffer[i]);
+			}
+		}
+		else printf("no plagiarism detected.\n");
+
+		printf("\n");
 	}
 
 	/*free*/
@@ -302,7 +385,7 @@ int main() {
 		free(options);
 	}
 
-
+	printf("hit return key to continue...");
 	getchar();
 
 	return 0;
