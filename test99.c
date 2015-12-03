@@ -19,6 +19,8 @@ typedef struct _test {
 }_test;
 
 
+#define printf(x, ...) do{printf(x,##__VA_ARGS__);fflush(stdout);}while(0)
+
 char *sanitize(char *line) {
 	int i;
 	for (i = 0; line[i + 1]; i++);
@@ -219,7 +221,17 @@ void parser(FILE *myfiles, _test *options, char **lines, int *eofmark, int *j, i
 			}
 
 			/*truncate logic & final output*/
-			if (str[i] != '.' && str[i] != '=' && str[i] != '_' && !isalnum(str[i]) && str[i] != '#' && str[i] != '<' && str[i] != '>' && str[i] != '/' && str[i] != '*'&& !check2 && !check3 && !check4) /*remove what you want to remove here to gain more detection rate*/
+			if (
+				str[i] != '.' &&
+				 str[i] != '=' &&
+				  str[i] != '_' &&
+				   !isalnum(str[i]) &&
+				    str[i] != '#' &&
+				     str[i] != '<' &&
+				      str[i] != '>' &&
+				       str[i] != '/' &&
+				        str[i] != '*'&&
+				         !check2 && !check3 && !check4) /*remove what you want to remove here to gain more detection rate*/
 				(*lines)[l++] = str[i];
 
 
@@ -381,6 +393,10 @@ int main() {
 	}
 
 	/*free*/
+	for(j=0;diffcheck[j]!=-1;j++){
+		free(diffcheck[j]);
+	}
+	free(diffcheck);
 	if (myfiles) {
 		free(myfiles);
 		for (i = 0; i < clearindex; i++) {
