@@ -12,9 +12,10 @@
 #include<string.h>
 #include<dos.h>
 
-/*#define DEBUG
+/*
+#define DEBUG
 #define SPEEDY_GONZALES
-  */
+*/
 
 typedef struct scoredat{
 	int score;
@@ -377,7 +378,10 @@ return -1 => abnormal(undecided, crashed)
 */
 #define ENGINE_REVERSE 
 #define ENGINE_OFFVSDEF
+/*leave all engine option ON to make it look plausible! - 2016-03-15
+higher level is now smarter than lower level!!
 
+*/
 /*
 list of engine speed/performance rank(AUTO LVL1 P1CPU LVL1):
 1st (about 29~46/100) => ENGINE_REVERSE on, ENGINE_OFFVSDEF off
@@ -939,7 +943,7 @@ void help(int argc, char **argv,
 	){
 	fprintf(stderr, "homework.c - a tic-tac-toe game!"
 		"\nCopyright(C) 2015  hoholee12@naver.com"
-		"\nUsage: %s -i [row]x[col] -r -a [level: 1(most aggressive) ~ row-1(least aggressive)] -v [level: 1(most aggressive) ~ row-1(least aggressive)]"
+		"\nUsage: %s -i [row]x[col] -r -a [level: 1(dumb) ~ row-1(smart)] -v [level: 1(dumb) ~ row-1(smart)]"
 		"\n\t-i sets derterminant size by [row]x[col]"
 		"\n\t-r reverses [row][col] input ingame"
 		"\n\t-a is a computer opponent"
