@@ -39,32 +39,17 @@ int cnt_fibo_iter(int n) {
 
 int main() {
 	unsigned long sum;
-	int rec_count = 0, iter_count = 0;
-	int arr[7] = { 10, 15, 20, 30, 35, 40, 45 };
+	int arr[8] = { 10, 15, 20, 25, 30, 35, 40, 45 };
 	clock_t start, end;
-	double elapsed;
-	/*
-	for (int i = 0; i < 7; i++) {
-	start = clock();
-	sum = fibo_iter(arr[i]);
-	end = clock();
-	printf("fibo_iter(%d) sum = %ld time = %.3gsecs\n", arr[i], sum, (double)(end - start) / CLOCKS_PER_SEC);
-	}
-	for (int i = 0; i < 7; i++) {
-	start = clock();
-	sum = fibo_rec(arr[i]);
-	end = clock();
-	printf("fibo_rec(%d) sum = %ld time = %.3gsecs\n", arr[i], sum, (double)(end - start) / CLOCKS_PER_SEC);
-	}*/
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < 8; i++) {
 		start = clock();
-		sum = cnt_fibo_iter(arr[i], &iter_count);
+		sum = cnt_fibo_iter(arr[i]);
 		end = clock();
 		printf("cnt_fibo_iter(%d) loop = %d time = %.3gsecs\n", arr[i], sum, (double)(end - start) / CLOCKS_PER_SEC);
 	}
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < 8; i++) {
 		start = clock();
-		sum = cnt_fibo_rec(arr[i], &rec_count);
+		sum = cnt_fibo_rec(arr[i]);
 		end = clock();
 		printf("cnt_fibo_rec(%d) loop = %d time = %.3gsecs\n", arr[i], sum, (double)(end - start) / CLOCKS_PER_SEC);
 	}
