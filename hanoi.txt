@@ -1,0 +1,15 @@
+procedure hanoi(n, A, B, C)
+	A <- n
+	if n = 1 move(A, C)
+	else
+		hanoi(n – 1, B, A, C)
+		move(A, C)
+		hanoi(n – 1, A, C, B)
+	endif
+end hanoi
+
+procedure move(A, C)
+	A--
+	C++
+	count++
+end move
